@@ -8,12 +8,12 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "prod": "webpack-dev-server --inline --progress --config build/webpack.prod.conf.js",
     "start": "npm run prod",
-
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs",
     "build": "node build/build.js"
   },
   "dependencies": {
+    "mime": "^2.0.3",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

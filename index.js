@@ -1,51 +1,44 @@
-const panaceaCMSmiddleware = function(app, options) {
+const panaceaCMSmiddleware = function(app) {
 
-  const { fs, path, _ } = DI.container
+  const { fs, path } = DI.container
+  const basePath = '/cms'
+  const distDir = './dist/cms'
 
-  options = _.defaultsDeep(options, {
-    basePath: '/cms'
-  })
+  const indexFile = path.resolve(
+    __dirname,
+    distDir,
+    'index.html'
+  )
 
-  const { basePath } = options
+  app.use([basePath, basePath + '*'], function(req, res, next) {
 
-  app.use([basePath, basePath + '*', '/cms*'], function(req, res, next) {
     const mime = require('mime')
 
-    const distDir = './dist/cms'
+    const requestedFile = req.originalUrl
+      .replace(basePath + '/', '')
+      .replace('/cms/', '')
 
-    let loadFile = ''
+    let loadFile = path.resolve(
+      __dirname,
+      distDir,
+      requestedFile
+    )
 
-    if (/\/static\//.test(req.originalUrl)) {
-      loadFile = path.resolve(
-        __dirname,
-        distDir,
-        req.originalUrl
-          .replace(basePath + '/', '')
-          .replace('/cms/', ''))
-    }
-    else {
-      loadFile = path.resolve(
-        __dirname,
-        distDir,
-        'index.html'
-      )
+    // If loadFile path isn't available the re-route to index file.
+    if (!fs.pathExistsSync(loadFile) || !fs.lstatSync(loadFile).isFile()) {
+      loadFile = indexFile
     }
 
-    if (fs.pathExistsSync(loadFile)) {
-      const fileContents = fs.readFileSync(loadFile, 'UTF-8')
+    const fileContents = fs.readFileSync(loadFile, 'UTF-8')
 
-      if (!res.getHeader('content-type')) {
-        const fileType = mime.getType(loadFile)
-        res.set('Content-Type', fileType + '; charset=utf-8')
-      }
-
-      res.send(fileContents)
-    }
-    else {
-      res.status(404).send(`File not found: ${loadFile}`)
+    if (!res.getHeader('content-type')) {
+      const fileType = mime.getType(loadFile)
+      res.set('Content-Type', fileType + '; charset=utf-8')
     }
 
+    res.send(fileContents)
     next()
+
   })
 
 }

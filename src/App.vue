@@ -1,14 +1,19 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <PanaceaLogo></PanaceaLogo>
     <router-view/>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app'
-}
+  import PanaceaLogo from './components/PanaceaLogo.vue'
+
+  export default {
+    name: 'app',
+    components: {
+      PanaceaLogo
+    }
+  }
 </script>
 
 <style>
