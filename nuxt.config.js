@@ -1,3 +1,8 @@
+import path from 'path'
+
+const { options } = DI.container
+const publicPrefix = options.build.publicPath
+
 module.exports = {
   /*
   ** Headers of the page
@@ -10,7 +15,7 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'Panacea Content Management System' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: path.join(publicPrefix, 'favicon.ico') }
     ]
   },
   /*
@@ -30,7 +35,7 @@ module.exports = {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules)/
+          exclude: /(node_modules|.nuxt)/
         })
       }
     }

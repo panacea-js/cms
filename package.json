@@ -3,11 +3,6 @@
   "version": "1.0.0",
   "description": "Panacea Content Management System",
   "author": "Barry Fisher <barry.fisher@reallifedigital.com>",
-  "config": {
-    "nuxt": {
-      "port": 4000
-    }
-  },
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
