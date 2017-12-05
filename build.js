@@ -22,11 +22,9 @@ export default function (options = {}) {
     services: DI.container.options
   }
 
-  console.log(`Generating Panacea CMS at path ${config.build.publicPath}...`)
+  console.log(`Generating Panacea CMS at path ${config.build.publicPath} ...`)
 
   const nuxt = new Nuxt(config)
   new Builder(nuxt).build()
-
-
 
 }
