@@ -14,7 +14,7 @@
     },
     asyncData ({ env }) {
       return {
-        graphqlEndpoint: env.panacea.services.main.endpoint
+        graphqlEndpoint: env.panacea.main.endpoint
       }
     }
   }
