@@ -1,45 +1,36 @@
-import { Nuxt, Builder, Generator } from 'nuxt'
-import _ from 'lodash'
-import { registerServices } from '@panaceajs/core/src/utils/DIContainer'
-import path from 'path'
-import fs from 'fs-extra'
+import { Nuxt, Builder } from 'nuxt'
+import bootstrap from '@panaceajs/core/src/utils/bootstrap'
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
- *
- * @param {*} params
- *   Panacea application specific options mirroring the same structure
- *   as nuxt.config.js.
  */
 export default function (params = {}) {
-  // Register Panacea Core's services to instantiate global container.
-  registerServices(params)
+  new bootstrap().all()
 
-  const { options } = DI.container
+  const { options, path, fs, _ } = DI.container
 
-  // Load defaults nuxt.config.js and override with options passed in.
+  // Load defaults nuxt.config.js and override with options loaded in container.
   const nuxtConfigFile = require('../nuxt.config.js')
-  const config = _.defaultsDeep(params, _.cloneDeep(options), nuxtConfigFile)
+  const config = _.defaultsDeep(params, _.cloneDeep(options.cms), nuxtConfigFile)
 
   // Ensure root directory is considered the parent directory and not
   // the directory where this script is included from.
   config.rootDir = path.resolve(__dirname, '..')
   config.srcDir = path.resolve(__dirname, '..')
 
-  // Ensure the router knows about the set public path,
+  // Ensure the router knows about the set public path.
   config.router = config.router || {}
-  config.router.base = config.panacea.cms.build.publicPath
-
-  config.build.publicPath = config.panacea.cms.build.publicPath
+  config.router.base = config.build.publicPath
 
   // Append the compiled configuration from Panacea Core's is made
-  // available to both client and server.
+  // available to both client and server. Cloned to prevent circular referencing.
   const configExcludingEnv = _.cloneDeep(config)
   config.env = config.env || {}
-  config.env.panacea = configExcludingEnv
+  config.env.panacea = options
+  config.env.cms = configExcludingEnv
 
+  // @todo Merging of assets should be resolved from registry to allow plugins to make cms additions
   const cmsCustomOverridesDir = path.resolve(process.cwd(), 'cms')
-
   mergeNuxtAssets(config.rootDir, cmsCustomOverridesDir)
 
   const nuxt = new Nuxt(config)
@@ -54,6 +45,8 @@ export default function (params = {}) {
 }
 
 const mergeNuxtAssets = function (rootDir, cmsCustomOverridesDir) {
+
+  const { path, fs } = DI.container
 
   const availableMergeDirectories = [
     'assets',
