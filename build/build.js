@@ -3,20 +3,24 @@ import bootstrap from '@panaceajs/core/src/utils/bootstrap'
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
+ *
+ * @param params
+ *   Nuxt options (not Panacea's DI container options.)
  */
 export default function (params = {}) {
   new bootstrap().all()
 
-  const { options, path, fs, _ } = DI.container
+  const { _, path, options } = DI.container
 
   // Load defaults nuxt.config.js and override with options loaded in container.
   const nuxtConfigFile = require('../nuxt.config.js')
   const config = _.defaultsDeep(params, _.cloneDeep(options.cms), nuxtConfigFile)
 
-  // Ensure root directory is considered the parent directory and not
-  // the directory where this script is included from.
+  // Ensure root directory is considered the parent directory - the base of Panacea CMS.
   config.rootDir = path.resolve(__dirname, '..')
-  config.srcDir = path.resolve(__dirname, '..')
+
+  // Hard code the srcDir option for safety as this directory is deleted when recompiled.
+  config.srcDir = path.resolve(process.cwd(), '.compiled/cms')
 
   // Ensure the router knows about the set public path.
   config.router = config.router || {}
@@ -29,9 +33,7 @@ export default function (params = {}) {
   config.env.panacea = options
   config.env.cms = configExcludingEnv
 
-  // @todo Merging of assets should be resolved from registry to allow plugins to make cms additions
-  const cmsCustomOverridesDir = path.resolve(process.cwd(), 'cms')
-  mergeNuxtAssets(config.rootDir, cmsCustomOverridesDir)
+  compileNuxtAssets(config)
 
   const nuxt = new Nuxt(config)
   const builder = new Builder(nuxt)
@@ -44,54 +46,35 @@ export default function (params = {}) {
 
 }
 
-const mergeNuxtAssets = function (rootDir, cmsCustomOverridesDir) {
+/**
+ * Merge nuxt assets from:
+ *   1. Panacea CMS
+ *   2. Application
+ *   3. Panacea plugins.
+ *
+ * @param {*} config
+ *   Nuxt config options.
+ */
+const compileNuxtAssets = function (config) {
+  const { _, path, fs, glob, rimraf, mkdirp, resolvePluginPath, registry } = DI.container
 
-  const { path, fs } = DI.container
+  // Remove and re-create compilation (srcDir) directory.
+  rimraf.sync(config.srcDir)
+  mkdirp.sync(config.srcDir)
 
-  const availableMergeDirectories = [
-    'assets',
-    'components',
-    'layouts',
-    'middleware',
-    'pages',
-    'plugins',
-    'static',
-    'store'
+  // Compile valid source paths of CMS assets.
+  const cmsSourcePaths = [
+    config.rootDir, // Panacea CMS assets.
+    process.cwd(), // Application assets.
+    ...Object.keys(registry.plugins) // Panacea plugin assets.
   ]
-
-  const customOverrideDirExists = (dir) =>
-    fs.pathExistsSync(
-      path.resolve(cmsCustomOverridesDir, dir)
-    )
-
-  const originalDirDoesNotExist = (dir) =>
-    !fs.pathExistsSync(
-      path.resolve(rootDir, `${dir}.original`)
-    )
-
-  const createOriginalDir = dir => {
+  .map(dir => resolvePluginPath(dir))
+  .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
+  .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => path.basename(subDir) !== 'node_modules'))
+  .map(dir =>
     fs.copySync(
-      path.resolve(rootDir, dir),
-      path.join(rootDir, `${dir}.original`)
+      dir,
+      path.resolve(config.srcDir, path.basename(dir))
     )
-    return dir
-  }
-
-  const mergeCustomDirectoryToRoot = (dir) =>
-    fs.copySync(
-      path.resolve(cmsCustomOverridesDir, dir),
-      path.join(rootDir, dir)
-    )
-
-  // Create .original directories for each of the nuxt custom
-  // override directories if they don't exist.
-  availableMergeDirectories
-    .filter(customOverrideDirExists)
-    .filter(originalDirDoesNotExist)
-    .map(createOriginalDir)
-
-  // Merge nuxt custom overrides to compilation root.
-  availableMergeDirectories
-    .filter(customOverrideDirExists)
-    .map(mergeCustomDirectoryToRoot)
+  )
 }
