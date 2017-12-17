@@ -1,7 +1,7 @@
 <template>
   <section class="container">
     <div>
-      <h1 class="title">All entities</h1>
+      <h1 class="title">Settings</h1>
       <p>Graphql endpoint: {{ graphqlEndpoint }}</p>
     </div>
   </section>
@@ -11,7 +11,7 @@
   export default {
     head () {
       return {
-        title: 'Entities',
+        title: 'Settings',
       }
     },
     data () {

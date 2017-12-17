@@ -2,7 +2,9 @@
   "name": "@panaceajs/cms",
   "version": "1.0.0",
   "description": "Panacea Content Management System",
-  "author": "Barry Fisher <barry.fisher@reallifedigital.com>",
+  "author": "Barry Fisher <hello@reallifedigital.com> (https://www.reallifedigital.com)",
+  "repository": "panacea-js/cms",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -19,7 +21,14 @@
     "babel-register": "^6.26.0",
     "glob": "^7.1.2",
     "mime": "^2.0.3",
-    "nuxt": "^1.0.0-rc11"
+    "node-sass": "^4.7.2",
+    "nuxt": "^1.0.0-rc9",
+    "sass-loader": "^6.0.6",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "vue-style-loader": "^3.0.3",
+    "vue-template-compiler": "^2.5.11",
+    "vuetify": "^0.17.5"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
