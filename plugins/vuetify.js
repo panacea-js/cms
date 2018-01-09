@@ -6,3 +6,4 @@ Vue.use(Vuetify, {
     primary: '#bada55',
   }
 })
+

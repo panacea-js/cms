@@ -49,8 +49,8 @@ export default function (params = {}) {
 /**
  * Merge nuxt assets from:
  *   1. Panacea CMS
- *   2. Application
- *   3. Panacea plugins.
+ *   2. Panacea plugins.
+ *   3. Application
  *
  * @param {*} config
  *   Nuxt config options.
@@ -65,8 +65,8 @@ const compileNuxtAssets = function (config) {
   // Compile valid source paths of CMS assets.
   const cmsSourcePaths = [
     config.rootDir, // Panacea CMS assets.
-    process.cwd(), // Application assets.
-    ...Object.keys(registry.plugins) // Panacea plugin assets.
+    ...Object.keys(registry.plugins), // Panacea plugin assets.
+    process.cwd() // Application assets.
   ]
   .map(dir => resolvePluginPath(dir))
   .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
