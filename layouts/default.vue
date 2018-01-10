@@ -37,20 +37,20 @@
       <v-btn
         icon
         @click.stop="miniVariant = !miniVariant"
+        class="hidden-md-and-down"
       >
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
-    <v-content>
-      <v-navigation-drawer
-      :mini-variant="miniVariant"
-      v-model="drawer"
-      clipped
-      fixed
-      app
-    >
+
+    <v-navigation-drawer
+    :mini-variant="miniVariant"
+    v-model="drawer"
+    clipped
+    fixed
+    app>
       <v-list>
         <v-list-tile
           router
@@ -76,10 +76,11 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-      <v-container>
-        <nuxt />
-      </v-container>
+
+    <v-content>
+      <nuxt />
     </v-content>
+
     <v-footer fixed app>
       <v-toolbar>
         <v-toolbar-items class="hidden-sm-and-down">
