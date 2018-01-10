@@ -112,7 +112,7 @@ export default {
       drawer: true,
       primaryNavigationItems: [
         { icon: 'apps', title: 'Dashboard', to: '/' },
-        { icon: 'pages', title: 'Entities', to: '/entities' },
+        { icon: 'group_work', title: 'Entities', to: '/entities' },
         { icon: 'settings', title: 'Settings', to: '/settings' },
         { icon: 'extension', title: 'Plugins', to: '/plugins' },
       ],
