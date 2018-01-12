@@ -7,8 +7,7 @@
     <v-flex xs12 lg10>
       <v-card dark color="secondary">
         <v-card-text>
-          <h1 class="title">All entities dashboard</h1>
-          <p>Graphql endpoint: {{ graphqlEndpoint }}</p>
+          <h1 class="title">{{ entity }}</h1>
         </v-card-text>
       </v-card>
     </v-flex>
@@ -28,9 +27,20 @@
         title: 'Entities',
       }
     },
+    methods: {
+      redirectToEntity: function (entityName) {
+        this.$router.push({ name: 'entities-name', params: { name: entityName }})
+      }
+    },
+    validate ({ params }) {
+      // @todo Must be a valid entity
+      // return /^Cat+$/.test(params.name)
+      return true
+    },
     data () {
       return {
         graphqlEndpoint: '',
+        entity: this.$route.params.name,
       }
     },
     asyncData ({ env }) {
