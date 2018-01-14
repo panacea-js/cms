@@ -6,7 +6,7 @@
           <v-card-text class="pa-0">
             <v-list two-line class="pa-0">
             <template v-for="(entity, index) in entities">
-              <v-list-tile v-bind:key="`entity-${index}`" @click="redirectToEntity(entity.name)">
+              <v-list-tile :class="isActive(entity.name)" v-bind:key="`entity-${index}`" @click="redirectToEntity(entity.name)">
                 <v-list-tile-content>
                   <v-list-tile-title v-html="entity.name"></v-list-tile-title>
                   <v-list-tile-sub-title v-html="entity.description" :title="entity.description"></v-list-tile-sub-title>
@@ -27,6 +27,9 @@
     methods: {
       redirectToEntity: function (entityName) {
         this.$router.push({ name: 'entities-name', params: { name: entityName }})
+      },
+      isActive: function (entityName) {
+        return entityName === this.$route.params.name ? 'active' : ''
       }
     },
     data () {
@@ -45,3 +48,14 @@
     }
   }
 </script>
+
+<style lang="scss" scoped>
+li {
+  border-left: 3px solid transparent;
+  opacity: 0.5;
+}
+li.active {
+  border-left-color: #bada55;
+  opacity: 1;
+}
+</style>

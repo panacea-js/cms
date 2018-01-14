@@ -57,7 +57,6 @@
           :to="item.to"
           :key="i"
           v-for="(item, i) in primaryNavigationItems"
-          exact
         >
           <v-list-tile-action v-if="miniVariant">
             <v-tooltip right>
@@ -111,7 +110,7 @@ export default {
     return {
       drawer: true,
       primaryNavigationItems: [
-        { icon: 'apps', title: 'Dashboard', to: '/' },
+        { icon: 'apps', title: 'Dashboard', to: '/dashboard' },
         { icon: 'group_work', title: 'Entities', to: '/entities' },
         { icon: 'settings', title: 'Settings', to: '/settings' },
         { icon: 'extension', title: 'Plugins', to: '/plugins' },

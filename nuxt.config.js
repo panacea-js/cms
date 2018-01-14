@@ -47,5 +47,8 @@ module.exports = {
         })
       }
     }
-  }
+  },
+  serverMiddleware: [
+    '~/serverMiddleware/redirects'
+  ]
 }
