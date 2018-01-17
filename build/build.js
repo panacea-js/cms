@@ -1,5 +1,9 @@
 import { Nuxt, Builder } from 'nuxt'
+
 import bootstrap from '@panaceajs/core/src/utils/bootstrap'
+new bootstrap().all()
+
+const { _, path, options, fs, glob, rimraf, mkdirp, resolvePluginPath, registry } = DI.container
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
@@ -8,9 +12,6 @@ import bootstrap from '@panaceajs/core/src/utils/bootstrap'
  *   Nuxt options (not Panacea's DI container options.)
  */
 export default function (params = {}) {
-  new bootstrap().all()
-
-  const { _, path, options } = DI.container
 
   // Load defaults nuxt.config.js and override with options loaded in container.
   const nuxtConfigFile = require('../nuxt.config.js')
@@ -34,6 +35,7 @@ export default function (params = {}) {
   config.env.cms = configExcludingEnv
 
   compileNuxtAssets(config)
+  compileVarsAssets(config)
 
   const nuxt = new Nuxt(config)
   const builder = new Builder(nuxt)
@@ -56,8 +58,6 @@ export default function (params = {}) {
  *   Nuxt config options.
  */
 const compileNuxtAssets = function (config) {
-  const { _, path, fs, glob, rimraf, mkdirp, resolvePluginPath, registry } = DI.container
-
   // Remove and re-create compilation (srcDir) directory.
   rimraf.sync(config.srcDir)
   mkdirp.sync(config.srcDir)
@@ -77,4 +77,23 @@ const compileNuxtAssets = function (config) {
       path.resolve(config.srcDir, path.basename(dir))
     )
   )
+
+}
+
+/**
+ * Create static files from configuration which can be referenced by
+ * nuxt plugins and nuxt-sass-resources-loader
+ *
+ * @param {*} config
+ *   Nuxt config options.
+ */
+const compileVarsAssets = function (config) {
+  // Export the vars to json file so they can be referenced publicly and by plugins.
+  fs.writeJsonSync(path.resolve(config.srcDir, 'assets/vars.json'), config.vars)
+
+  // Export the vars to scss file so they can be included with nuxt-sass-resources-loader
+  // and be used in any Vue component style tag.
+  // See nuxt.config.js for nuxt-sass-resources-loader configuration.
+  const colorsScss = _(config.vars.colors).map((color, name) => `\$color-${name}: ${color};`).join('\n')
+  fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.scss'), colorsScss)
 }

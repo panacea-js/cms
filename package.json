@@ -23,6 +23,7 @@
     "mime": "^2.0.3",
     "node-sass": "^4.7.2",
     "nuxt": "^1.0.0",
+    "nuxt-sass-resources-loader": "^1.1.0",
     "sass-loader": "^6.0.6",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",

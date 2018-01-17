@@ -1,6 +1,6 @@
 import path from 'path'
 
-const { options } = DI.container
+const { options, fs } = DI.container
 const publicPrefix = options.cms.build.publicPath
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#bada55' },
+  loading: { color: options.cms.vars.colors.primary },
   plugins: ['@/plugins/vuetify.js'],
   css: [
     '@/assets/style/app.styl'
@@ -46,6 +46,16 @@ module.exports = {
           exclude: /(node_modules|.nuxt)/
         })
       }
+    }
+  },
+  modules: [
+    ['nuxt-sass-resources-loader', [
+      path.resolve(process.cwd(), '.compiled/cms/assets/colors.scss')
+    ]],
+  ],
+  vars: {
+    colors: {
+      primary: '#bada55'
     }
   },
   serverMiddleware: [

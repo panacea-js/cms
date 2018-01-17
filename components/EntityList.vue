@@ -55,7 +55,7 @@ li {
   opacity: 0.5;
 }
 li.active {
-  border-left-color: #bada55;
+  border-left-color: $color-primary;
   opacity: 1;
 }
 </style>
