@@ -23,30 +23,34 @@
 </template>
 
 <script>
-  export default {
-    methods: {
-      redirectToEntity: function (entityName) {
-        this.$router.push({ name: 'entities-name', params: { name: entityName }})
-      },
-      isActive: function (entityName) {
-        return entityName === this.$route.params.name ? 'active' : ''
-      }
+export default {
+  methods: {
+    redirectToEntity: function(entityName) {
+      this.$router.push({
+        name: "entities-name",
+        params: { name: entityName }
+      });
     },
-    data () {
-      return {
-        entities: [
-          {
-            name: 'Cat',
-            description: 'A furry thing',
-          },
-          {
-            name: 'Dog',
-            description: 'A woofer. Here\'s a very long description to test what it will look like if somebody decides to put something really really long as the description',
-          },
-        ]
-      }
+    isActive: function(entityName) {
+      return entityName === this.$route.params.name ? "active" : "";
     }
+  },
+  data() {
+    return {
+      entities: [
+        {
+          name: "Cat",
+          description: "A furry thing"
+        },
+        {
+          name: "Dog",
+          description:
+            "A woofer. Here's a very long description to test what it will look like if somebody decides to put something really really long as the description"
+        }
+      ]
+    };
   }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -55,7 +59,7 @@ li {
   opacity: 0.5;
 }
 li.active {
-  border-left-color: $color-primary;
+  border-left-color: $color-accent;
   opacity: 1;
 }
 </style>

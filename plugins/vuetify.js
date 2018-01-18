@@ -4,6 +4,6 @@ import vars from '../assets/vars.json'
 
 Vue.use(Vuetify, {
   theme: {
-    primary: vars.colors.primary,
+    ...vars.colors,
   }
 })

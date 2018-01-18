@@ -68,15 +68,15 @@ const compileNuxtAssets = function (config) {
     ...Object.keys(registry.plugins), // Panacea plugin assets.
     process.cwd() // Application assets.
   ]
-  .map(dir => resolvePluginPath(dir))
-  .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
-  .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => path.basename(subDir) !== 'node_modules'))
-  .map(dir =>
-    fs.copySync(
-      dir,
-      path.resolve(config.srcDir, path.basename(dir))
+    .map(dir => resolvePluginPath(dir))
+    .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
+    .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => path.basename(subDir) !== 'node_modules'))
+    .map(dir =>
+      fs.copySync(
+        dir,
+        path.resolve(config.srcDir, path.basename(dir))
+      )
     )
-  )
 
 }
 

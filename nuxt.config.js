@@ -37,7 +37,7 @@ module.exports = {
     /*
     ** Run ESLint on save
     */
-    extend (config, ctx) {
+    extend(config, ctx) {
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
@@ -55,7 +55,11 @@ module.exports = {
   ],
   vars: {
     colors: {
-      primary: '#bada55'
+      primary: '#bada55',
+      secondary: '#661b87',
+      accent: '#ca372a',
+      error: '#ca372a',
+      success: '#bada55',
     }
   },
   serverMiddleware: [
