@@ -62,7 +62,7 @@ module.exports = {
       success: '#bada55',
     }
   },
-  serverMiddleware: [
-    '~/serverMiddleware/redirects'
-  ]
+  router: {
+    middleware: ['redirects']
+  }
 }
