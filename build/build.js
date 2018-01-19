@@ -71,7 +71,11 @@ const compileNuxtAssets = function (config) {
   ]
     .map(dir => resolvePluginPath(dir))
     .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
-    .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => path.basename(subDir) !== 'node_modules'))
+    .flatMap(dir => {
+      return glob.sync(dir + "/*/").filter(subDir => {
+        return !['node_modules', 'locales'].find(exclude => exclude === path.basename(subDir))
+      })
+    })
     .map(dir =>
       fs.copySync(
         dir,
@@ -106,7 +110,9 @@ const compileVarsAssets = function (config) {
  *   Nuxt config options.
  */
 const compileLocales = function (config) {
-  const allLocaleMessages = glob.sync(path.join(config.srcDir, 'locales/*.json'))
+  mkdirp.sync(path.join(config.srcDir, 'locales'))
+
+  const allLocaleMessages = glob.sync(path.resolve(__dirname, '../locales/*.json'))
     .reduce((acc, file) => {
       const locale = path.basename(file).replace('.json', '')
       acc[locale] = fs.readJsonSync(file)
