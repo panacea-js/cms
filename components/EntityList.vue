@@ -4,17 +4,17 @@
       <v-list two-line class="pa-0">
         <v-card dark color="secondary">
           <v-card-text class="pa-0">
-            <v-list two-line class="pa-0">
             <template v-for="(entity, index) in entities">
-              <v-list-tile :class="isActive(entity.name)" v-bind:key="`entity-${index}`" @click="redirectToEntity(entity.name)">
-                <v-list-tile-content>
-                  <v-list-tile-title v-html="entity.name"></v-list-tile-title>
-                  <v-list-tile-sub-title v-html="entity.description" :title="entity.description"></v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
+              <v-tooltip v-bind:key="`tooltip-${index}`" right>
+                <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="isActive(entity.name)" @click="redirectToEntity(entity.name)">
+                  <v-list-tile-content>
+                    <v-list-tile-title v-html="entity.name"></v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+                <span class="tooltip-text">{{ entity.description }}</span>
+              </v-tooltip>
               <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
             </template>
-          </v-list>
           </v-card-text>
         </v-card>
       </v-list>
@@ -61,5 +61,10 @@ li {
 li.active {
   border-left-color: $color-accent;
   opacity: 1;
+}
+.tooltip-text {
+  display: inline-block;
+  max-width: 200px;
+  font-size: 1.2em;
 }
 </style>

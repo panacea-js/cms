@@ -1,20 +1,8 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer
-      :mini-variant="miniVariant"
-      v-model="drawer"
-      clipped
-      fixed
-      app
-    >
+    <v-navigation-drawer :mini-variant="miniVariant" v-model="drawer" clipped fixed app>
       <v-list>
-        <v-list-tile
-          router
-          :to="item.to"
-          :key="i"
-          v-for="(item, i) in primaryNavigationItems"
-          exact
-        >
+        <v-list-tile router :to="item.to" :key="i" v-for="(item, i) in primaryNavigationItems" exact>
           <v-list-tile-action v-if="miniVariant">
             <v-tooltip right>
               <v-btn icon slot="activator">
@@ -34,30 +22,16 @@
     </v-navigation-drawer>
     <v-toolbar fixed app clipped-left>
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
-        class="hidden-md-and-down"
-      >
+      <v-btn icon @click.stop="miniVariant = !miniVariant" class="hidden-md-and-down">
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
 
-    <v-navigation-drawer
-    :mini-variant="miniVariant"
-    v-model="drawer"
-    clipped
-    fixed
-    app>
+    <v-navigation-drawer :mini-variant="miniVariant" v-model="drawer" clipped fixed app>
       <v-list>
-        <v-list-tile
-          router
-          :to="item.to"
-          :key="i"
-          v-for="(item, i) in primaryNavigationItems"
-        >
+        <v-list-tile router :to="item.to" :key="i" v-for="(item, i) in primaryNavigationItems">
           <v-list-tile-action v-if="miniVariant">
             <v-tooltip right>
               <v-btn icon slot="activator">
@@ -83,8 +57,12 @@
     <v-footer fixed app>
       <v-toolbar>
         <v-toolbar-items class="hidden-sm-and-down">
-          <v-btn v-if="tools.voyager.enable" target="_blank" :href="`/${tools.voyager.endpoint}`" flat><GraphqlVoyagerLogo/></v-btn>
-          <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`/${tools.graphiql.endpoint}`" flat><GraphiqlLogo/></v-btn>
+          <v-btn v-if="tools.voyager.enable" target="_blank" :href="`/${tools.voyager.endpoint}`" flat>
+            <GraphqlVoyagerLogo/>
+          </v-btn>
+          <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`/${tools.graphiql.endpoint}`" flat>
+            <GraphiqlLogo/>
+          </v-btn>
         </v-toolbar-items>
         <v-spacer></v-spacer>
         <v-toolbar-items class="hidden-sm-and-down">
@@ -98,22 +76,22 @@
 </template>
 
 <script>
-import GraphqlVoyagerLogo from '../components/GraphqlVoyagerLogo'
-import GraphiqlLogo from '../components/GraphiqlLogo'
+import GraphqlVoyagerLogo from "../components/GraphqlVoyagerLogo";
+import GraphiqlLogo from "../components/GraphiqlLogo";
 
 export default {
   components: {
     GraphqlVoyagerLogo,
     GraphiqlLogo
   },
-  data () {
+  data() {
     return {
       drawer: true,
       primaryNavigationItems: [
-        { icon: 'apps', title: 'Dashboard', to: '/dashboard' },
-        { icon: 'group_work', title: 'Entities', to: '/entities' },
-        { icon: 'settings', title: 'Settings', to: '/settings' },
-        { icon: 'extension', title: 'Plugins', to: '/plugins' },
+        { icon: "apps", title: "Dashboard", to: "/dashboard" },
+        { icon: "group_work", title: "Entities", to: "/entities" },
+        { icon: "settings", title: "Settings", to: "/settings" },
+        { icon: "extension", title: "Plugins", to: "/plugins" }
       ],
       miniVariant: false,
       title: process.env.cms.head.title,
@@ -122,7 +100,7 @@ export default {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager
       }
-    }
+    };
   }
-}
+};
 </script>
