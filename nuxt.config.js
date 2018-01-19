@@ -23,7 +23,10 @@ module.exports = {
   ** Customize the progress bar color
   */
   loading: { color: options.cms.vars.colors.primary },
-  plugins: ['@/plugins/vuetify.js'],
+  plugins: [
+    '@/plugins/i18n.js',
+    '@/plugins/vuetify.js',
+  ],
   css: [
     '@/assets/style/app.styl'
   ],
@@ -32,7 +35,8 @@ module.exports = {
   */
   build: {
     vendor: [
-      '@/plugins/vuetify.js'
+      'vue-i18n',
+      '@/plugins/vuetify.js',
     ],
     /*
     ** Run ESLint on save
@@ -63,6 +67,9 @@ module.exports = {
     }
   },
   router: {
-    middleware: ['redirects']
+    middleware: [
+      'i18n',
+      'redirects',
+    ]
   }
 }

@@ -4,6 +4,8 @@
       <h1 class="title">
         Dashboard
       </h1>
+      <p>{{ $t('home.title') }}</p>
+      <p>{{ $t('home.introduction') }}</p>
       <p>
         Some boxes with dashboard stats etc.
       </p>
@@ -12,12 +14,11 @@
 </template>
 
 <script>
-
 export default {
-  head () {
+  head() {
     return {
-      title: 'Dashboard',
-    }
+      title: "Dashboard"
+    };
   }
-}
+};
 </script>

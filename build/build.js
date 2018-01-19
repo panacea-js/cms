@@ -36,6 +36,7 @@ export default function (params = {}) {
 
   compileNuxtAssets(config)
   compileVarsAssets(config)
+  compileLocales(config)
 
   const nuxt = new Nuxt(config)
   const builder = new Builder(nuxt)
@@ -96,4 +97,21 @@ const compileVarsAssets = function (config) {
   // See nuxt.config.js for nuxt-sass-resources-loader configuration.
   const colorsScss = _(config.vars.colors).map((color, name) => `\$color-${name}: ${color};`).join('\n')
   fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.scss'), colorsScss)
+}
+
+/**
+ * Compile all locale files into a single file.
+ *
+ * @param {*} config
+ *   Nuxt config options.
+ */
+const compileLocales = function (config) {
+  const allLocaleMessages = glob.sync(path.join(config.srcDir, 'locales/*.json'))
+    .reduce((acc, file) => {
+      const locale = path.basename(file).replace('.json', '')
+      acc[locale] = fs.readJsonSync(file)
+      return acc
+    }, {})
+
+  fs.writeJsonSync(path.join(config.srcDir, 'locales/all.json'), allLocaleMessages)
 }

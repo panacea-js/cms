@@ -85,13 +85,14 @@ export default {
     GraphiqlLogo
   },
   data() {
+    const locale = this.$i18n.locale;
     return {
       drawer: true,
       primaryNavigationItems: [
-        { icon: "apps", title: "Dashboard", to: "/dashboard" },
-        { icon: "group_work", title: "Entities", to: "/entities" },
-        { icon: "settings", title: "Settings", to: "/settings" },
-        { icon: "extension", title: "Plugins", to: "/plugins" }
+        { icon: "apps", title: "Dashboard", to: `/${locale}/dashboard` },
+        { icon: "group_work", title: "Entities", to: `/${locale}/entities` },
+        { icon: "settings", title: "Settings", to: `/${locale}/settings` },
+        { icon: "extension", title: "Plugins", to: `/${locale}/plugins` }
       ],
       miniVariant: false,
       title: process.env.cms.head.title,
