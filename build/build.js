@@ -50,6 +50,19 @@ export default function (params = {}) {
 }
 
 /**
+ * Get a list of sources base paths from core, plugins and application.
+ *
+ * @param {*} config
+ */
+const sourcePaths = (config) => [
+  config.rootDir, // Panacea CMS assets.
+  ...Object.keys(registry.plugins), // Panacea plugin assets.
+  process.cwd() // Application assets.
+]
+  .map(dir => resolvePluginPath(dir))
+  .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
+
+/**
  * Merge nuxt assets from:
  *   1. Panacea CMS
  *   2. Panacea plugins.
@@ -63,19 +76,11 @@ const compileNuxtAssets = function (config) {
   rimraf.sync(config.srcDir)
   mkdirp.sync(config.srcDir)
 
+  const excludeDirectories = (dirs, subDir) => !dirs.find(exclude => exclude === path.basename(subDir))
+
   // Compile valid source paths of CMS assets.
-  const cmsSourcePaths = [
-    config.rootDir, // Panacea CMS assets.
-    ...Object.keys(registry.plugins), // Panacea plugin assets.
-    process.cwd() // Application assets.
-  ]
-    .map(dir => resolvePluginPath(dir))
-    .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
-    .flatMap(dir => {
-      return glob.sync(dir + "/*/").filter(subDir => {
-        return !['node_modules', 'locales'].find(exclude => exclude === path.basename(subDir))
-      })
-    })
+  sourcePaths(config)
+    .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => excludeDirectories(['node_modules', 'locales', 'build'], subDir)))
     .map(dir =>
       fs.copySync(
         dir,
@@ -112,10 +117,12 @@ const compileVarsAssets = function (config) {
 const compileLocales = function (config) {
   mkdirp.sync(path.join(config.srcDir, 'locales'))
 
-  const allLocaleMessages = glob.sync(path.resolve(__dirname, '../locales/*.json'))
+  const allLocaleMessages = sourcePaths(config)
+    .flatMap(dir => glob.sync(path.resolve(dir, 'locales/*.json')))
+    .filter(dir => dir.indexOf('.json') !== -1)
     .reduce((acc, file) => {
       const locale = path.basename(file).replace('.json', '')
-      acc[locale] = fs.readJsonSync(file)
+      acc[locale] = _.merge(acc[locale] || {}, fs.readJsonSync(file))
       return acc
     }, {})
 
