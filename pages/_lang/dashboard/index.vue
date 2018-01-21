@@ -1,11 +1,8 @@
 <template>
   <section class="container">
     <div>
-      <h1 class="title">
-        Dashboard
-      </h1>
-      <p>{{ $t('home.title') }}</p>
-      <p>{{ $t('home.introduction') }}</p>
+      <h1 class="title">{{ $t('dashboard.h1') }}</h1>
+      <p>{{ $t('dashboard.description') }}</p>
       <p>
         Some boxes with dashboard stats etc.
       </p>
@@ -17,7 +14,14 @@
 export default {
   head() {
     return {
-      title: "Dashboard"
+      title: this.$t("dashboard.title"),
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: this.$t("dashboard.description")
+        }
+      ]
     }
   }
 }

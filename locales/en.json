@@ -1,6 +1,13 @@
 {
-  "home": {
-    "title": "Welcome",
-    "introduction": "This is an introduction in English."
+  "sections": {
+    "dashboard": "Dashboard",
+    "entities": "Entities",
+    "settings": "Settings",
+    "plugins": "Plugins"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "h1": "Dashboard",
+    "description": "This is an introduction in English."
   }
 }

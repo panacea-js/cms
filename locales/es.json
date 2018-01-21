@@ -1,6 +1,13 @@
 {
-  "home": {
-    "title": "Bienvenido",
-    "introduction": "Esta es una introducción en español."
+  "sections": {
+    "dashboard": "Tablero de control",
+    "entities": "Entidades",
+    "settings": "Ajustes",
+    "plugins": "Plugins"
+  },
+  "dashboard": {
+    "title": "Tablero de control",
+    "h1": "Tablero de control",
+    "description": "Esta es una introducción en español."
   }
 }

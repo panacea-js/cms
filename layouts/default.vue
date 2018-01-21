@@ -89,10 +89,10 @@ export default {
     return {
       drawer: true,
       primaryNavigationItems: [
-        { icon: "apps", title: "Dashboard", to: `/${locale}/dashboard` },
-        { icon: "group_work", title: "Entities", to: `/${locale}/entities` },
-        { icon: "settings", title: "Settings", to: `/${locale}/settings` },
-        { icon: "extension", title: "Plugins", to: `/${locale}/plugins` }
+        { icon: "apps", title: this.$t("sections.dashboard"), to: `/${locale}/dashboard` },
+        { icon: "group_work", title: this.$t("sections.entities"), to: `/${locale}/entities` },
+        { icon: "settings", title: this.$t("sections.settings"), to: `/${locale}/settings` },
+        { icon: "extension", title: this.$t("sections.plugins"), to: `/${locale}/plugins` }
       ],
       miniVariant: false,
       title: process.env.cms.head.title,
