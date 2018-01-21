@@ -1,6 +1,6 @@
 import path from 'path'
 
-const { options, fs } = DI.container
+const { options } = DI.container
 const publicPrefix = options.cms.build.publicPath
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
   loading: { color: options.cms.vars.colors.primary },
   plugins: [
     '@/plugins/i18n.js',
-    '@/plugins/vuetify.js',
+    '@/plugins/vuetify.js'
   ],
   css: [
     '@/assets/style/app.styl'
@@ -36,12 +36,12 @@ module.exports = {
   build: {
     vendor: [
       'vue-i18n',
-      '@/plugins/vuetify.js',
+      '@/plugins/vuetify.js'
     ],
     /*
     ** Run ESLint on save
     */
-    extend(config, ctx) {
+    extend (config, ctx) {
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
@@ -55,7 +55,7 @@ module.exports = {
   modules: [
     ['nuxt-sass-resources-loader', [
       path.resolve(process.cwd(), '.compiled/cms/assets/colors.scss')
-    ]],
+    ]]
   ],
   vars: {
     colors: {
@@ -63,13 +63,13 @@ module.exports = {
       secondary: '#661b87',
       accent: '#ca372a',
       error: '#ca372a',
-      success: '#bada55',
+      success: '#bada55'
     }
   },
   router: {
     middleware: [
       'i18n',
-      'redirects',
+      'redirects'
     ]
   }
 }

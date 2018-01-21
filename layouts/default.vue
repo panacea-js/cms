@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import GraphqlVoyagerLogo from "../components/GraphqlVoyagerLogo";
-import GraphiqlLogo from "../components/GraphiqlLogo";
+import GraphqlVoyagerLogo from "../components/GraphqlVoyagerLogo"
+import GraphiqlLogo from "../components/GraphiqlLogo"
 
 export default {
   components: {
@@ -85,7 +85,7 @@ export default {
     GraphiqlLogo
   },
   data() {
-    const locale = this.$i18n.locale;
+    const locale = this.$i18n.locale
     return {
       drawer: true,
       primaryNavigationItems: [
@@ -101,7 +101,7 @@ export default {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager
       }
-    };
+    }
   }
-};
+}
 </script>

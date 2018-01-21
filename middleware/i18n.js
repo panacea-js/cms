@@ -7,7 +7,10 @@ export default function ({ isHMR, app, store, route, params, error, redirect }) 
   store.commit('SET_AVAILABLE_LOCALES', availableLocales)
 
   if (availableLocales.indexOf(locale) === -1) {
-    return error({ message: 'This page locale could not be found.', statusCode: 404 })
+    return error({
+      message: 'This page locale could not be found.',
+      statusCode: 404
+    })
   }
   // Set locale
   store.commit('SET_LOCALE', locale)

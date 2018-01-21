@@ -8,10 +8,10 @@ export default ({ app, store }) => {
   app.i18n = new VueI18n({
     locale: store.state.locale,
     fallbackLocale: 'en',
-    messages: require('~/locales/all.json'),
+    messages: require('~/locales/all.json')
   })
 
-  app.i18n.path = (link) => {
+  app.i18n.path = link => {
     if (app.i18n.locale === app.i18n.fallbackLocale) {
       return `/${link}`
     }

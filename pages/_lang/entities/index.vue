@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import EntityList from "../../../components/EntityList.vue";
+import EntityList from "../../../components/EntityList.vue"
 
 export default {
   components: {
@@ -26,17 +26,17 @@ export default {
   head() {
     return {
       title: "Entities"
-    };
+    }
   },
   data() {
     return {
       graphqlEndpoint: ""
-    };
+    }
   },
   asyncData({ env }) {
     return {
       graphqlEndpoint: env.panacea.main.endpoint
-    };
+    }
   }
-};
+}
 </script>

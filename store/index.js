@@ -4,12 +4,12 @@ export const state = () => ({
 })
 
 export const mutations = {
-  SET_LOCALE(state, locale) {
+  SET_LOCALE (state, locale) {
     if (state.availableLocales.indexOf(locale) !== -1) {
       state.locale = locale
     }
   },
-  SET_AVAILABLE_LOCALES(state, locales) {
+  SET_AVAILABLE_LOCALES (state, locales) {
     state.availableLocales = locales
   }
 }

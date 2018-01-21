@@ -1,7 +1,7 @@
 import { Nuxt, Builder } from 'nuxt'
 
-import bootstrap from '@panaceajs/core/src/utils/bootstrap'
-new bootstrap().all()
+import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
+new Bootstrap().all()
 
 const { _, path, options, fs, glob, rimraf, mkdirp, resolvePluginPath, registry } = DI.container
 
@@ -12,7 +12,6 @@ const { _, path, options, fs, glob, rimraf, mkdirp, resolvePluginPath, registry 
  *   Nuxt options (not Panacea's DI container options.)
  */
 export default function (params = {}) {
-
   // Load defaults nuxt.config.js and override with options loaded in container.
   const nuxtConfigFile = require('../nuxt.config.js')
   const config = _.defaultsDeep(params, _.cloneDeep(options.cms), nuxtConfigFile)
@@ -46,7 +45,6 @@ export default function (params = {}) {
     builder,
     config
   }
-
 }
 
 /**
@@ -80,14 +78,13 @@ const compileNuxtAssets = function (config) {
 
   // Compile valid source paths of CMS assets.
   sourcePaths(config)
-    .flatMap(dir => glob.sync(dir + "/*/").filter(subDir => excludeDirectories(['node_modules', 'locales', 'build'], subDir)))
+    .flatMap(dir => glob.sync(dir + '/*/').filter(subDir => excludeDirectories(['node_modules', 'locales', 'build'], subDir)))
     .map(dir =>
       fs.copySync(
         dir,
         path.resolve(config.srcDir, path.basename(dir))
       )
     )
-
 }
 
 /**
@@ -104,7 +101,7 @@ const compileVarsAssets = function (config) {
   // Export the vars to scss file so they can be included with nuxt-sass-resources-loader
   // and be used in any Vue component style tag.
   // See nuxt.config.js for nuxt-sass-resources-loader configuration.
-  const colorsScss = _(config.vars.colors).map((color, name) => `\$color-${name}: ${color};`).join('\n')
+  const colorsScss = _(config.vars.colors).map((color, name) => `$color-${name}: ${color};`).join('\n')
   fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.scss'), colorsScss)
 }
 

@@ -29,10 +29,10 @@ export default {
       this.$router.push({
         name: "lang-entities-name",
         params: { name: entityName }
-      });
+      })
     },
     isActive: function(entityName) {
-      return entityName === this.$route.params.name ? "active" : "";
+      return entityName === this.$route.params.name ? "active" : ""
     }
   },
   data() {
@@ -48,9 +48,9 @@ export default {
             "A woofer. Here's a very long description to test what it will look like if somebody decides to put something really really long as the description"
         }
       ]
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

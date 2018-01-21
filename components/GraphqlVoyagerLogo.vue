@@ -19,7 +19,7 @@ svg {
   transform: rotate(16deg);
   margin-left: -10px;
   path {
-    fill: white
+    fill: white;
   }
 }
 .logo {
@@ -36,7 +36,7 @@ svg {
 }
 .voyager-title {
   color: white;
-  font-family: helvetica neue,helvetica,arial,sans-serif;
+  font-family: helvetica neue, helvetica, arial, sans-serif;
   letter-spacing: 4px;
   font-weight: 400;
   text-transform: uppercase;
