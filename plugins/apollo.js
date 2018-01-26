@@ -13,11 +13,11 @@ export default ({ app, store }) => {
   const apolloClient = new ApolloClient({
     link: httpLink,
     cache: new InMemoryCache(),
-    connectToDevTools: true,
+    connectToDevTools: true
   })
 
   const apolloProvider = new VueApollo({
-    defaultClient: apolloClient,
+    defaultClient: apolloClient
   })
 
   app.apolloProvider = apolloProvider
