@@ -1,0 +1,6 @@
+query ENTITY ($name: String!) {
+  ENTITY(name: $name) {
+    name,
+    data
+  }
+}

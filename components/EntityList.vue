@@ -11,7 +11,7 @@
                     <v-list-tile-title v-html="entity.name"></v-list-tile-title>
                   </v-list-tile-content>
                 </v-list-tile>
-                <span class="tooltip-text">{{ entity.description }}</span>
+                <span class="tooltip-text">{{ entity.data | json('description') }}</span>
               </v-tooltip>
               <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
             </template>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import ENTITIES_ALL from '../gql/queries/EntitiesAll.gql'
 export default {
   methods: {
     redirectToEntity: function(entityName) {
@@ -35,19 +36,16 @@ export default {
       return entityName === this.$route.params.name ? "active" : ""
     }
   },
+  apollo: {
+    entities: {
+      query: ENTITIES_ALL,
+      fetchPolicy: 'cache-and-network',
+      update: data => data.ENTITIES
+    },
+  },
   data() {
     return {
-      entities: [
-        {
-          name: "Cat",
-          description: "A furry thing"
-        },
-        {
-          name: "Dog",
-          description:
-            "A woofer. Here's a very long description to test what it will look like if somebody decides to put something really really long as the description"
-        }
-      ]
+      entities: []
     }
   }
 }

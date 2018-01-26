@@ -25,7 +25,9 @@ module.exports = {
   loading: { color: options.cms.vars.colors.primary },
   plugins: [
     '@/plugins/i18n.js',
-    '@/plugins/vuetify.js'
+    '@/plugins/vuetify.js',
+    '@/plugins/filters.js',
+    '@/plugins/apollo.js'
   ],
   css: [
     '@/assets/style/app.styl'
@@ -41,7 +43,7 @@ module.exports = {
     /*
     ** Run ESLint on save
     */
-    extend (config, ctx) {
+    extend(config, ctx) {
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
@@ -50,6 +52,10 @@ module.exports = {
           exclude: /(node_modules|.nuxt)/
         })
       }
+      config.module.rules.push({
+        test: /\.(gql|graphql)$/,
+        loader: 'graphql-tag/loader'
+      })
     }
   },
   modules: [
