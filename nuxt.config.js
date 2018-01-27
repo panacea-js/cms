@@ -51,6 +51,11 @@ module.exports = {
           loader: 'eslint-loader',
           exclude: /(node_modules|.nuxt)/
         })
+        if (typeof config.entry.app !== 'undefined') {
+          // Replace timeout of HMR to 1s instead of
+          // 30s as hardcoded into nuxt's webpack client.config.js
+          config.entry.app = config.entry.app.map(x => x.replace('timeout=30000', 'timeout=1000'))
+        }
       }
       config.module.rules.push({
         test: /\.(gql|graphql)$/,
