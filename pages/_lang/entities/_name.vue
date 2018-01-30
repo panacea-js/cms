@@ -37,7 +37,7 @@
                       <span>{{ props.item.description }}</span>
                     </v-tooltip>
                   </td>
-                  <td>
+                  <td class="hidden-sm-and-down">
                     <code v-html="getFieldPropertyPath(props.item)"></code>
                   </td>
                   <td class="field-type">
@@ -190,7 +190,8 @@ export default {
         },
         {
           text: 'Field path',
-          value: 'id'
+          value: 'id',
+          class: 'hidden-sm-and-down'
         },
         {
           text: 'Type',
