@@ -24,17 +24,16 @@
 
 <script>
 import ENTITIES_ALL from '../gql/queries/EntitiesAll.gql'
+import { mapActions } from 'vuex'
+
 export default {
   methods: {
-    redirectToEntity: function(entityName) {
-      this.$router.push({
-        name: "lang-entities-name",
-        params: { name: entityName }
-      })
-    },
     isActive: function(entityName) {
       return entityName === this.$route.params.name ? "active" : ""
-    }
+    },
+    ...mapActions({
+      redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
+    })
   },
   apollo: {
     entities: {

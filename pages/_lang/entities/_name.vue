@@ -19,7 +19,7 @@
           </v-card-title>
           <v-card-text>
             <v-breadcrumbs>
-              <v-breadcrumbs-item v-for="(fieldPath, index) in fieldPaths" :key="fieldPath.path" @click.native="setFieldPathActive(fieldPath.path)" :disabled="index +1 === fieldPaths.length">
+              <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
                 {{ fieldPath.label }}
               </v-breadcrumbs-item>
               <v-icon slot="divider">forward</v-icon>
@@ -58,6 +58,9 @@
                     <v-icon color="grey lighten-1" v-if="!!props.item.required">check</v-icon>
                     <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
                   </td>
+                  <td>
+                    <FieldEdit />
+                  </td>
                 </template>
               </v-data-table>
             </div>
@@ -72,11 +75,14 @@
 <script>
 import _ from 'lodash'
 import EntityList from "../../../components/EntityList.vue"
+import FieldEdit from "../../../components/FieldEdit.vue"
 import ENTITY from '../../../gql/queries/Entity.gql'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
-    EntityList
+    EntityList,
+    FieldEdit
   },
   head() {
     return {
@@ -84,13 +90,7 @@ export default {
     }
   },
   methods: {
-    redirectToEntity: function(entityName) {
-      this.$router.push({
-        name: "lang-entities-name",
-        params: { name: entityName }
-      })
-      return false
-    },
+    // Local methods.
     ensureFieldsContainerHeight: function () {
       if (document) {
         const fieldsTable = document.getElementsByClassName('fields-table')
@@ -98,17 +98,17 @@ export default {
         fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
       }
     },
-    setFieldPathActive: function (path) {
+    gotoField: function (path, label = '') {
 
-      // Ignore changing path if it's already active.
-      if (path === this.fieldPathActive) {
+      // Ignore if gotoField request is already active.
+      if (path === this.$store.state.entities.fieldPathActive) {
         return
       }
 
       this.ensureFieldsContainerHeight()
 
       // Determine the slide action direction.
-      const deeperPath = path.length > this.fieldPathActive.length
+      const deeperPath = path.length > this.$store.state.entities.fieldPathActive.length
       const initialTransition = deeperPath ? 'left' : 'right'
       const resolveTransition = deeperPath ? 'right' : 'left'
 
@@ -116,8 +116,12 @@ export default {
 
       // Initial slide out and update table.
       setTimeout(() => {
-        this.fieldPathActive = path
-        this.fieldPaths = this.fieldPaths.filter(fp => _(path).startsWith(fp.path))
+        if (label) {
+          this.$store.dispatch('entities/GOTO_NEW_FIELD_PATH', {path, label})
+        }
+        else {
+          this.$store.dispatch('entities/GOTO_EXISTING_FIELD_PATH', path)
+        }
         this.fieldsTableTransition = resolveTransition
       }, 400)
 
@@ -127,33 +131,21 @@ export default {
         this.ensureFieldsContainerHeight()
       }, 800)
     },
-    gotoField: function (path, label) {
-      this.fieldPaths.push({
-        path: path,
-        label: label
-      })
-      this.setFieldPathActive(path)
-    },
-    getFieldPropertyPath: function (field) {
-      return [
-        this.entity,
-        this.fieldPathActive
-          .split('.')
-          .filter(p => p !== 'all')
-          .join('.'),
-        field._meta.camel
-      ].filter(i => !!i).join('.')
-    }
+
+    // Store actions.
+    ...mapActions({
+      redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
+    })
   },
   computed: {
     fields: function () {
-      if (this.entityData.length === 0) {
+      const storeEntityData = this.$store.state.entities.entityData
+
+      if (Object.keys(storeEntityData).length === 0) {
         return []
       }
 
-      const allFields = _(JSON.parse(this.entityData))
-
-      const fieldPathOnEntitityData = _(this.fieldPathActive).split('.')
+      const fieldPathOnEntityData = _(this.fieldPathActive).split('.')
         .filter(p => p !== 'all')
         .map(p => ['fields', p])
         .push('fields')
@@ -161,14 +153,17 @@ export default {
         .value()
         .join('.')
 
-      return _(allFields.get(fieldPathOnEntitityData)).values().value()
+      const fieldsOnCurrentFieldPath = _(storeEntityData).get(fieldPathOnEntityData)
 
+      return _(fieldsOnCurrentFieldPath).values().value()
+    },
+    entity: function () {
+      const storeEntityData = this.$store.state.entities.entityData
+      return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : ''
     },
     entityDescription: function () {
-      if (this.entityData.length === 0) {
-        return ''
-      }
-      return JSON.parse(this.entityData).description
+      const storeEntityData = this.$store.state.entities.entityData
+      return Object.keys(storeEntityData).length !== 0 ? storeEntityData.description : ''
     },
     fieldsTableClasses: function () {
       const classes = ['fields-table']
@@ -177,12 +172,22 @@ export default {
         classes.push(this.fieldsTableTransition)
       }
       return classes
-    }
+    },
+    fieldPaths() {
+      return this.$store.state.entities.fieldPaths
+    },
+    fieldPathActive() {
+      return this.$store.state.entities.fieldPathActive
+    },
+
+    // Store getters.
+    ...mapGetters({
+      getFieldPropertyPath: 'entities/GET_FIELD_PROPERTY_PATH'
+    })
   },
   data() {
     return {
-      entity: this.$route.params.name,
-      entityData: [],
+      apolloEntityData: {}, // Assigned to Apollo.
       fieldHeaders: [
         {
           text: 'Label',
@@ -200,25 +205,22 @@ export default {
         {
           text: 'Required',
           value: 'required'
+        },
+        {
+          text: '',
+          value: 'actions'
         }
       ].map(h => {
         h.align = 'left'
         h.sortable = false
         return h
       }),
-      fieldPaths: [
-        {
-          path: 'all',
-          label: 'All fields',
-        }
-      ],
-      fieldPathActive: 'all',
       fieldsTableTransition: null,
       graphqlError: false,
     }
   },
   apollo: {
-    entityData() {
+    apolloEntityData() {
       return {
         query: ENTITY,
         variables() {
@@ -229,7 +231,10 @@ export default {
         fetchPolicy: 'cache-and-network',
         update: (data) => {
           if (data.ENTITY) {
-            return data.ENTITY.data
+            const parsedEntityData = JSON.parse(data.ENTITY.data)
+            // Add entity data to Vuex store so it can be mutated independently from Apollo data.
+            this.$store.commit('entities/UPDATE_ENTITY_DATA', parsedEntityData)
+            return parsedEntityData
           }
           this.graphqlError = true
         },
