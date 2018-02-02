@@ -5,7 +5,7 @@
     </v-btn>
     <v-card>
       <v-card-title>
-        <span class="headline">Field Edit</span>
+        <span class="headline">{{ $t('entities.fields.edit.title') }}</span>
       </v-card-title>
       <v-card-text>
         <v-container grid-list-md>
@@ -21,11 +21,11 @@
             </v-flex>
           </v-layout>
         </v-container>
-        <small>*indicates required field</small>
+        <small>*{{ $t('entities.fields.edit.indicatesRequiredField')}}</small>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="green darken-1" flat @click.native="opened = false">Save</v-btn>
+        <v-btn color="green darken-1" flat @click.native="opened = false">{{ $t('entities.fields.edit.save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -9,5 +9,30 @@
     "title": "Tablero de control",
     "h1": "Tablero de control",
     "description": "Esta es una introducción en español."
+  },
+  "entities": {
+    "fields": {
+      "breadcrumb": {
+        "allFields": "Todos los campos"
+      },
+      "cardinality": {
+        "many": "Muchos",
+        "one": "Uno"
+      },
+      "headers": {
+        "label": "Rótulo",
+        "path": "Ruta de campo",
+        "type": "Tipo",
+        "required": "Obligatorio"
+      },
+      "edit": {
+        "title": "Edición de campo",
+        "indicatesRequiredField": "Indica campo requerido",
+        "save": "Guardar"
+      }
+    },
+    "errors": {
+      "error-loading-entity": "Se produjo un error al cargar {entityName}"
+    }
   }
 }

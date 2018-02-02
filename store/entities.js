@@ -1,15 +1,17 @@
 import _ from 'lodash'
 
-export const state = () => ({
-  entityData: {},
-  fieldPathActive: 'all',
-  fieldPaths: [
-    {
-      path: 'all',
-      label: 'All fields'
-    }
-  ]
-})
+export const state = () => {
+  return {
+    entityData: {},
+    fieldPathActive: 'all',
+    fieldPaths: [
+      {
+        path: 'all',
+        label: 'entities.fields.breadcrumb.allFields'
+      }
+    ]
+  }
+}
 
 export const getters = {
   GET_FIELD_PROPERTY_PATH: (state) => (field) => {

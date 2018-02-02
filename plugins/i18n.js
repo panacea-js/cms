@@ -9,6 +9,7 @@ export default ({ app, store }) => {
     locale: store.state.locale,
     fallbackLocale: 'en',
     messages: require('~/locales/all.json')
+    // silentTranslationWarn: true
   })
 
   app.i18n.path = link => {

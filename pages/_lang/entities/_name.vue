@@ -7,7 +7,7 @@
       <v-flex xs12 lg10>
         <v-card dark color="secondary" v-if="graphqlError">
           <v-alert color="error" icon="warning" value="true">
-            There was an error loading {{ entity }}
+            {{ $t('entities.errors.error-loading-entity', {entityName : entity}) }}
           </v-alert>
         </v-card>
         <v-card dark color="secondary" v-if="!graphqlError">
@@ -20,7 +20,7 @@
           <v-card-text>
             <v-breadcrumbs>
               <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
-                {{ fieldPath.label }}
+                {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
               </v-breadcrumbs-item>
               <v-icon slot="divider">forward</v-icon>
             </v-breadcrumbs>
@@ -30,7 +30,7 @@
                 <template slot="items" slot-scope="props">
                   <td class="field-label">
                     {{ props.item.label }}
-                    <v-tooltip v-model="show" top v-if="!!props.item.description">
+                    <v-tooltip top v-if="!!props.item.description">
                       <v-btn icon slot="activator">
                         <v-icon color="grey lighten-1">info</v-icon>
                       </v-btn>
@@ -43,7 +43,7 @@
                   <td class="field-type">
                     <span>
                       {{ props.item.type }}
-                      <span class="field-type--cardinality">{{ !!props.item.many ? 'Many' : 'One' }}</span>
+                      <span class="field-type--cardinality">{{ !!props.item.many ? $t('entities.fields.cardinality.many') : $t('entities.fields.cardinality.one') }}</span>
                     </span>
                     <span v-if="props.item.type === 'reference'">
                       <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
@@ -86,7 +86,7 @@ export default {
   },
   head() {
     return {
-      title: "Entities"
+      title: this.$t('sections.entities')
     }
   },
   methods: {
@@ -159,7 +159,7 @@ export default {
     },
     entity: function () {
       const storeEntityData = this.$store.state.entities.entityData
-      return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : ''
+      return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : this.$route.params.name
     },
     entityDescription: function () {
       const storeEntityData = this.$store.state.entities.entityData
@@ -190,20 +190,20 @@ export default {
       apolloEntityData: {}, // Assigned to Apollo.
       fieldHeaders: [
         {
-          text: 'Label',
+          text: this.$t('entities.fields.headers.label'),
           value: 'label'
         },
         {
-          text: 'Field path',
+          text: this.$t('entities.fields.headers.path'),
           value: 'id',
           class: 'hidden-sm-and-down'
         },
         {
-          text: 'Type',
+          text: this.$t('entities.fields.headers.type'),
           value: 'type'
         },
         {
-          text: 'Required',
+          text: this.$t('entities.fields.headers.required'),
           value: 'required'
         },
         {

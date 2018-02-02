@@ -9,5 +9,30 @@
     "title": "Dashboard",
     "h1": "Dashboard",
     "description": "This is an introduction in English."
+  },
+  "entities": {
+    "fields": {
+      "breadcrumb": {
+        "allFields": "All fields"
+      },
+      "cardinality": {
+        "many": "Many",
+        "one": "One"
+      },
+      "headers": {
+        "label": "Label",
+        "path": "Field path",
+        "type": "Type",
+        "required": "Required"
+      },
+      "edit": {
+        "title": "Field edit",
+        "indicatesRequiredField": "Indicates required field",
+        "save": "Save"
+      }
+    },
+    "errors": {
+      "error-loading-entity": "There was an error loading {entityName}"
+    }
   }
 }
