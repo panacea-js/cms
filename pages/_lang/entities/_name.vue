@@ -42,7 +42,7 @@
                   </td>
                   <td class="field-type">
                     <span>
-                      {{ props.item.type }}
+                      {{ $t(`entities.fields.types.${props.item.type}`) }}
                       <span class="field-type--cardinality">{{ !!props.item.many ? $t('entities.fields.cardinality.many') : $t('entities.fields.cardinality.one') }}</span>
                     </span>
                     <span v-if="props.item.type === 'reference'">

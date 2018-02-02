@@ -12,6 +12,17 @@
   },
   "entities": {
     "fields": {
+      "types": {
+        "id": "ID",
+        "string": "String",
+        "password": "Password",
+        "text": "Text",
+        "integer": "Integer",
+        "float": "Float",
+        "boolean": "Boolean",
+        "reference": "Reference",
+        "object": "Object"
+      },
       "breadcrumb": {
         "allFields": "All fields"
       },

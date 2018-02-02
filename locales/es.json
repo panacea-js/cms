@@ -12,6 +12,17 @@
   },
   "entities": {
     "fields": {
+      "types": {
+        "id": "ID",
+        "string": "Cadena",
+        "password": "Contraseña",
+        "text": "Texto",
+        "integer": "Entero",
+        "float": "Decimal",
+        "boolean": "Booleano",
+        "reference": "Referencia",
+        "object": "Objeto"
+      },
       "breadcrumb": {
         "allFields": "Todos los campos"
       },

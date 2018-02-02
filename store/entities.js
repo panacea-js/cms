@@ -38,7 +38,7 @@ export const mutations = {
     state.fieldPaths = [
       {
         path: 'all',
-        label: 'All fields'
+        label: 'entities.fields.breadcrumb.allFields'
       }
     ]
   },
