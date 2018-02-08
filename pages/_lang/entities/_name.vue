@@ -26,7 +26,7 @@
             </v-breadcrumbs>
 
             <div class="fields-table-container">
-              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fields" hide-actions class="elevation-1">
+              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fields()" hide-actions class="elevation-1">
                 <template slot="items" slot-scope="props">
                   <td class="field-label">
                     {{ props.item.label }}
@@ -138,25 +138,6 @@ export default {
     })
   },
   computed: {
-    fields: function () {
-      const storeEntityData = this.$store.state.entities.entityData
-
-      if (Object.keys(storeEntityData).length === 0) {
-        return []
-      }
-
-      const fieldPathOnEntityData = _(this.fieldPathActive).split('.')
-        .filter(p => p !== 'all')
-        .map(p => ['fields', p])
-        .push('fields')
-        .flatten()
-        .value()
-        .join('.')
-
-      const fieldsOnCurrentFieldPath = _(storeEntityData).get(fieldPathOnEntityData)
-
-      return _(fieldsOnCurrentFieldPath).values().value()
-    },
     entity: function () {
       const storeEntityData = this.$store.state.entities.entityData
       return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : this.$route.params.name
@@ -182,7 +163,8 @@ export default {
 
     // Store getters.
     ...mapGetters({
-      getFieldPropertyPath: 'entities/GET_FIELD_PROPERTY_PATH'
+      getFieldPropertyPath: 'entities/GET_FIELD_PROPERTY_PATH',
+      fields: 'entities/GET_FIELDS'
     })
   },
   data() {

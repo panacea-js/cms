@@ -17,7 +17,7 @@
         "string": "String",
         "password": "Password",
         "text": "Text",
-        "integer": "Integer",
+        "int": "Integer",
         "float": "Float",
         "boolean": "Boolean",
         "reference": "Reference",

@@ -17,7 +17,7 @@
         "string": "Cadena",
         "password": "Contraseña",
         "text": "Texto",
-        "integer": "Entero",
+        "int": "Entero",
         "float": "Decimal",
         "boolean": "Booleano",
         "reference": "Referencia",
