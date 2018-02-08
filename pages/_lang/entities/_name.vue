@@ -59,7 +59,7 @@
                     <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
                   </td>
                   <td>
-                    <FieldEdit />
+                    <FieldEdit :fieldPath="fieldPathActive" :field="props.item" />
                   </td>
                 </template>
               </v-data-table>

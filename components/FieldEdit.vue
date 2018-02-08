@@ -5,19 +5,19 @@
     </v-btn>
     <v-card>
       <v-card-title>
-        <span class="headline">{{ $t('entities.fields.edit.title') }}</span>
+        <span class="headline">{{ $t('entities.fields.edit.title') }} - {{ field.label }}</span>
       </v-card-title>
       <v-card-text>
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal first name" required></v-text-field>
+              <v-text-field label="Label" required></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal middle name" hint="example of helper text only on focus"></v-text-field>
+              <v-text-field label="Machine Name" hint="The addressable key for the field. Will be converted to camelCase" required></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal last name" hint="example of persistent helper text" persistent-hint required></v-text-field>
+              <v-text-field textarea label="Description" hint="A short description about the context of this field"></v-text-field>
             </v-flex>
           </v-layout>
         </v-container>
@@ -34,9 +34,17 @@
 <script>
   export default {
     data() {
+      console.log(this.fieldPath)
+      console.log(this.field)
+      console.log(this.$store.state.entities.entityData.fields)
       return {
-        opened: false
+        opened: false,
+        label: ''
       }
+    },
+    props: {
+      fieldPath: String,
+      field: Object
     }
   }
 </script>
