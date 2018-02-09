@@ -5,12 +5,12 @@
         <EntityList />
       </v-flex>
       <v-flex xs12 lg10>
-        <v-card dark color="secondary" v-if="graphqlError">
+        <v-card dark color="secondary" v-if="graphqlError" flat>
           <v-alert color="error" icon="warning" value="true">
             {{ $t('entities.errors.error-loading-entity', {entityName : entity}) }}
           </v-alert>
         </v-card>
-        <v-card dark color="secondary" v-if="!graphqlError">
+        <v-card dark color="secondary" v-if="!graphqlError" flat>
           <v-card-title>
             <div>
               <h1 class="headline mb-0">{{ entity }}</h1>
@@ -62,6 +62,15 @@
                   </td>
                 </template>
               </v-data-table>
+            </div>
+
+            <div class="entity-field-actions">
+              <v-tooltip right>
+                <v-btn slot="activator" small fab color="primary secondary--text" class="entity-field-actions__add">
+                  <v-icon>add</v-icon>
+                </v-btn>
+                <span class="tooltip-text">{{ $t('entities.fields.actions.add') }}</span>
+              </v-tooltip>
             </div>
 
           </v-card-text>
@@ -274,5 +283,9 @@ export default {
       transform: translateX(50%);
     }
   }
+}
+.entity-field-actions {
+  margin: 1em auto 0 auto;
+  text-align: center;
 }
 </style>

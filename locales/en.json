@@ -43,7 +43,13 @@
         "title": "Field edit",
         "indicatesRequiredField": "Indicates required field",
         "save": "Save"
+      },
+      "actions": {
+        "add": "Add field"
       }
+    },
+    "actions": {
+      "add": "Add entity"
     },
     "errors": {
       "error-loading-entity": "There was an error loading {entityName}"

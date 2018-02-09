@@ -43,7 +43,13 @@
         "title": "Edición de campo",
         "indicatesRequiredField": "Indica campo requerido",
         "save": "Guardar"
+      },
+      "actions": {
+        "add": "Crear campo"
       }
+    },
+    "actions": {
+      "add": "Crear entidad"
     },
     "errors": {
       "error-loading-entity": "Se produjo un error al cargar {entityName}"

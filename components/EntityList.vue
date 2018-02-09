@@ -1,25 +1,35 @@
 <template>
-  <v-card dark color="secondary">
-    <v-card-text class="pa-0">
-      <v-list two-line class="pa-0">
-        <v-card dark color="secondary">
-          <v-card-text class="pa-0">
-            <template v-for="(entity, index) in entities">
-              <v-tooltip v-bind:key="`tooltip-${index}`" right>
-                <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="isActive(entity.name)" @click="redirectToEntity(entity.name)">
-                  <v-list-tile-content>
-                    <v-list-tile-title v-html="entity.name"></v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-                <span class="tooltip-text">{{ entity.data | json('description') }}</span>
-              </v-tooltip>
-              <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
-            </template>
-          </v-card-text>
-        </v-card>
-      </v-list>
-    </v-card-text>
-  </v-card>
+  <div class="entity-list-wrapper">
+
+    <v-card dark color="secondary" flat>
+      <v-card-text class="pa-0">
+        <v-list class="pa-0">
+          <template v-for="(entity, index) in entities">
+            <v-tooltip v-bind:key="`tooltip-${index}`" right>
+              <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="isActive(entity.name)" @click="redirectToEntity(entity.name)">
+                <v-list-tile-content>
+                  <v-list-tile-title v-html="entity.name"></v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <span class="tooltip-text">{{ entity.data | json('description') }}</span>
+            </v-tooltip>
+            <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
+
+          </template>
+        </v-list>
+      </v-card-text>
+    </v-card>
+
+    <div class="entity-actions">
+      <v-tooltip right>
+        <v-btn slot="activator" small fab color="primary secondary--text" class="entity-actions__add">
+          <v-icon>add</v-icon>
+        </v-btn>
+        <span class="tooltip-text">{{ $t('entities.actions.add') }}</span>
+      </v-tooltip>
+    </div>
+
+  </div>
 </template>
 
 <script>
@@ -51,6 +61,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ul {
+  background: transparent !important;
+}
 li {
   border-left: 3px solid transparent;
   opacity: 0.5;
@@ -58,6 +71,10 @@ li {
 li.active {
   border-left-color: $color-accent;
   opacity: 1;
+}
+.entity-actions {
+  margin: 1em auto;
+  text-align: center;
 }
 .tooltip-text {
   display: inline-block;
