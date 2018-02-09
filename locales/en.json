@@ -30,11 +30,14 @@
         "many": "Many",
         "one": "One"
       },
-      "headers": {
+      "attributes": {
         "label": "Label",
         "path": "Field path",
         "type": "Type",
-        "required": "Required"
+        "required": "Required",
+        "references": "References",
+        "machineName": "Machine name",
+        "description": "Description"
       },
       "edit": {
         "title": "Field edit",

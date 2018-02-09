@@ -30,11 +30,14 @@
         "many": "Muchos",
         "one": "Uno"
       },
-      "headers": {
+      "attributes": {
         "label": "Rótulo",
         "path": "Ruta de campo",
         "type": "Tipo",
-        "required": "Obligatorio"
+        "required": "Obligatorio",
+        "references": "Hace referencia",
+        "machineName": "Nombre de la máquina",
+        "description": "Descripción"
       },
       "edit": {
         "title": "Edición de campo",

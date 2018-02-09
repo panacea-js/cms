@@ -11,16 +11,20 @@
         <small>*{{ $t('entities.fields.edit.indicatesRequiredField')}}</small>
         <v-container grid-list-md>
           <v-layout wrap>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="label" label="Label" required></v-text-field>
+            <v-flex xs12 sm6>
+              <v-text-field v-model="fieldFormData.label" label="Label" required></v-text-field>
             </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="machineName" label="Machine Name" hint="The addressable key for the field. Will be converted to camelCase" required></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="description" textarea label="Description" hint="A short description about the context of this field"></v-text-field>
+            <v-flex xs12 sm6>
+              <v-text-field :label="$t('entities.fields.attributes.machineName')" v-model="fieldFormData.machineName" hint="The addressable key for the field. Will be converted to camelCase" required></v-text-field>
             </v-flex>
           </v-layout>
+          <v-text-field :label="$t('entities.fields.attributes.description')" v-model="fieldFormData.description" textarea hint="A short description about the context of this field"></v-text-field>
+
+          <v-select :label="$t('entities.fields.attributes.type')" :items="fieldTypes" v-model="fieldFormData.type" dark></v-select>
+          <v-select :label="$t('entities.fields.attributes.references')" v-if="fieldFormData.type === 'reference'" :items="entityTypes" v-model="fieldFormData.references" dark></v-select>
+          <v-switch :label="$t('entities.fields.attributes.required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
+          <v-switch :label="$t('entities.fields.cardinality.many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+
         </v-container>
       </v-card-text>
       <v-card-actions>
@@ -33,30 +37,56 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import _ from 'lodash'
 
   export default {
     data() {
       return {
         opened: false,
-        label: this.field.label,
-        machineName: this.field._meta.camel,
-        description: this.field.description
+        fieldFormData: {
+          type: this.field.type,
+          label: this.field.label,
+          machineName: this.field._meta.camel,
+          description: this.field.description,
+          required: this.field.required,
+          many: this.field.many,
+          references: this.field.references
+        },
+        // @todo get field types via API call rather than statically defined.
+        fieldTypes: [
+
+          {value: 'id', text: this.$t('entities.fields.types.id')},
+          {value: 'int', text: this.$t('entities.fields.types.int')},
+          {value: 'string', text: this.$t('entities.fields.types.string')},
+          {value: 'reference', text: this.$t('entities.fields.types.reference')},
+          {value: 'object', text: this.$t('entities.fields.types.object')},
+          {value: 'float', text: this.$t('entities.fields.types.float')},
+        ],
+        // @todo get entities from store once EntityList component stores its state in vuex.
+        entityTypes: ['Dog', 'Cat']
       }
     },
     methods: {
       save() {
-        if (this.machineName !== this.field._meta.camel) {
+
+        const machineNameCamel = _(this.fieldFormData.machineName).camelCase()
+
+        if (machineNameCamel !== this.field._meta.camel) {
           this.$store.commit('entities/RENAME_FIELD', {
             oldId: this.field._meta.camel,
-            newId: this.machineName
+            newId: machineNameCamel
           })
         }
 
         this.$store.commit('entities/UPDATE_FIELD', {
-          id: this.machineName,
+          id: machineNameCamel,
           fieldData: {
-            label: this.label,
-            description: this.description
+            type: this.fieldFormData.type,
+            label: this.fieldFormData.label,
+            description: this.fieldFormData.description,
+            many: this.fieldFormData.many,
+            required: this.fieldFormData.required,
+            references: this.fieldFormData.references,
           }
         })
 

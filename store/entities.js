@@ -13,6 +13,24 @@ export const state = () => {
   }
 }
 
+/**
+ * Adds placeholder values for undefined field attributes to ensure data
+ * reactivity is set when missing attributes are added.
+ *
+ * For example, many and required attributes should be considered false
+ * if they are not defined.
+ */
+function addPlaceholderAttributes (fields) {
+  _(fields).forEach((field, fieldKey) => {
+    !field.hasOwnProperty('required') && (fields[fieldKey].required = false)
+    !field.hasOwnProperty('many') && (fields[fieldKey].many = false)
+    if (field.hasOwnProperty('fields')) {
+      fields[fieldKey].fields = addPlaceholderAttributes(fields[fieldKey].fields)
+    }
+  })
+  return fields
+}
+
 export const getters = {
   /**
    * Get human readable traversion to get the field data.
@@ -56,6 +74,7 @@ export const getters = {
 
 export const mutations = {
   UPDATE_ENTITY_DATA (state, entityData) {
+    entityData.fields = addPlaceholderAttributes(entityData.fields)
     state.entityData = entityData
   },
 

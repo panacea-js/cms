@@ -41,10 +41,9 @@
                     <code v-html="getFieldPropertyPath(props.item)"></code>
                   </td>
                   <td class="field-type">
-                    <span>
-                      {{ $t(`entities.fields.types.${props.item.type}`) }}
-                      <span class="field-type--cardinality">{{ !!props.item.many ? $t('entities.fields.cardinality.many') : $t('entities.fields.cardinality.one') }}</span>
-                    </span>
+                    <span>{{ $t(`entities.fields.types.${props.item.type}`) }}</span>
+                    <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
+
                     <span v-if="props.item.type === 'reference'">
                       <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
                       <v-btn small flat dark color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
@@ -59,7 +58,7 @@
                     <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
                   </td>
                   <td>
-                    <FieldEdit :fieldPath="fieldPathActive" :field="props.item" />
+                    <FieldEdit :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
                   </td>
                 </template>
               </v-data-table>
@@ -91,14 +90,15 @@ export default {
   },
   methods: {
     // Local methods.
-    ensureFieldsContainerHeight: function () {
+    ensureFieldsContainerHeight() {
       if (document) {
         const fieldsTable = document.getElementsByClassName('fields-table')
         const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
         fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
       }
     },
-    gotoField: function (path, label = '') {
+
+    gotoField(path, label = '') {
 
       // Ignore if gotoField request is already active.
       if (path === this.$store.state.entities.fieldPathActive) {
@@ -132,21 +132,25 @@ export default {
       }, 800)
     },
 
+    cardinalityText(isMany) {
+      return !!isMany ? this.$t('entities.fields.cardinality.many') : this.$t('entities.fields.cardinality.one')
+    },
+
     // Store actions.
     ...mapActions({
       redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
     })
   },
   computed: {
-    entity: function () {
+    entity() {
       const storeEntityData = this.$store.state.entities.entityData
       return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : this.$route.params.name
     },
-    entityDescription: function () {
+    entityDescription() {
       const storeEntityData = this.$store.state.entities.entityData
       return Object.keys(storeEntityData).length !== 0 ? storeEntityData.description : ''
     },
-    fieldsTableClasses: function () {
+    fieldsTableClasses() {
       const classes = ['fields-table']
       if (this.fieldsTableTransition) {
         classes.push('transitioning')
@@ -172,20 +176,20 @@ export default {
       apolloEntityData: {}, // Assigned to Apollo.
       fieldHeaders: [
         {
-          text: this.$t('entities.fields.headers.label'),
+          text: this.$t('entities.fields.attributes.label'),
           value: 'label'
         },
         {
-          text: this.$t('entities.fields.headers.path'),
+          text: this.$t('entities.fields.attributes.path'),
           value: 'id',
           class: 'hidden-sm-and-down'
         },
         {
-          text: this.$t('entities.fields.headers.type'),
+          text: this.$t('entities.fields.attributes.type'),
           value: 'type'
         },
         {
-          text: this.$t('entities.fields.headers.required'),
+          text: this.$t('entities.fields.attributes.required'),
           value: 'required'
         },
         {
