@@ -3,6 +3,7 @@ import _ from 'lodash'
 export const state = () => {
   return {
     entityData: {},
+    fieldsDisplayed: [],
     fieldPathActive: 'all',
     fieldPaths: [
       {
@@ -44,35 +45,15 @@ export const getters = {
         .join('.'),
       field._meta.camel
     ].filter(i => !!i).join('.')
-  },
-
-  /**
-   * Get all fields from the active field path.
-   */
-  GET_FIELDS: (state) => () => {
-    const allFieldsPathOnEntityData = _(state.fieldPathActive).split('.')
-      .filter(p => p !== 'all')
-      .map(p => ['fields', p])
-      .push('fields')
-      .flatten()
-      .value()
-      .join('.')
-
-    const fields = _(state.entityData).get(allFieldsPathOnEntityData)
-
-    return _(fields).values().value()
-  },
-
-  /**
-   * Get a specific field from the currently active field path and field name.
-   */
-  GET_FIELD: (state, getters) => (fieldName) => {
-    const fields = getters.GET_FIELDS()
-    return fields[fieldName]
   }
 }
 
 export const mutations = {
+
+  SET_FIELDS (state, fields) {
+    state.fieldsDisplayed = fields
+  },
+
   UPDATE_ENTITY_DATA (state, entityData) {
     entityData.fields = addPlaceholderAttributes(entityData.fields)
     state.entityData = entityData
@@ -122,12 +103,14 @@ export const mutations = {
   },
 
   UPDATE_FIELD (state, { id, fieldData }) {
+    const fieldPathOnEntityData = _(state.fieldPathActive).split('.')
+      .filter(p => p !== 'all')
+      .map(p => ['fields', p])
+      .push('fields')
+      .push(id)
+
     _(fieldData).forEach((value, attribute) => {
-      const fieldAttributePathOnEntityData = _(state.fieldPathActive).split('.')
-        .filter(p => p !== 'all')
-        .map(p => ['fields', p])
-        .push('fields')
-        .push(id)
+      const fieldAttributePathOnEntityData = fieldPathOnEntityData
         .push(attribute)
         .flatten()
         .value()
@@ -135,6 +118,15 @@ export const mutations = {
 
       _.set(state.entityData, fieldAttributePathOnEntityData, value)
     })
+
+    const metaCamelAttributePathOnEntityData = fieldPathOnEntityData
+      .push('_meta')
+      .push('camel')
+      .flatten()
+      .value()
+      .join('.')
+
+    _.set(state.entityData, metaCamelAttributePathOnEntityData, id)
   },
 
   DELETE_FIELD (state, id) {
@@ -144,6 +136,24 @@ export const mutations = {
 }
 
 export const actions = {
+  /**
+  * Get all fields from the active field path.
+  */
+  GET_FIELDS ({ state, commit, dispatch }) {
+    const allFieldsPathOnEntityData = _(state.fieldPathActive).split('.')
+      .filter(p => p !== 'all')
+      .map(p => ['fields', p])
+      .push('fields')
+      .flatten()
+      .value()
+      .join('.')
+
+    const fields = _(state.entityData).get(allFieldsPathOnEntityData)
+
+    commit('SET_FIELDS', _(fields).values().value())
+
+    dispatch('ensureFieldsContainerHeight')
+  },
   REDIRECT_TO_ENTITY ({ state, commit }, entityName) {
     commit('RESET_FIELD_PATH_STATES')
     this.$router.push({
@@ -153,12 +163,12 @@ export const actions = {
     return false
   },
 
-  GOTO_NEW_FIELD_PATH ({ state, commit }, pathObject) {
+  GOTO_NEW_FIELD_PATH ({ commit }, pathObject) {
     commit('APPEND_FIELD_PATHS', pathObject)
     commit('SET_FIELD_PATH_ACTIVE', pathObject.path)
   },
 
-  GOTO_EXISTING_FIELD_PATH ({ state, commit }, path) {
+  GOTO_EXISTING_FIELD_PATH ({ commit }, path) {
     commit('SET_FIELD_PATH_ACTIVE', path)
     commit('FILTER_FIELD_PATHS_ACTIVE_AND_ABOVE', path)
   },
@@ -166,5 +176,16 @@ export const actions = {
   SAVE_ENTITY ({ state, commit }) {
     // @todo
     console.log(`Entity ${state.entityData._meta.camel} fake saved`)
+  },
+
+  ensureFieldsContainerHeight () {
+    if (typeof document !== 'undefined') {
+      setTimeout(() => {
+        const fieldsTable = document.getElementsByClassName('fields-table')
+        const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
+        fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
+      }, 200)
+    }
   }
+
 }

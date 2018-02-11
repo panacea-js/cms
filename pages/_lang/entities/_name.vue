@@ -26,7 +26,7 @@
             </v-breadcrumbs>
 
             <div class="fields-table-container">
-              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fields()" hide-actions class="elevation-1">
+              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions class="elevation-1">
                 <template slot="items" slot-scope="props">
                   <td class="field-label">
                     {{ props.item.label }}
@@ -65,12 +65,7 @@
             </div>
 
             <div class="entity-field-actions">
-              <v-tooltip right>
-                <v-btn slot="activator" small fab color="primary secondary--text" class="entity-field-actions__add">
-                  <v-icon>add</v-icon>
-                </v-btn>
-                <span class="tooltip-text">{{ $t('entities.fields.actions.add') }}</span>
-              </v-tooltip>
+              <FieldEdit :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
             </div>
 
           </v-card-text>
@@ -99,14 +94,6 @@ export default {
   },
   methods: {
     // Local methods.
-    ensureFieldsContainerHeight() {
-      if (document) {
-        const fieldsTable = document.getElementsByClassName('fields-table')
-        const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
-        fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
-      }
-    },
-
     gotoField(path, label = '') {
 
       // Ignore if gotoField request is already active.
@@ -114,7 +101,7 @@ export default {
         return
       }
 
-      this.ensureFieldsContainerHeight()
+      this.$store.dispatch('entities/ensureFieldsContainerHeight')
 
       // Determine the slide action direction.
       const deeperPath = path.length > this.$store.state.entities.fieldPathActive.length
@@ -131,13 +118,16 @@ export default {
         else {
           this.$store.dispatch('entities/GOTO_EXISTING_FIELD_PATH', path)
         }
+
+        this.$store.dispatch('entities/GET_FIELDS')
+
         this.fieldsTableTransition = resolveTransition
       }, 400)
 
       // Slide back into view.
       setTimeout(() => {
         this.fieldsTableTransition = null
-        this.ensureFieldsContainerHeight()
+        this.$store.dispatch('entities/ensureFieldsContainerHeight')
       }, 800)
     },
 
@@ -173,11 +163,13 @@ export default {
     fieldPathActive() {
       return this.$store.state.entities.fieldPathActive
     },
+    fieldsDisplayed () {
+      return this.$store.state.entities.fieldsDisplayed
+    },
 
     // Store getters.
     ...mapGetters({
       getFieldPropertyPath: 'entities/GET_FIELD_PROPERTY_PATH',
-      fields: 'entities/GET_FIELDS'
     })
   },
   data() {
@@ -229,6 +221,7 @@ export default {
             const parsedEntityData = JSON.parse(data.ENTITY.data)
             // Add entity data to Vuex store so it can be mutated independently from Apollo data.
             this.$store.commit('entities/UPDATE_ENTITY_DATA', parsedEntityData)
+            this.$store.dispatch('entities/GET_FIELDS')
             return parsedEntityData
           }
           this.graphqlError = true
