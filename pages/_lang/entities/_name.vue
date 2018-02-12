@@ -7,7 +7,7 @@
       <v-flex xs12 lg10>
         <v-card dark color="secondary" v-if="graphqlError" flat>
           <v-alert color="error" icon="warning" value="true">
-            {{ $t('entities.errors.error-loading-entity', {entityName : entity}) }}
+            {{ $t('cms.entities.errors.error-loading-entity', {entityName : entity}) }}
           </v-alert>
         </v-card>
         <v-card dark color="secondary" v-if="!graphqlError" flat>
@@ -41,7 +41,7 @@
                     <code v-html="getFieldPropertyPath(props.item)"></code>
                   </td>
                   <td class="field-type">
-                    <span>{{ $t(`entities.fields.types.${props.item.type}`) }}</span>
+                    <span>{{ $t(`cms.entities.fields.types.${props.item.type}`) }}</span>
                     <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
 
                     <span v-if="props.item.type === 'reference'">
@@ -89,7 +89,7 @@ export default {
   },
   head() {
     return {
-      title: this.$t('sections.entities')
+      title: this.$t('cms.sections.entities')
     }
   },
   methods: {
@@ -132,7 +132,7 @@ export default {
     },
 
     cardinalityText(isMany) {
-      return !!isMany ? this.$t('entities.fields.cardinality.many') : this.$t('entities.fields.cardinality.one')
+      return !!isMany ? this.$t('cms.entities.fields.cardinality.many') : this.$t('cms.entities.fields.cardinality.one')
     },
 
     // Store actions.
@@ -177,20 +177,20 @@ export default {
       apolloEntityData: {}, // Assigned to Apollo.
       fieldHeaders: [
         {
-          text: this.$t('entities.fields.attributes.label'),
+          text: this.$t('cms.entities.fields.attributes.label'),
           value: 'label'
         },
         {
-          text: this.$t('entities.fields.attributes.path'),
+          text: this.$t('cms.entities.fields.attributes.path'),
           value: 'id',
           class: 'hidden-sm-and-down'
         },
         {
-          text: this.$t('entities.fields.attributes.type'),
+          text: this.$t('cms.entities.fields.attributes.type'),
           value: 'type'
         },
         {
-          text: this.$t('entities.fields.attributes.required'),
+          text: this.$t('cms.entities.fields.attributes.required'),
           value: 'required'
         },
         {

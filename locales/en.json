@@ -1,63 +1,65 @@
 {
-  "sections": {
-    "dashboard": "Dashboard",
-    "entities": "Entities",
-    "settings": "Settings",
-    "plugins": "Plugins"
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "h1": "Dashboard",
-    "description": "This is an introduction in English."
-  },
-  "entities": {
-    "fields": {
-      "types": {
-        "id": "ID",
-        "string": "String",
-        "password": "Password",
-        "text": "Text",
-        "int": "Integer",
-        "float": "Float",
-        "boolean": "Boolean",
-        "reference": "Reference",
-        "object": "Object"
-      },
-      "breadcrumb": {
-        "allFields": "All fields"
-      },
-      "cardinality": {
-        "many": "Many",
-        "one": "One"
-      },
-      "attributes": {
-        "label": "Label",
-        "path": "Field path",
-        "type": "Type",
-        "required": "Required",
-        "references": "References entity",
-        "machineName": "Machine name",
-        "description": "Description"
-      },
-      "edit": {
-        "title": "Field edit",
-        "indicatesRequiredField": "Indicates required field",
-        "save": "Save",
-        "cancel": "Cancel"
+  "cms": {
+    "sections": {
+      "dashboard": "Dashboard",
+      "entities": "Entities",
+      "settings": "Settings",
+      "plugins": "Plugins"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "h1": "Dashboard",
+      "description": "This is an introduction in English."
+    },
+    "entities": {
+      "fields": {
+        "types": {
+          "id": "ID",
+          "string": "String",
+          "password": "Password",
+          "text": "Text",
+          "int": "Integer",
+          "float": "Float",
+          "boolean": "Boolean",
+          "reference": "Reference",
+          "object": "Object"
+        },
+        "breadcrumb": {
+          "allFields": "All fields"
+        },
+        "cardinality": {
+          "many": "Many",
+          "one": "One"
+        },
+        "attributes": {
+          "label": "Label",
+          "path": "Field path",
+          "type": "Type",
+          "required": "Required",
+          "references": "References entity",
+          "machineName": "Machine name",
+          "description": "Description"
+        },
+        "edit": {
+          "title": "Field edit",
+          "indicatesRequiredField": "Indicates required field",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "actions": {
+          "add": "Add field"
+        },
+        "validations": {
+          "required": "This field is required",
+          "selectReference": "Select an entity to reference"
+        }
       },
       "actions": {
-        "add": "Add field"
+        "add": "Add entity"
       },
-      "validations": {
-        "required": "This field is required",
-        "selectReference": "Select an entity to reference"
+      "errors": {
+        "error-loading-entity": "There was an error loading {entityName}"
       }
-    },
-    "actions": {
-      "add": "Add entity"
-    },
-    "errors": {
-      "error-loading-entity": "There was an error loading {entityName}"
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <section class="container">
     <div>
-      <h1 class="title">{{ $t('dashboard.h1') }}</h1>
-      <p>{{ $t('dashboard.description') }}</p>
+      <h1 class="title">{{ $t('cms.dashboard.h1') }}</h1>
+      <p>{{ $t('cms.dashboard.description') }}</p>
       <p>
         Some boxes with dashboard stats etc.
       </p>
@@ -14,12 +14,12 @@
 export default {
   head() {
     return {
-      title: this.$t("dashboard.title"),
+      title: this.$t("cms.dashboard.title"),
       meta: [
         {
           hid: "description",
           name: "description",
-          content: this.$t("dashboard.description")
+          content: this.$t("cms.dashboard.description")
         }
       ]
     }

@@ -25,7 +25,7 @@
         <v-btn slot="activator" small fab color="primary secondary--text" class="entity-actions__add">
           <v-icon>add</v-icon>
         </v-btn>
-        <span class="tooltip-text">{{ $t('entities.actions.add') }}</span>
+        <span class="tooltip-text">{{ $t('cms.entities.actions.add') }}</span>
       </v-tooltip>
     </div>
 

@@ -52,11 +52,13 @@ export default function (params = {}) {
  *
  * @param {*} config
  */
-const sourcePaths = (config) => [
-  config.rootDir, // Panacea CMS assets.
-  ...Object.keys(registry.plugins), // Panacea plugin assets.
-  process.cwd() // Application assets.
+const sourcePaths = (config, options = {}) => [
+  options.includeCore ? path.dirname(require.resolve('@panaceajs/core')) : null, // Panacea core.
+  config.rootDir, // Panacea CMS.
+  ...Object.keys(registry.plugins), // All Panacea plugins.
+  process.cwd() // Application.
 ]
+  .filter(x => !!x)
   .map(dir => resolvePluginPath(dir))
   .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
 
@@ -114,7 +116,7 @@ const compileVarsAssets = function (config) {
 const compileLocales = function (config) {
   mkdirp.sync(path.join(config.srcDir, 'locales'))
 
-  const allLocaleMessages = sourcePaths(config)
+  const allLocaleMessages = sourcePaths(config, { includeCore: true })
     .flatMap(dir => glob.sync(path.resolve(dir, 'locales/*.json')))
     .filter(dir => dir.indexOf('.json') !== -1)
     .reduce((acc, file) => {
