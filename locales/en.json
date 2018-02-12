@@ -35,17 +35,22 @@
         "path": "Field path",
         "type": "Type",
         "required": "Required",
-        "references": "References",
+        "references": "References entity",
         "machineName": "Machine name",
         "description": "Description"
       },
       "edit": {
         "title": "Field edit",
         "indicatesRequiredField": "Indicates required field",
-        "save": "Save"
+        "save": "Save",
+        "cancel": "Cancel"
       },
       "actions": {
         "add": "Add field"
+      },
+      "validations": {
+        "required": "This field is required",
+        "selectReference": "Select an entity to reference"
       }
     },
     "actions": {

@@ -35,17 +35,22 @@
         "path": "Ruta de campo",
         "type": "Tipo",
         "required": "Obligatorio",
-        "references": "Hace referencia",
+        "references": "Entidad objetivo",
         "machineName": "Nombre de la máquina",
         "description": "Descripción"
       },
       "edit": {
         "title": "Edición de campo",
         "indicatesRequiredField": "Indica campo requerido",
-        "save": "Guardar"
+        "save": "Guardar",
+        "cancel": "Cancelar"
       },
       "actions": {
         "add": "Crear campo"
+      },
+      "validations": {
+        "required": "El campo es obligatorio",
+        "selectReference": "Elija una entidad para referencia"
       }
     },
     "actions": {
