@@ -118,7 +118,6 @@ const compileLocales = function (config) {
 
   const allLocaleMessages = sourcePaths(config, { includeCore: true })
     .flatMap(dir => glob.sync(path.resolve(dir, 'locales/*.json')))
-    .filter(dir => dir.indexOf('.json') !== -1)
     .reduce((acc, file) => {
       const locale = path.basename(file).replace('.json', '')
       acc[locale] = _.merge(acc[locale] || {}, fs.readJsonSync(file))
