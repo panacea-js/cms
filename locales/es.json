@@ -13,17 +13,6 @@
     },
     "entities": {
       "fields": {
-        "types": {
-          "id": "ID",
-          "string": "Cadena",
-          "password": "Contraseña",
-          "text": "Texto",
-          "int": "Entero",
-          "float": "Decimal",
-          "boolean": "Booleano",
-          "reference": "Referencia",
-          "object": "Objeto"
-        },
         "breadcrumb": {
           "allFields": "Todos los campos"
         },
@@ -32,13 +21,22 @@
           "one": "Uno"
         },
         "attributes": {
-          "label": "Rótulo",
+          "label": "Etiqueta",
           "path": "Ruta de campo",
           "type": "Tipo",
           "required": "Obligatorio",
           "references": "Entidad objetivo",
           "machineName": "Nombre de la máquina",
           "description": "Descripción"
+        },
+        "machineName": {
+          "synced": "Nombre de la máquina generado automáticamente desde la etiqueta.",
+          "locked": "Nombre de la máquina bloqueado de cambios de etiqueta. Eliminar para volver a sincronizar.",
+          "noChangeId": "El nombre de la máquina no se puede cambiar para el campo <code>id</code>.",
+          "hint": "La tecla direccionable para el campo. Se convertirá en camelCase."
+        },
+        "description": {
+          "hint": "Una breve descripción sobre el contexto de este campo."
         },
         "edit": {
           "title": "Edición de campo",

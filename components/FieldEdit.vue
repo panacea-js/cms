@@ -20,18 +20,17 @@
               </v-flex>
               <v-flex xs12 lg6>
 
-                <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" hint="The addressable key for the field. Will be converted to camelCase" :rules="rules.required" required spellcheck="false"></v-text-field>
+                <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
 
                 <div class="text-lg-center pa-2">
                   <div v-if="machineNameAlterable">
                     <v-icon color="green">brightness_auto</v-icon>
-                    <span v-if="showFormElement('machineNameAutoText')" class="pl-2">Machine name auto generated from label.</span>
+                    <span v-if="showFormElement('machineNameAutoText')" class="pl-2">{{ $t('cms.entities.fields.machineName.synced') }}</span>
                   </div>
                   <div v-if="!machineNameAlterable">
                     <v-icon color="red">lock</v-icon>
-                    <span v-if="showFormElement('machineNameLockText')" class="pl-2">Machine name locked from label changes. Delete it to re-sync.</span>
-                    <span v-if="showFormElement('machineNameLockIdText')" class="pl-2">Machine name cannot be changed for
-                      <code>id</code> field.</span>
+                    <span v-if="showFormElement('machineNameLockText')" class="pl-2">{{ $t('cms.entities.fields.machineName.locked') }}</span>
+                    <span v-if="showFormElement('machineNameLockIdText')" class="pl-2">{{ $t('cms.entities.fields.machineName.noChangeId') }}</span>
                   </div>
                 </div>
 
@@ -39,7 +38,7 @@
 
             </v-layout>
 
-            <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" hint="A short description about the context of this field"></v-text-field>
+            <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
 
             <v-layout wrap>
               <v-flex xs12 lg6>

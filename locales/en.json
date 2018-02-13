@@ -13,17 +13,6 @@
     },
     "entities": {
       "fields": {
-        "types": {
-          "id": "ID",
-          "string": "String",
-          "password": "Password",
-          "text": "Text",
-          "int": "Integer",
-          "float": "Float",
-          "boolean": "Boolean",
-          "reference": "Reference",
-          "object": "Object"
-        },
         "breadcrumb": {
           "allFields": "All fields"
         },
@@ -39,6 +28,15 @@
           "references": "References entity",
           "machineName": "Machine name",
           "description": "Description"
+        },
+        "machineName": {
+          "synced": "Machine name auto generated from label.",
+          "locked": "Machine name locked from label changes. Delete it to re-sync.",
+          "noChangeId": "Machine name cannot be changed for <code>id</code> field.",
+          "hint": "The addressable key for the field. Will be converted to camelCase."
+        },
+        "description": {
+          "hint": "A short description about the context of this field."
         },
         "edit": {
           "title": "Field edit",
