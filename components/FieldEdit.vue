@@ -7,20 +7,20 @@
 
     <v-card>
       <v-card-title>
-        <span class="headline" v-if="!isNew">{{ $t('entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
-        <span class="headline" v-if="isNew">{{ $t('entities.fields.actions.add') }}</span>
+        <span class="headline" v-if="!isNew">{{ $t('cms.entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
+        <span class="headline" v-if="isNew">{{ $t('cms.entities.fields.actions.add') }}</span>
       </v-card-title>
       <v-card-text>
         <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
           <v-container fluid grid-list-xl>
-            <p>*{{ $t('entities.fields.edit.indicatesRequiredField')}}</p>
+            <p>*{{ $t('cms.entities.fields.edit.indicatesRequiredField')}}</p>
             <v-layout wrap>
               <v-flex xs12 lg6>
                 <v-text-field box v-model="fieldFormData.label" label="Label" v-if="showFormElement('label')" :disabled="disableFormElement('label')" :rules="rules.required" required @keyup="deriveMachineNameFromLabel()"></v-text-field>
               </v-flex>
               <v-flex xs12 lg6>
 
-                <v-text-field box :label="$t('entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" hint="The addressable key for the field. Will be converted to camelCase" :rules="rules.required" required spellcheck="false"></v-text-field>
+                <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" hint="The addressable key for the field. Will be converted to camelCase" :rules="rules.required" required spellcheck="false"></v-text-field>
 
                 <div class="text-lg-center pa-2">
                   <div v-if="machineNameAlterable">
@@ -39,14 +39,13 @@
 
             </v-layout>
 
-            <v-text-field box :label="$t('entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" hint="A short description about the context of this field"></v-text-field>
+            <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" hint="A short description about the context of this field"></v-text-field>
 
             <v-layout wrap>
               <v-flex xs12 lg6>
-
                 <v-layout>
                   <v-flex xs11>
-                    <v-select :label="$t('entities.fields.attributes.type')" v-if="showFormElement('type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                    <v-select :label="$t('cms.entities.fields.attributes.type')" v-if="showFormElement('type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
                   </v-flex>
                   <v-flex xs1 text-xs-center mt-4>
                     <v-tooltip left content-class="field-type-help__tooltip">
@@ -68,7 +67,7 @@
 
                 <v-layout>
                   <v-flex x11>
-                    <v-select :label="$t('entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                    <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
                   </v-flex>
                   <v-flex xs1>
                   </v-flex>
@@ -76,8 +75,8 @@
 
               </v-flex>
               <v-flex xs12 lg6>
-                <v-switch :label="$t('entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
-                <v-switch :label="$t('entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+                <v-switch :label="$t('cms.entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
+                <v-switch :label="$t('cms.entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
               </v-flex>
             </v-layout>
 
@@ -86,8 +85,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="green darken-1" flat @click="submit">{{ $t('entities.fields.edit.save') }}</v-btn>
-        <v-btn color="grey darken-1" flat @click="cancel">{{ $t('entities.fields.edit.cancel') }}</v-btn>
+        <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
+        <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -117,10 +116,10 @@
         valid: false,
         rules: {
           required: [
-            (v) => !!v || this.$t('entities.fields.validations.required')
+            (v) => !!v || this.$t('cms.entities.fields.validations.required')
           ],
           references: [
-            (v) => (this.fieldFormData.type !== 'reference' || !!v) || this.$t('entities.fields.validations.selectReference')
+            (v) => (this.fieldFormData.type !== 'reference' || !!v) || this.$t('cms.entities.fields.validations.selectReference')
           ]
         },
         icon: this.isNew ? 'add' : 'edit',

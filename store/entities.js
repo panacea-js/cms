@@ -8,7 +8,7 @@ export const state = () => {
     fieldPaths: [
       {
         path: 'all',
-        label: 'entities.fields.breadcrumb.allFields'
+        label: 'cms.entities.fields.breadcrumb.allFields'
       }
     ],
     fieldTypes: {}
@@ -69,7 +69,7 @@ export const mutations = {
     state.fieldPaths = [
       {
         path: 'all',
-        label: 'entities.fields.breadcrumb.allFields'
+        label: 'cms.entities.fields.breadcrumb.allFields'
       }
     ]
   },
