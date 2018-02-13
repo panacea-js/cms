@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="opened" persistent>
+  <v-dialog v-model="opened" persistent max-width="75%">
 
     <v-btn fab dark small :color="iconBackgroundColor" slot="activator">
       <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
@@ -43,8 +43,37 @@
 
             <v-layout wrap>
               <v-flex xs12 lg6>
-                <v-select :label="$t('entities.fields.attributes.type')" v-if="showFormElement('type')" :disabled="disableFormElement('type')" :items="fieldTypes" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
-                <v-select :label="$t('entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+
+                <v-layout>
+                  <v-flex xs11>
+                    <v-select :label="$t('entities.fields.attributes.type')" v-if="showFormElement('type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                  </v-flex>
+                  <v-flex xs1 text-xs-center mt-4>
+                    <v-tooltip left content-class="field-type-help__tooltip">
+                      <v-icon dark color="primary" slot="activator">help</v-icon>
+                      <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypesSelectHelp" hide-actions class="field-type-help__table elevation-1">
+                        <template slot="items" slot-scope="props">
+                          <td>
+                            {{ props.item.label }}
+                          </td>
+                          <td>
+                            {{ props.item.description }}
+                          </td>
+                        </template>
+                      </v-data-table>
+                    </v-tooltip>
+
+                  </v-flex>
+                </v-layout>
+
+                <v-layout>
+                  <v-flex x11>
+                    <v-select :label="$t('entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                  </v-flex>
+                  <v-flex xs1>
+                  </v-flex>
+                </v-layout>
+
               </v-flex>
               <v-flex xs12 lg6>
                 <v-switch :label="$t('entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
@@ -98,18 +127,44 @@
         iconBackgroundColor: this.isNew ? 'primary' : 'amber darken-1',
         fieldFormData,
         fieldFormDataOriginal,
-        // @todo get field types via API call rather than statically defined.
-        fieldTypes: [
-          {value: 'int', text: this.$t('entities.fields.types.int')},
-          {value: 'string', text: this.$t('entities.fields.types.string')},
-          {value: 'reference', text: this.$t('entities.fields.types.reference')},
-          {value: 'object', text: this.$t('entities.fields.types.object')},
-          {value: 'float', text: this.$t('entities.fields.types.float')},
-        ],
         // @todo get entities from store once EntityList component stores its state in vuex.
         entityTypes: ['Dog', 'Cat'],
-        machineNameAlterable: this.isNew
+        machineNameAlterable: this.isNew,
+
+        fieldTypesSelectHelpHeaders: [
+          {
+            text: "Field type",
+            value: 'label'
+          },
+          {
+            text: "Description",
+            value: 'description'
+          }
+        ].map(h => {
+          h.align = 'left'
+          h.sortable = false
+          return h
+        })
       }
+    },
+    computed: {
+      fieldTypesSelect () {
+        return _.map(this.$store.state.entities.fieldTypes, (fieldTypeData, fieldType) => {
+          return {
+            value: fieldType,
+            text: fieldTypeData.label
+          }
+        })
+      },
+      fieldTypesSelectHelp () {
+        return _.map(this.$store.state.entities.fieldTypes, (fieldTypeData, fieldType) => {
+          return {
+            fieldType,
+            label: fieldTypeData.label,
+            description: fieldTypeData.description
+          }
+        })
+      },
     },
     methods: {
       disableFormElement(element) {
@@ -181,7 +236,12 @@
         this.opened = false
       },
       cancel() {
-        this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
+        if (this.isNew) {
+          this.$refs.fieldEditForm.reset()
+        }
+        else {
+          this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
+        }
         this.opened = false
       },
       deriveMachineNameFromLabel() {
@@ -225,3 +285,18 @@
     }
   }
 </script>
+
+<style lang="scss">
+.field-type-help__tooltip {
+  opacity: 1 !important;
+}
+.field-type-help__table table {
+  background-color: $color-secondary !important;
+  thead tr {
+    height: 32px;
+  }
+  tbody td {
+    height: 24px;
+  }
+}
+</style>

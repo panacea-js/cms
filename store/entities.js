@@ -10,7 +10,8 @@ export const state = () => {
         path: 'all',
         label: 'entities.fields.breadcrumb.allFields'
       }
-    ]
+    ],
+    fieldTypes: {}
   }
 }
 
@@ -132,6 +133,10 @@ export const mutations = {
   DELETE_FIELD (state, id) {
     // @todo
     console.log(`Field ${id} fake deleted`)
+  },
+
+  SET_FIELD_TYPES (state, fieldTypes) {
+    state.fieldTypes = fieldTypes
   }
 }
 

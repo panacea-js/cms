@@ -41,7 +41,7 @@
                     <code v-html="getFieldPropertyPath(props.item)"></code>
                   </td>
                   <td class="field-type">
-                    <span>{{ $t(`entities.fields.types.${props.item.type}`) }}</span>
+                    <span>{{ fieldTypes[props.item.type].label }}</span>
                     <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
 
                     <span v-if="props.item.type === 'reference'">
@@ -165,6 +165,9 @@ export default {
     },
     fieldsDisplayed () {
       return this.$store.state.entities.fieldsDisplayed
+    },
+    fieldTypes () {
+      return this.$store.state.entities.fieldTypes
     },
 
     // Store getters.
