@@ -3,7 +3,7 @@ import { Nuxt, Builder } from 'nuxt'
 import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
 new Bootstrap().all()
 
-const { _, path, options, fs, glob, rimraf, mkdirp, resolvePluginPath, registry } = DI.container
+const { _, path, options, fs, glob, rimraf, mkdirp, rsync: Rsync, resolvePluginPath, registry } = DI.container
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
@@ -21,6 +21,10 @@ export default function (params = {}) {
 
   // Hard code the srcDir option for safety as this directory is deleted when recompiled.
   config.srcDir = path.resolve(process.cwd(), '.compiled/cms')
+
+  // Remove and re-create compilation (srcDir) directory.
+  rimraf.sync(config.srcDir)
+  mkdirp.sync(config.srcDir)
 
   // Ensure the router knows about the set public path.
   config.router = config.router || {}
@@ -72,21 +76,25 @@ const sourcePaths = (config, options = {}) => [
  *   Nuxt config options.
  */
 const compileNuxtAssets = function (config) {
-  // Remove and re-create compilation (srcDir) directory.
-  rimraf.sync(config.srcDir)
-  mkdirp.sync(config.srcDir)
-
   const excludeDirectories = (dirs, subDir) => !dirs.find(exclude => exclude === path.basename(subDir))
 
   // Compile valid source paths of CMS assets.
   sourcePaths(config)
     .flatMap(dir => glob.sync(dir + '/*/').filter(subDir => excludeDirectories(['node_modules', 'locales', 'build'], subDir)))
-    .map(dir =>
-      fs.copySync(
-        dir,
-        path.resolve(config.srcDir, path.basename(dir))
-      )
-    )
+    .map(dir => {
+      const rsync = new Rsync()
+        .progress()
+        .recursive()
+        .update()
+        .source(dir)
+        .destination(path.resolve(config.srcDir, path.basename(dir)))
+
+      rsync.execute((error, code, cmd) => {
+        if (error) {
+          console.error(error)
+        }
+      })
+    })
 }
 
 /**
