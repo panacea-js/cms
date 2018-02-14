@@ -40,11 +40,13 @@
 
             <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
 
-            <v-layout wrap>
+            <v-layout wrap v-if="fieldFormData.type !== 'id'">
+
               <v-flex xs12 lg6>
+
                 <v-layout>
                   <v-flex xs11>
-                    <v-select :label="$t('cms.entities.fields.attributes.type')" v-if="showFormElement('type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                    <v-select :label="$t('cms.entities.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
                   </v-flex>
                   <v-flex xs1 text-xs-center mt-4>
                     <v-tooltip left content-class="field-type-help__tooltip">
@@ -60,7 +62,6 @@
                         </template>
                       </v-data-table>
                     </v-tooltip>
-
                   </v-flex>
                 </v-layout>
 
@@ -73,10 +74,12 @@
                 </v-layout>
 
               </v-flex>
+
               <v-flex xs12 lg6>
                 <v-switch :label="$t('cms.entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
                 <v-switch :label="$t('cms.entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
               </v-flex>
+
             </v-layout>
 
           </v-container>
@@ -97,7 +100,6 @@
 
   export default {
     data() {
-
       const fieldFormData = {
         type: this.field.type,
         label: this.field.label,
@@ -162,7 +164,7 @@
             description: fieldTypeData.description
           }
         })
-      },
+      }
     },
     methods: {
       disableFormElement(element) {
@@ -179,13 +181,11 @@
         let show = true
 
         // Hide rules.
-        if ( this.fieldFormData.type !== 'reference' && element === 'references'
-          || this.fieldFormData.type === 'id' && element === 'type'
-          || this.fieldFormData.type === 'id' && element === 'required'
-          || this.fieldFormData.type === 'id' && element === 'many'
-          || this.fieldFormData.type === 'id' && element === 'machineNameLockText'
-          || this.fieldFormData.type === 'id' && element === 'machineNameAutoText'
-          || this.fieldFormData.type !== 'id' && element === 'machineNameLockIdText'
+        if (
+          (this.fieldFormData.type !== "reference" && element === "references") ||
+          (this.fieldFormData.type === "id" && element === "machineNameLockText") ||
+          (this.fieldFormData.type === "id" && element === "machineNameAutoText") ||
+          (this.fieldFormData.type !== "id" && element === "machineNameLockIdText")
         ) {
           show = false
         }
