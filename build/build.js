@@ -22,10 +22,6 @@ export default function (params = {}) {
   // Hard code the srcDir option for safety as this directory is deleted when recompiled.
   config.srcDir = path.resolve(process.cwd(), '.compiled/cms')
 
-  // Remove and re-create compilation (srcDir) directory.
-  rimraf.sync(config.srcDir)
-  mkdirp.sync(config.srcDir)
-
   // Ensure the router knows about the set public path.
   config.router = config.router || {}
   config.router.base = config.build.publicPath
@@ -36,6 +32,25 @@ export default function (params = {}) {
   config.env = config.env || {}
   config.env.panacea = options
   config.env.cms = configExcludingEnv
+
+  if (params.compileOnly) {
+    return compileFiles(config)
+  } else {
+    return fullBuild(config)
+  }
+}
+
+const compileFiles = (config) => {
+  compileNuxtAssets(config)
+  compileVarsAssets(config)
+  compileLocales(config)
+  return {}
+}
+
+const fullBuild = (config) => {
+  // Remove and re-create compilation (srcDir) directory.
+  rimraf.sync(config.srcDir)
+  mkdirp.sync(config.srcDir)
 
   compileNuxtAssets(config)
   compileVarsAssets(config)
