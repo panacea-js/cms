@@ -55,6 +55,27 @@ export const mutations = {
     state.fieldsDisplayed = fields
   },
 
+  SET_FIELDS_FROM_REORDERING (state, fieldsDisplayed) {
+    state.fieldsDisplayed = fieldsDisplayed
+
+    let weight = 1
+    const fields = fieldsDisplayed.reduce((acc, field) => {
+      field._meta.weight = weight++
+      acc[field._meta.camel] = field
+      return acc
+    }, {})
+
+    const fieldsFromFieldActivePath = _(state.fieldPathActive).split('.')
+      .filter(p => p !== 'all')
+      .map(p => ['fields', p])
+      .push('fields')
+      .flatten()
+      .value()
+      .join('.')
+
+    _.set(state.entityData, fieldsFromFieldActivePath, fields)
+  },
+
   UPDATE_ENTITY_DATA (state, entityData) {
     entityData.fields = addPlaceholderAttributes(entityData.fields)
     state.entityData = entityData
@@ -155,7 +176,12 @@ export const actions = {
 
     const fields = _(state.entityData).get(allFieldsPathOnEntityData)
 
-    commit('SET_FIELDS', _(fields).values().value())
+    const unorderedFields = _(fields).values().value()
+
+    // @todo reorder the array of orderedFields from ._meta.weight if it exists
+    const orderedFields = unorderedFields
+
+    commit('SET_FIELDS', orderedFields)
 
     dispatch('ensureFieldsContainerHeight')
   },

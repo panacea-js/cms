@@ -26,42 +26,48 @@
             </v-breadcrumbs>
 
             <div class="fields-table-container">
-              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions class="elevation-1">
+              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions class="elevation-1" ref="sortableTable">
+
                 <template slot="items" slot-scope="props">
-                  <td class="field-label">
-                    {{ props.item.label }}
-                    <v-tooltip top v-if="!!props.item.description">
-                      <v-btn icon slot="activator">
-                        <v-icon color="grey lighten-1">info</v-icon>
-                      </v-btn>
-                      <span>{{ props.item.description }}</span>
-                    </v-tooltip>
-                  </td>
-                  <td class="hidden-sm-and-down">
-                    <code v-html="getFieldPropertyPath(props.item)"></code>
-                  </td>
-                  <td class="field-type">
+                  <tr class="sortable-row" :key="fieldOrderKey(props.item)">
+                    <td>
+                      <v-btn v-if="props.item.type !== 'id'" icon class="sort-handle"><v-icon>drag_handle</v-icon></v-btn>
+                    </td>
+                    <td class="field-label">
+                      {{ props.item.label }}
+                      <v-tooltip top v-if="!!props.item.description">
+                        <v-btn icon slot="activator">
+                          <v-icon color="grey lighten-1">info</v-icon>
+                        </v-btn>
+                        <span>{{ props.item.description }}</span>
+                      </v-tooltip>
+                    </td>
+                    <td class="hidden-sm-and-down">
+                      <code v-html="getFieldPropertyPath(props.item)"></code>
+                    </td>
+                    <td class="field-type">
 
-                    <span>{{ fieldTypes[props.item.type].label }}</span>
+                      <span>{{ fieldTypes[props.item.type].label }}</span>
 
-                    <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
+                      <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
 
-                    <span v-if="props.item.type === 'reference'">
-                      <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                      <v-btn small flat dark color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
-                    </span>
-                    <span v-if="props.item.type === 'object'">
-                      <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                      <v-btn small flat dark color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
-                    </span>
-                  </td>
-                  <td>
-                    <v-icon color="grey lighten-1" v-if="!!props.item.required">check</v-icon>
-                    <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
-                  </td>
-                  <td>
-                    <FieldEdit :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
-                  </td>
+                      <span v-if="props.item.type === 'reference'">
+                        <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
+                        <v-btn small flat dark color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
+                      </span>
+                      <span v-if="props.item.type === 'object'">
+                        <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
+                        <v-btn small flat dark color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
+                      </span>
+                    </td>
+                    <td>
+                      <v-icon color="grey lighten-1" v-if="!!props.item.required">check</v-icon>
+                      <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
+                    </td>
+                    <td>
+                      <FieldEdit :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
+                    </td>
+                  </tr>
                 </template>
               </v-data-table>
             </div>
@@ -79,8 +85,9 @@
 
 <script>
 import _ from 'lodash'
-import EntityList from "../../../components/EntityList.vue"
-import FieldEdit from "../../../components/FieldEdit.vue"
+import EntityList from '../../../components/EntityList.vue'
+import FieldEdit from '../../../components/FieldEdit.vue'
+import Sortable from 'sortablejs'
 import ENTITY from '../../../gql/queries/Entity.gql'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
 
@@ -94,8 +101,44 @@ export default {
       title: this.$t('cms.sections.entities')
     }
   },
+  mounted () {
+    this.sortableInstance = this.initialiseSortableTable()
+  },
   methods: {
     // Local methods.
+    initialiseSortableTable () {
+      return new Sortable(
+        this.$refs.sortableTable.$el.getElementsByTagName('tbody')[0],
+        {
+          draggable: '.sortable-row',
+          handle: '.sort-handle',
+          onEnd: this.dragReorder
+        }
+      )
+    },
+    dragReorder ({item, oldIndex, newIndex}) {
+      // Copy computed fieldsDisplayed to prevent mutating store.
+      const clonedFieldsDisplayed = _.cloneDeep(this.fieldsDisplayed)
+
+      // Update the order of the displayed fields based on what just moved.
+      const movedItem = clonedFieldsDisplayed.splice(oldIndex, 1)[0]
+      clonedFieldsDisplayed.splice(newIndex, 0, movedItem)
+
+      // Ensure ID field remains as the first item in the list.
+      const idIndex = clonedFieldsDisplayed.findIndex(x => x.type === 'id')
+      if (idIndex !== -1) {
+        const idField = clonedFieldsDisplayed.splice(idIndex, 1)[0]
+        clonedFieldsDisplayed.unshift(idField)
+      }
+
+      this.$store.commit('entities/SET_FIELDS_FROM_REORDERING', clonedFieldsDisplayed)
+    },
+    fieldOrderKey (item) {
+      if (!this.fieldOrderKeys.has(item)) {
+        this.fieldOrderKeys.set(item, ++this.currentfieldOrderKey)
+      }
+      return this.fieldOrderKeys.get(item)
+    },
     gotoField(path, label = '') {
 
       // Ignore if gotoField request is already active.
@@ -165,7 +208,7 @@ export default {
     fieldPathActive() {
       return this.$store.state.entities.fieldPathActive
     },
-    fieldsDisplayed () {
+    fieldsDisplayed() {
       return this.$store.state.entities.fieldsDisplayed
     },
     fieldTypes () {
@@ -180,7 +223,11 @@ export default {
   data() {
     return {
       apolloEntityData: {}, // Assigned to Apollo.
+      sortableInstance: {},
+      fieldOrderKeys: new WeakMap(),
+      currentfieldOrderKey: 0,
       fieldHeaders: [
+        {}, // Drag handle.
         {
           text: this.$t('cms.entities.fields.attributes.label'),
           value: 'label'
@@ -281,6 +328,9 @@ export default {
       transform: translateX(50%);
     }
   }
+}
+.sort-handle {
+  cursor: move;
 }
 .entity-field-actions {
   margin: 1em auto 0 auto;
