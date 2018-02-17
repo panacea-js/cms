@@ -45,7 +45,9 @@
           "cancel": "Cancelar"
         },
         "actions": {
-          "add": "Crear campo"
+          "add": "Crear campo",
+          "move": "Mover",
+          "idNoMove": "ID permanece en la parte superior"
         },
         "validations": {
           "required": "El campo es obligatorio",

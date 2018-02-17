@@ -45,7 +45,9 @@
           "cancel": "Cancel"
         },
         "actions": {
-          "add": "Add field"
+          "add": "Add field",
+          "move": "Move",
+          "idNoMove": "ID stays at top"
         },
         "validations": {
           "required": "This field is required",
