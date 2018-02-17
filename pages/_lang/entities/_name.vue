@@ -29,16 +29,25 @@
               <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions class="elevation-1" ref="sortableTable">
 
                 <template slot="items" slot-scope="props">
-                  <tr class="sortable-row" :key="fieldOrderKey(props.item)">
-                    <td>
-                      <v-btn v-if="props.item.type !== 'id'" icon class="sort-handle"><v-icon>drag_handle</v-icon></v-btn>
+                  <tr :class="`sortable-row field-type-${props.item.type}`" :key="fieldOrderKey(props.item)">
+                    <td :class="props.item.type !== 'id' ? 'sort-handle' : 'sort-locked'">
+
+                      <v-tooltip left>
+                        <v-icon slot="activator" v-if="props.item.type !== 'id'">drag_handle</v-icon>
+                        <span>{{ $t('cms.entities.fields.actions.move') }}</span>
+                      </v-tooltip>
+
+                      <v-tooltip left>
+                        <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'">lock</v-icon>
+                        <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
+                      </v-tooltip>
+
+
                     </td>
                     <td class="field-label">
                       {{ props.item.label }}
                       <v-tooltip top v-if="!!props.item.description">
-                        <v-btn icon slot="activator">
-                          <v-icon color="grey lighten-1">info</v-icon>
-                        </v-btn>
+                        <sup slot="activator"><v-icon small color="grey lighten-1">info</v-icon></sup>
                         <span>{{ props.item.description }}</span>
                       </v-tooltip>
                     </td>
@@ -112,7 +121,12 @@ export default {
         {
           draggable: '.sortable-row',
           handle: '.sort-handle',
-          onEnd: this.dragReorder
+          onEnd: this.dragReorder,
+          onMove: function (event, originalEvent) {
+            // Don't allow move (visible when draggable) of any items above the ID field.
+            return originalEvent.toElement.parentNode.classList.value.indexOf('field-type-id') === -1
+          },
+          animation: 250,
         }
       )
     },
@@ -227,7 +241,9 @@ export default {
       fieldOrderKeys: new WeakMap(),
       currentfieldOrderKey: 0,
       fieldHeaders: [
-        {}, // Drag handle.
+        {
+          class: 'sort-handle'
+        },
         {
           text: this.$t('cms.entities.fields.attributes.label'),
           value: 'label'
@@ -301,6 +317,10 @@ export default {
   font-size: 0.9em;
   white-space: nowrap;
 }
+tr.field-type-id {
+  border-bottom-width: 5px !important;
+  border-bottom-style: double !important;
+}
 .field-type--cardinality {
   color: $color-primary;
   font-weight: bold;
@@ -329,9 +349,25 @@ export default {
     }
   }
 }
-.sort-handle {
-  cursor: move;
+
+.sort-locked {
+  text-align: center;
+  padding-left: 1.5em !important;
+  padding-right: 0 !important;
+  .icon {
+    cursor: not-allowed;
+  }
 }
+
+.sort-handle {
+  text-align: center;
+  padding-left: 1.5em !important;
+  padding-right: 0 !important;
+  .icon {
+    cursor: move;
+  }
+}
+
 .entity-field-actions {
   margin: 1em auto 0 auto;
   text-align: center;
