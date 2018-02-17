@@ -25,12 +25,12 @@
                 <div class="text-lg-center pa-2">
                   <div v-if="machineNameAlterable">
                     <v-icon color="green">brightness_auto</v-icon>
-                    <span v-if="showFormElement('machineNameAutoText')" class="pl-2">{{ $t('cms.entities.fields.machineName.synced') }}</span>
+                    <span v-if="showFormElement('machineNameAutoText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.synced')"></span>
                   </div>
                   <div v-if="!machineNameAlterable">
                     <v-icon color="red">lock</v-icon>
-                    <span v-if="showFormElement('machineNameLockText')" class="pl-2">{{ $t('cms.entities.fields.machineName.locked') }}</span>
-                    <span v-if="showFormElement('machineNameLockIdText')" class="pl-2">{{ $t('cms.entities.fields.machineName.noChangeId') }}</span>
+                    <span v-if="showFormElement('machineNameLockText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.locked')"></span>
+                    <span v-if="showFormElement('machineNameLockIdText')" class="pl-2" v-html="this.$t('cms.entities.fields.machineName.noChangeId')"></span>
                   </div>
                 </div>
 
