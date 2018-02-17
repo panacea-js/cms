@@ -154,7 +154,7 @@
             value: fieldType,
             text: fieldTypeData.label
           }
-        })
+        }).filter(field => field.value !== 'id')
       },
       fieldTypesSelectHelp () {
         return _.map(this.$store.state.entities.fieldTypes, (fieldTypeData, fieldType) => {
@@ -225,12 +225,16 @@
 
         if (this.isNew) {
           this.$refs.fieldEditForm.reset()
+          this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
+          this.machineNameAlterable = true
+        }
+        else {
+          this.machineNameAlterable = false
         }
 
         // Saved data should now be considered the original data.
         this.fieldFormDataOriginal = _.cloneDeep(this.fieldFormData)
 
-        this.machineNameAlterable = false
         this.opened = false
       },
       cancel() {
@@ -264,7 +268,7 @@
         type: Object,
         default: function() {
           return {
-            type: '',
+            type: 'string',
             label: '',
             _meta: {
               camel: ''
