@@ -240,11 +240,8 @@
       cancel() {
         if (this.isNew) {
           this.$refs.fieldEditForm.reset()
-          this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
         }
-        else {
-          this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
-        }
+        this.fieldFormData = _.cloneDeep(this.fieldFormDataOriginal)
         this.opened = false
       },
       deriveMachineNameFromLabel() {
