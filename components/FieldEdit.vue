@@ -219,7 +219,6 @@
           }
         })
 
-        // @todo async save.
         this.$store.dispatch('entities/SAVE_ENTITY')
         this.$store.dispatch('entities/GET_FIELDS')
 

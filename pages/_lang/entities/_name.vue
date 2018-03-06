@@ -146,6 +146,7 @@ export default {
       }
 
       this.$store.commit('entities/SET_FIELDS_FROM_REORDERING', clonedFieldsDisplayed)
+      this.$store.dispatch('entities/SAVE_ENTITY')
     },
     fieldOrderKey (item) {
       if (!this.fieldOrderKeys.has(item)) {
@@ -295,7 +296,7 @@ export default {
           this.graphqlError = true
         },
         error(error) {
-          graphqlError = error
+          this.graphqlError = error
         },
       }
     },

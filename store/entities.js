@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import createENTITY from '../gql/mutations/createENTITY.gql'
 
 export const state = () => {
   return {
@@ -204,9 +205,15 @@ export const actions = {
     commit('FILTER_FIELD_PATHS_ACTIVE_AND_ABOVE', path)
   },
 
-  SAVE_ENTITY ({ state, commit }) {
-    // @todo
-    console.log(`Entity ${state.entityData._meta.camel} fake saved`)
+  SAVE_ENTITY ({ state }) {
+    this.app.apolloProvider.defaultClient.mutate({
+      mutation: createENTITY,
+      variables: {
+        name: state.entityData._meta.camel,
+        data: JSON.stringify(state.entityData)
+      }
+    })
+    .catch(error => console.error(error))
   },
 
   ensureFieldsContainerHeight () {
