@@ -3,13 +3,13 @@ import { Nuxt, Builder } from 'nuxt'
 import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
 new Bootstrap().all()
 
-const { _, path, options, fs, glob, rimraf, mkdirp, rsync: Rsync, resolvePluginPath, registry } = DI.container
+const { _, path, options, fs, glob, rimraf, mkdirp, rsync: Rsync, resolvePluginPath, registry } = Panacea.container
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
  *
  * @param params
- *   Nuxt options (not Panacea's DI container options.)
+ *   Nuxt options (not Panacea's container options.)
  */
 export default function (params = {}) {
   // Load defaults nuxt.config.js and override with options loaded in container.

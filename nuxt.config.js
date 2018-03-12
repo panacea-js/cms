@@ -1,6 +1,6 @@
 import path from 'path'
 
-const { options } = DI.container
+const { options } = Panacea.container
 const publicPrefix = options.cms.build.publicPath
 
 module.exports = {

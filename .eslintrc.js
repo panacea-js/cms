@@ -13,6 +13,6 @@ module.exports = {
   rules: {},
   globals: {
     // Panacea core dependencies injection container
-    DI: false
+    Panacea: false
   }
 }

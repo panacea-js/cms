@@ -15,7 +15,7 @@ export const mutations = {
 }
 
 const updateCoreLocale = function (commit, route) {
-  const { entities, hooks, i18n } = DI.container
+  const { entities, hooks, i18n } = Panacea.container
 
   const routeLocale = route.params.lang
   const coreLocale = i18n.locale
