@@ -1,9 +1,5 @@
 import { Nuxt, Builder } from 'nuxt'
-
 import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
-new Bootstrap().all()
-
-const { _, path, options, fs, glob, rimraf, mkdirp, rsync: Rsync, resolvePluginPath, registry } = Panacea.container
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
@@ -11,7 +7,12 @@ const { _, path, options, fs, glob, rimraf, mkdirp, rsync: Rsync, resolvePluginP
  * @param params
  *   Nuxt options (not Panacea's container options.)
  */
-export default function (params = {}) {
+export default async function (params = {}) {
+
+  await new Bootstrap().all()
+
+  const { _, path, options } = Panacea.container
+
   // Load defaults nuxt.config.js and override with options loaded in container.
   const nuxtConfigFile = require('../nuxt.config.js')
   const config = _.defaultsDeep(params, _.cloneDeep(options.cms), nuxtConfigFile)
@@ -48,6 +49,9 @@ const compileFiles = (config) => {
 }
 
 const fullBuild = (config) => {
+
+  const { rimraf, mkdirp } = Panacea.container
+
   // Remove and re-create compilation (srcDir) directory.
   rimraf.sync(config.srcDir)
   mkdirp.sync(config.srcDir)
@@ -71,15 +75,21 @@ const fullBuild = (config) => {
  *
  * @param {*} config
  */
-const sourcePaths = (config, options = {}) => [
-  options.includeCore ? path.dirname(require.resolve('@panaceajs/core')) : null, // Panacea core.
-  config.rootDir, // Panacea CMS.
-  ...Object.keys(registry.plugins), // All Panacea plugins.
-  process.cwd() // Application.
-]
-  .filter(x => !!x)
-  .map(dir => resolvePluginPath(dir))
-  .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
+const sourcePaths = (config, options = {}) => {
+
+  const { path, fs, resolvePluginPath, registry } = Panacea.container
+
+  return [
+    options.includeCore ? path.dirname(require.resolve('@panaceajs/core')) : null, // Panacea core.
+    config.rootDir, // Panacea CMS.
+    ...Object.keys(registry.plugins), // All Panacea plugins.
+    process.cwd() // Application.
+  ]
+    .filter(x => !!x)
+    .map(dir => resolvePluginPath(dir))
+    .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
+
+}
 
 /**
  * Merge nuxt assets from:
@@ -91,6 +101,9 @@ const sourcePaths = (config, options = {}) => [
  *   Nuxt config options.
  */
 const compileNuxtAssets = function (config) {
+
+  const { path, glob, rsync: Rsync } = Panacea.container
+
   const excludeDirectories = (dirs, subDir) => !dirs.find(exclude => exclude === path.basename(subDir))
 
   // Compile valid source paths of CMS assets.
@@ -120,6 +133,9 @@ const compileNuxtAssets = function (config) {
  *   Nuxt config options.
  */
 const compileVarsAssets = function (config) {
+
+  const { _, path, fs } = Panacea.container
+
   // Export the vars to json file so they can be referenced publicly and by plugins.
   fs.writeJsonSync(path.resolve(config.srcDir, 'assets/vars.json'), config.vars)
 
@@ -137,6 +153,9 @@ const compileVarsAssets = function (config) {
  *   Nuxt config options.
  */
 const compileLocales = function (config) {
+
+  const { _, path, fs, glob, mkdirp } = Panacea.container
+
   mkdirp.sync(path.join(config.srcDir, 'locales'))
 
   const allLocaleMessages = sourcePaths(config, { includeCore: true })
