@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import GraphqlVoyagerLogo from "../components/GraphqlVoyagerLogo"
-import GraphiqlLogo from "../components/GraphiqlLogo"
+import GraphqlVoyagerLogo from "@/components/GraphqlVoyagerLogo"
+import GraphiqlLogo from "@/components/GraphiqlLogo"
 
 export default {
   components: {

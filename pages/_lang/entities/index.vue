@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import EntityList from "../../../components/EntityList.vue"
+import EntityList from "@/components/EntityList.vue"
 
 export default {
   components: {

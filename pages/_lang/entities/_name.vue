@@ -94,10 +94,10 @@
 
 <script>
 import _ from 'lodash'
-import EntityList from '../../../components/EntityList.vue'
-import FieldEdit from '../../../components/FieldEdit.vue'
+import EntityList from '@/components/EntityList.vue'
+import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
-import ENTITY from '../../../gql/queries/Entity.gql'
+import ENTITY from '@/gql/queries/Entity.gql'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
 
 export default {

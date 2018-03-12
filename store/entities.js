@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import createENTITY from '../gql/mutations/createENTITY.gql'
+import createENTITY from '@/gql/mutations/createENTITY.gql'
 
 export const state = () => {
   return {
