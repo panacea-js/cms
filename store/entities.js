@@ -1,9 +1,12 @@
 import _ from 'lodash'
-import createENTITY from '@/gql/mutations/createENTITY.gql'
+import CREATE_ENTITY_GQL from '@/gql/mutations/createENTITY.gql'
+import ENTITIES_ALL_GQL from '@/gql/queries/ENTITIES.gql'
+import ENTITY_GQL from '@/gql/queries/ENTITY.gql'
 
 export const state = () => {
   return {
     entityData: {},
+    entitiesData: {},
     fieldsDisplayed: [],
     fieldPathActive: 'all',
     fieldPaths: [
@@ -52,11 +55,11 @@ export const getters = {
 
 export const mutations = {
 
-  SET_FIELDS (state, fields) {
+  SET_DISPLAYED_FIELDS (state, fields) {
     state.fieldsDisplayed = fields
   },
 
-  SET_FIELDS_FROM_REORDERING (state, fieldsDisplayed) {
+  SET_DISPLAYED_FIELDS_FROM_REORDERING (state, fieldsDisplayed) {
     state.fieldsDisplayed = fieldsDisplayed
 
     let weight = 1
@@ -80,6 +83,10 @@ export const mutations = {
   UPDATE_ENTITY_DATA (state, entityData) {
     entityData.fields = addPlaceholderAttributes(entityData.fields)
     state.entityData = entityData
+  },
+
+  UPDATE_ENTITIES_DATA (state, entitiesData) {
+    state.entitiesData = entitiesData
   },
 
   SET_FIELD_PATH_ACTIVE (state, path) {
@@ -176,16 +183,13 @@ export const actions = {
       .join('.')
 
     const fields = _(state.entityData).get(allFieldsPathOnEntityData)
+    const fieldsValues = _(fields).values().value()
 
-    const unorderedFields = _(fields).values().value()
-
-    // @todo reorder the array of orderedFields from ._meta.weight if it exists
-    const orderedFields = unorderedFields
-
-    commit('SET_FIELDS', orderedFields)
+    commit('SET_DISPLAYED_FIELDS', fieldsValues)
 
     dispatch('ensureFieldsContainerHeight')
   },
+
   REDIRECT_TO_ENTITY ({ state, commit }, entityName) {
     commit('RESET_FIELD_PATH_STATES')
     this.$router.push({
@@ -205,9 +209,35 @@ export const actions = {
     commit('FILTER_FIELD_PATHS_ACTIVE_AND_ABOVE', path)
   },
 
+  GET_ENTITY ({ commit, dispatch }) {
+    const entityName = this.app.router.currentRoute.params.name
+
+    const query = this.app.apolloProvider.defaultClient.query({
+      query: ENTITY_GQL,
+      variables: {
+        name: entityName
+      }
+    })
+
+    query.then(result => {
+      const entityData = JSON.parse(result.data.ENTITY.data)
+      commit('UPDATE_ENTITY_DATA', entityData)
+      dispatch('GET_FIELDS')
+    })
+  },
+
+  GET_ENTITIES ({ commit, dispatch }) {
+    const query = this.app.apolloProvider.defaultClient.query({query: ENTITIES_ALL_GQL})
+
+    query.then(result => {
+      const entitiesData = result.data.ENTITIES
+      commit('UPDATE_ENTITIES_DATA', entitiesData)
+    })
+  },
+
   SAVE_ENTITY ({ state }) {
     this.app.apolloProvider.defaultClient.mutate({
-      mutation: createENTITY,
+      mutation: CREATE_ENTITY_GQL,
       variables: {
         name: state.entityData._meta.camel,
         data: JSON.stringify(state.entityData)

@@ -97,7 +97,6 @@ import _ from 'lodash'
 import EntityList from '@/components/EntityList.vue'
 import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
-import ENTITY from '@/gql/queries/Entity.gql'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
 
 export default {
@@ -112,6 +111,7 @@ export default {
   },
   mounted () {
     this.sortableInstance = this.initialiseSortableTable()
+    this.$store.dispatch('entities/GET_ENTITY')
   },
   methods: {
     // Local methods.
@@ -145,7 +145,7 @@ export default {
         clonedFieldsDisplayed.unshift(idField)
       }
 
-      this.$store.commit('entities/SET_FIELDS_FROM_REORDERING', clonedFieldsDisplayed)
+      this.$store.commit('entities/SET_DISPLAYED_FIELDS_FROM_REORDERING', clonedFieldsDisplayed)
       this.$store.dispatch('entities/SAVE_ENTITY')
     },
     fieldOrderKey (item) {
@@ -201,6 +201,9 @@ export default {
     })
   },
   computed: {
+    entityData() {
+      return this.$store.state.entities.entityData
+    },
     entity() {
       const storeEntityData = this.$store.state.entities.entityData
       return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : this.$route.params.name
@@ -237,7 +240,6 @@ export default {
   },
   data() {
     return {
-      apolloEntityData: {}, // Assigned to Apollo.
       sortableInstance: {},
       fieldOrderKeys: new WeakMap(),
       currentfieldOrderKey: 0,
@@ -272,36 +274,11 @@ export default {
         return h
       }),
       fieldsTableTransition: null,
+      // @todo link graphql error with store.
       graphqlError: false,
     }
   },
-  apollo: {
-    apolloEntityData() {
-      return {
-        query: ENTITY,
-        variables() {
-          return {
-            name: this.$route.params.name,
-          }
-        },
-        fetchPolicy: 'cache-and-network',
-        update: (data) => {
-          if (data.ENTITY) {
-            const parsedEntityData = JSON.parse(data.ENTITY.data)
-            // Add entity data to Vuex store so it can be mutated independently from Apollo data.
-            this.$store.commit('entities/UPDATE_ENTITY_DATA', parsedEntityData)
-            this.$store.dispatch('entities/GET_FIELDS')
-            return parsedEntityData
-          }
-          this.graphqlError = true
-        },
-        error(error) {
-          this.graphqlError = error
-        },
-      }
-    },
-  },
-  asyncData({ env }) {
+  asyncData({ env, store }) {
     return {
       graphqlEndpoint: env.panacea.main.endpoint
     }

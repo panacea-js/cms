@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import ENTITIES_ALL from '../gql/queries/EntitiesAll.gql'
 import { mapActions } from 'vuex'
 
 export default {
@@ -45,17 +44,13 @@ export default {
       redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
     })
   },
-  apollo: {
-    entities: {
-      query: ENTITIES_ALL,
-      fetchPolicy: 'cache-and-network',
-      update: data => data.ENTITIES
-    },
+  mounted() {
+    this.$store.dispatch('entities/GET_ENTITIES')
   },
-  data() {
-    return {
-      entities: []
-    }
+  computed: {
+    entities() {
+      return this.$store.state.entities.entitiesData
+    },
   }
 }
 </script>

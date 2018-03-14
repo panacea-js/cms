@@ -8,7 +8,6 @@ import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
  *   Nuxt options (not Panacea's container options.)
  */
 export default async function (params = {}) {
-
   await new Bootstrap().all()
 
   const { _, path, options } = Panacea.container
@@ -49,7 +48,6 @@ const compileFiles = (config) => {
 }
 
 const fullBuild = (config) => {
-
   const { rimraf, mkdirp } = Panacea.container
 
   // Remove and re-create compilation (srcDir) directory.
@@ -76,7 +74,6 @@ const fullBuild = (config) => {
  * @param {*} config
  */
 const sourcePaths = (config, options = {}) => {
-
   const { path, fs, resolvePluginPath, registry } = Panacea.container
 
   return [
@@ -88,7 +85,6 @@ const sourcePaths = (config, options = {}) => {
     .filter(x => !!x)
     .map(dir => resolvePluginPath(dir))
     .map(dir => fs.pathExistsSync(path.join(dir, 'cms')) ? path.join(dir, 'cms') : dir)
-
 }
 
 /**
@@ -101,7 +97,6 @@ const sourcePaths = (config, options = {}) => {
  *   Nuxt config options.
  */
 const compileNuxtAssets = function (config) {
-
   const { path, glob, rsync: Rsync } = Panacea.container
 
   const excludeDirectories = (dirs, subDir) => !dirs.find(exclude => exclude === path.basename(subDir))
@@ -133,7 +128,6 @@ const compileNuxtAssets = function (config) {
  *   Nuxt config options.
  */
 const compileVarsAssets = function (config) {
-
   const { _, path, fs } = Panacea.container
 
   // Export the vars to json file so they can be referenced publicly and by plugins.
@@ -153,7 +147,6 @@ const compileVarsAssets = function (config) {
  *   Nuxt config options.
  */
 const compileLocales = function (config) {
-
   const { _, path, fs, glob, mkdirp } = Panacea.container
 
   mkdirp.sync(path.join(config.srcDir, 'locales'))
