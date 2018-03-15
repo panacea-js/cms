@@ -15,6 +15,9 @@ export const mutations = {
 }
 
 const updateCoreLocale = function (commit, route) {
+  // @todo Remove the need to call Panacea container directly
+  // Replace with a graphQL mutation call e.g. UPDATE_LOCALE
+  // This is to decouple the cms from needing access to the Panacea container
   const { entities, hooks, i18n } = Panacea.container
 
   const routeLocale = route.params.lang
