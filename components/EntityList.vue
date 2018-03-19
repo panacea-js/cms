@@ -1,44 +1,39 @@
 <template>
-  <div class="entity-list-wrapper">
-
+  <div class="EntityList">
     <v-card dark color="secondary" flat>
       <v-card-text class="pa-0">
         <v-list class="pa-0">
-          <template v-for="(entity, index) in entities">
+          <template v-for="(entity, index) in entities" class="EntityList__items">
             <v-tooltip v-bind:key="`tooltip-${index}`" right>
-              <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="isActive(entity.name)" @click="redirectToEntity(entity.name)">
+              <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="itemClasses(entity.name)" @click="redirectToEntity(entity.name)">
                 <v-list-tile-content>
                   <v-list-tile-title v-html="entity.name"></v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <span class="tooltip-text">{{ entity.data | json('description') }}</span>
+              <span class="tooltip-text">{{ entity.description }}</span>
             </v-tooltip>
             <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
-
           </template>
         </v-list>
       </v-card-text>
     </v-card>
-
-    <div class="entity-actions">
-      <v-tooltip right>
-        <v-btn slot="activator" small fab color="primary secondary--text" class="entity-actions__add">
-          <v-icon>add</v-icon>
-        </v-btn>
-        <span class="tooltip-text">{{ $t('cms.entities.actions.add') }}</span>
-      </v-tooltip>
-    </div>
-
+    <EntityListActions />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import EntityListActions from './EntityListActions'
 
 export default {
+  components: {
+    EntityListActions
+  },
   methods: {
-    isActive: function(entityName) {
-      return entityName === this.$route.params.name ? "active" : ""
+    itemClasses: function(entityName) {
+      const classes = ['EntityList__item']
+      entityName === this.$route.params.name && classes.push('EntityList__item--active')
+      return classes.join(' ')
     },
     ...mapActions({
       redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
@@ -49,31 +44,27 @@ export default {
   },
   computed: {
     entities() {
-      return this.$store.state.entities.entitiesData
+      if (Array.isArray(this.$store.state.entities.entitiesData)) {
+        return this.$store.state.entities.entitiesData.map(e => {
+          const entityData = JSON.parse(e.data)
+          return {
+            name: e.name,
+            description: entityData.description
+          }
+        })
+      }
     },
   }
 }
 </script>
 
-<style lang="scss" scoped>
-ul {
-  background: transparent !important;
-}
-li {
+<style lang="scss">
+.EntityList__item {
   border-left: 3px solid transparent;
   opacity: 0.5;
 }
-li.active {
+.EntityList__item--active {
   border-left-color: $color-accent;
   opacity: 1;
-}
-.entity-actions {
-  margin: 1em auto;
-  text-align: center;
-}
-.tooltip-text {
-  display: inline-block;
-  max-width: 200px;
-  font-size: 1.2em;
 }
 </style>
