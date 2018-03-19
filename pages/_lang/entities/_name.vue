@@ -18,6 +18,7 @@
             </div>
           </v-card-title>
           <v-card-text>
+            <EntityEdit :isNew="false" :entity="entity" />
             <v-breadcrumbs>
               <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
                 {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
@@ -95,6 +96,7 @@
 <script>
 import _ from 'lodash'
 import EntityList from '@/components/EntityList.vue'
+import EntityEdit from '@/components/EntityEdit.vue'
 import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
@@ -102,6 +104,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex'
 export default {
   components: {
     EntityList,
+    EntityEdit,
     FieldEdit
   },
   head() {

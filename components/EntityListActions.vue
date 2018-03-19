@@ -1,14 +1,18 @@
 <template>
   <div class="EntityListActions">
-    <v-tooltip right>
-      <v-btn slot="activator" small fab color="primary secondary--text">
-        <v-icon>add</v-icon>
-      </v-btn>
-      <span class="tooltip-text">{{ $t('cms.entities.actions.add') }}</span>
-    </v-tooltip>
+    <EntityEdit :isNew="true" />
   </div>
-
 </template>
+
+<script>
+import EntityEdit from './EntityEdit'
+
+export default {
+  components: {
+    EntityEdit
+  }
+}
+</script>
 
 <style lang="scss">
 .EntityListActions {

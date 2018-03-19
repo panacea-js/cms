@@ -55,7 +55,8 @@
         }
       },
       "actions": {
-        "add": "Add entity"
+        "add": "Add entity",
+        "edit": "Edit entity"
       },
       "errors": {
         "error-loading-entity": "There was an error loading {entityName}"
