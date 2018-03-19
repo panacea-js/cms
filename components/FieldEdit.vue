@@ -1,97 +1,99 @@
 <template>
-  <v-dialog v-model="opened" persistent max-width="75%">
+  <div class="FieldEdit">
+    <v-dialog v-model="opened" persistent max-width="75%">
 
-    <v-btn fab dark small :color="iconBackgroundColor" slot="activator">
-      <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
-    </v-btn>
+      <v-btn fab dark small :color="iconBackgroundColor" slot="activator" class="FieldEdit__activator">
+        <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
+      </v-btn>
 
-    <v-card>
-      <v-card-title>
-        <span class="headline" v-if="!isNew">{{ $t('cms.entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
-        <span class="headline" v-if="isNew">{{ $t('cms.entities.fields.actions.add') }}</span>
-      </v-card-title>
-      <v-card-text>
-        <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
-          <v-container fluid grid-list-xl>
-            <p>*{{ $t('cms.entities.fields.edit.indicatesRequiredField')}}</p>
-            <v-layout wrap>
-              <v-flex xs12 lg6>
-                <v-text-field box v-model="fieldFormData.label" label="Label" v-if="showFormElement('label')" :disabled="disableFormElement('label')" :rules="rules.required" required @keyup="deriveMachineNameFromLabel()"></v-text-field>
-              </v-flex>
-              <v-flex xs12 lg6>
+      <v-card class="FieldEdit__dialog">
+        <v-card-title>
+          <span class="headline" v-if="!isNew">{{ $t('cms.entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
+          <span class="headline" v-if="isNew">{{ $t('cms.entities.fields.actions.add') }}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
+            <v-container fluid grid-list-xl>
+              <p>*{{ $t('cms.entities.fields.edit.indicatesRequiredField')}}</p>
+              <v-layout wrap>
+                <v-flex xs12 lg6>
+                  <v-text-field box v-model="fieldFormData.label" label="Label" v-if="showFormElement('label')" :disabled="disableFormElement('label')" :rules="rules.required" required @keyup="deriveMachineNameFromLabel()"></v-text-field>
+                </v-flex>
+                <v-flex xs12 lg6>
 
-                <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
+                  <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
 
-                <div class="text-lg-center pa-2">
-                  <div v-if="machineNameAlterable">
-                    <v-icon color="green">brightness_auto</v-icon>
-                    <span v-if="showFormElement('machineNameAutoText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.synced')"></span>
+                  <div class="text-lg-center pa-2">
+                    <div v-if="machineNameAlterable">
+                      <v-icon color="green">brightness_auto</v-icon>
+                      <span v-if="showFormElement('machineNameAutoText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.synced')"></span>
+                    </div>
+                    <div v-if="!machineNameAlterable">
+                      <v-icon color="red">lock</v-icon>
+                      <span v-if="showFormElement('machineNameLockText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.locked')"></span>
+                      <span v-if="showFormElement('machineNameLockIdText')" class="pl-2" v-html="this.$t('cms.entities.fields.machineName.noChangeId')"></span>
+                    </div>
                   </div>
-                  <div v-if="!machineNameAlterable">
-                    <v-icon color="red">lock</v-icon>
-                    <span v-if="showFormElement('machineNameLockText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.locked')"></span>
-                    <span v-if="showFormElement('machineNameLockIdText')" class="pl-2" v-html="this.$t('cms.entities.fields.machineName.noChangeId')"></span>
-                  </div>
-                </div>
 
-              </v-flex>
+                </v-flex>
 
-            </v-layout>
+              </v-layout>
 
-            <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
+              <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
 
-            <v-layout wrap v-if="fieldFormData.type !== 'id'">
+              <v-layout wrap v-if="fieldFormData.type !== 'id'">
 
-              <v-flex xs12 lg6>
+                <v-flex xs12 lg6>
 
-                <v-layout>
-                  <v-flex xs11>
-                    <v-select :label="$t('cms.entities.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
-                  </v-flex>
-                  <v-flex xs1 text-xs-center mt-4>
-                    <v-tooltip left content-class="field-type-help__tooltip">
-                      <v-icon dark color="primary" slot="activator">help</v-icon>
-                      <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypesSelectHelp" hide-actions class="field-type-help__table elevation-1">
-                        <template slot="items" slot-scope="props">
-                          <td>
-                            {{ props.item.label }}
-                          </td>
-                          <td>
-                            {{ props.item.description }}
-                          </td>
-                        </template>
-                      </v-data-table>
-                    </v-tooltip>
-                  </v-flex>
-                </v-layout>
+                  <v-layout>
+                    <v-flex xs11>
+                      <v-select :label="$t('cms.entities.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                    </v-flex>
+                    <v-flex xs1 text-xs-center mt-4>
+                      <v-tooltip left content-class="FieldEdit__help-tooltip">
+                        <v-icon dark color="primary" slot="activator" class="FieldEdit__help-activator">help</v-icon>
+                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypesSelectHelp" hide-actions class="FieldEdit__help-table elevation-1">
+                          <template slot="items" slot-scope="props">
+                            <td>
+                              {{ props.item.label }}
+                            </td>
+                            <td>
+                              {{ props.item.description }}
+                            </td>
+                          </template>
+                        </v-data-table>
+                      </v-tooltip>
+                    </v-flex>
+                  </v-layout>
 
-                <v-layout>
-                  <v-flex x11>
-                    <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
-                  </v-flex>
-                  <v-flex xs1>
-                  </v-flex>
-                </v-layout>
+                  <v-layout>
+                    <v-flex x11>
+                      <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                    </v-flex>
+                    <v-flex xs1>
+                    </v-flex>
+                  </v-layout>
 
-              </v-flex>
+                </v-flex>
 
-              <v-flex xs12 lg6>
-                <v-switch :label="$t('cms.entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
-                <v-switch :label="$t('cms.entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
-              </v-flex>
+                <v-flex xs12 lg6>
+                  <v-switch :label="$t('cms.entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
+                  <v-switch :label="$t('cms.entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+                </v-flex>
 
-            </v-layout>
+              </v-layout>
 
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
-        <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+            </v-container>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="FieldEdit__actions">
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
+          <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -127,8 +129,6 @@
         iconBackgroundColor: this.isNew ? 'primary' : 'amber darken-1',
         fieldFormData,
         fieldFormDataOriginal,
-        // @todo get entities from store once EntityList component stores its state in vuex.
-        entityTypes: ['Dog', 'Cat'],
         machineNameAlterable: this.isNew,
 
         fieldTypesSelectHelpHeaders: [
@@ -164,6 +164,9 @@
             description: fieldTypeData.description
           }
         })
+      },
+      entityTypes () {
+        return this.$store.state.entities.entitiesData.map(e => e.name)
       }
     },
     methods: {
@@ -286,10 +289,10 @@
 </script>
 
 <style lang="scss">
-.field-type-help__tooltip {
+.FieldEdit__help-tooltip {
   opacity: 1 !important;
 }
-.field-type-help__table table {
+.FieldEdit__help-table table {
   background-color: $color-secondary !important;
   thead tr {
     height: 32px;
