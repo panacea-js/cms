@@ -12,6 +12,29 @@
       "description": "This is an introduction in English."
     },
     "entities": {
+      "attributes": {
+        "name": {
+          "label": "Entity name",
+          "hint": "The singular name of this entity"
+        },
+        "description": {
+          "label": "Description",
+          "hint": "A useful description of this entity"
+        },
+        "plural": {
+          "label": "Plural",
+          "hint": "The plural form of this entity's name"
+        },
+        "idLabel": {
+          "label": "ID label",
+          "hint": "A description for this entity's <code>id</code> field"
+        },
+        "storage": {
+          "label": "Storage",
+          "db": "Database",
+          "fs": "File system"
+        }
+      },
       "fields": {
         "breadcrumb": {
           "allFields": "All fields"
@@ -40,7 +63,6 @@
         },
         "edit": {
           "title": "Field edit",
-          "indicatesRequiredField": "Indicates required field",
           "save": "Save",
           "cancel": "Cancel"
         },
@@ -61,6 +83,9 @@
       "errors": {
         "error-loading-entity": "There was an error loading {entityName}"
       }
+    },
+    "forms": {
+      "indicatesRequiredField": "Indicates required field"
     }
   }
 }

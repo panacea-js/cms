@@ -14,14 +14,27 @@
         <v-card-text>
           <v-form v-model="valid" ref="EntityEditForm" lazy-validation>
             <v-container fluid grid-list-xl>
-              <p>*{{ $t('cms.entities.fields.edit.indicatesRequiredField')}}</p>
+              <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
               <v-layout wrap>
                 <v-flex xs12>
-                  <v-text-field box v-model="entityDataForm.name" label="Label" required></v-text-field>
+                  <v-text-field box v-model="entityDataForm.name" :label="$t('cms.entities.attributes.name.label')" required @keyup="populateMetaNamePascalCase()"></v-text-field>
                 </v-flex>
               </v-layout>
 
-              <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-model="entityDataForm.data.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
+              <v-text-field box
+                :label="$t('cms.entities.attributes.description.label')"
+                v-model="entityDataForm.data.description"
+                :hint="this.$t('cms.entities.attributes.description.hint')" />
+
+              <v-text-field box
+                :label="$t('cms.entities.attributes.plural.label')"
+                v-model="entityDataForm.data.plural"
+                :hint="this.$t('cms.entities.attributes.plural.hint')" />
+
+              <v-text-field box
+                :label="$t('cms.entities.attributes.idLabel.label')"
+                v-model="entityDataForm.data.fields.id.label"
+                :hint="this.$t('cms.entities.attributes.idLabel.hint')" />
 
             </v-container>
           </v-form>
@@ -60,16 +73,29 @@
             return this.$store.state.entities.entitiesData
               .filter(e => e.name === this.entity)
               .map(e => {
-                return {
-                  name: e.name,
-                  data: JSON.parse(e.data)
-                }
+                const entity = _.cloneDeep(e)
+                entity.data = JSON.parse(entity.data)
+
+                return entity
               })[0]
           }
           else {
             return {
               name: '',
-              data: {},
+              data: {
+                _meta: {
+                  pascal: ''
+                },
+                storage: 'db',
+                description: '',
+                plural: '',
+                fields: {
+                  id: {
+                    label: '',
+                    type: 'id'
+                  }
+                }
+              },
             }
           }
 
@@ -82,6 +108,9 @@
       //entityDataFormOriginal: _.cloneDeep(this.entityDataForm),
     },
     methods: {
+      populateMetaNamePascalCase() {
+        this.entityDataForm.data._meta.pascal = this.entityDataForm.name
+      },
       submit() {
 
         // if (!this.$refs.EntityEditForm.validate()) {
@@ -109,12 +138,15 @@
         //   }
         // })
 
-        // this.$store.dispatch('entities/SAVE_ENTITY')
-        // this.$store.dispatch('entities/GET_FIELDS')
+        this.$store.commit('entities/UPDATE_ENTITY_DATA', this.entityDataForm.data)
+        this.$store.dispatch('entities/SAVE_ENTITY')
 
         if (this.isNew) {
           this.$refs.EntityEditForm.reset()
           this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
+          this.$store.dispatch('entities/GET_ENTITIES', this.entityDataForm.data._meta.pascal)
+          this.$store.dispatch('entities/REDIRECT_TO_ENTITY', this.entityDataForm.data._meta.pascal)
+
         }
 
         // Saved data should now be considered the original data.

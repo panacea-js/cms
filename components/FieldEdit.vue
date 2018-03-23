@@ -14,7 +14,7 @@
         <v-card-text>
           <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
             <v-container fluid grid-list-xl>
-              <p>*{{ $t('cms.entities.fields.edit.indicatesRequiredField')}}</p>
+              <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
               <v-layout wrap>
                 <v-flex xs12 lg6>
                   <v-text-field box v-model="fieldFormData.label" label="Label" v-if="showFormElement('label')" :disabled="disableFormElement('label')" :rules="rules.required" required @keyup="deriveMachineNameFromLabel()"></v-text-field>

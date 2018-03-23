@@ -239,7 +239,7 @@ export const actions = {
     this.app.apolloProvider.defaultClient.mutate({
       mutation: CREATE_ENTITY_GQL,
       variables: {
-        name: state.entityData._meta.camel,
+        name: state.entityData._meta.pascal,
         data: JSON.stringify(state.entityData)
       }
     })
