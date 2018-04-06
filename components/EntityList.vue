@@ -10,7 +10,7 @@
                   <v-list-tile-title v-html="entity.name"></v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <span class="tooltip-text">{{ entity.description }}</span>
+              <span class="tooltip-text">{{ entity.data | json('description') }}</span>
             </v-tooltip>
             <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
           </template>
@@ -24,6 +24,7 @@
 <script>
 import { mapActions } from 'vuex'
 import EntityListActions from './EntityListActions'
+import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
 
 export default {
   components: {
@@ -40,20 +41,34 @@ export default {
     })
   },
   mounted() {
-    this.$store.dispatch('entities/GET_ENTITIES')
+    //this.$store.dispatch('entities/GET_ENTITIES')
   },
-  computed: {
-    entities() {
-      if (Array.isArray(this.$store.state.entities.entitiesData)) {
-        return this.$store.state.entities.entitiesData.map(e => {
-          const entityData = JSON.parse(e.data)
-          return {
-            name: e.name,
-            description: entityData.description
-          }
-        })
+  // computed: {
+  //   entities() {
+  //     if (Array.isArray(this.$store.state.entities.entitiesData)) {
+  //       return this.$store.state.entities.entitiesData.map(e => {
+  //         const entityData = JSON.parse(e.data)
+  //         return {
+  //           name: e.name,
+  //           description: entityData.description
+  //         }
+  //       })
+  //     }
+  //   },
+  // }
+  apollo: {
+    entities: {
+      fetchPolicy: 'cache-and-network',
+      query: ENTITY_TYPES,
+      update: (data) => {
+        return data.ENTITY_TYPES
       }
-    },
+    }
+  },
+  data() {
+    return {
+      entities: []
+    }
   }
 }
 </script>

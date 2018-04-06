@@ -1,5 +1,5 @@
 mutation ($name: String!, $data: String!) {
-  createENTITY (name: $name, data: $data) {
+  createENTITY_TYPE (name: $name, data: $data) {
     name,
     data
   }

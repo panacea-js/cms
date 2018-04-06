@@ -1,0 +1,6 @@
+query ENTITY_TYPE ($name: String!) {
+  ENTITY_TYPE(name: $name) {
+    name,
+    data
+  }
+}

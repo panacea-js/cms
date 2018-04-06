@@ -33,6 +33,9 @@
           "label": "Storage",
           "db": "Database",
           "fs": "File system"
+        },
+        "validations": {
+          "required": "This attribute is required"
         }
       },
       "fields": {

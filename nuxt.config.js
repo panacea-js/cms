@@ -26,8 +26,7 @@ module.exports = {
   plugins: [
     '@/plugins/i18n.js',
     '@/plugins/vuetify.js',
-    '@/plugins/filters.js',
-    '@/plugins/apollo.js'
+    '@/plugins/filters.js'
   ],
   css: [
     '@/assets/style/app.styl'
@@ -57,17 +56,20 @@ module.exports = {
           config.entry.app = config.entry.app.map(x => x.replace('timeout=30000', 'timeout=1000'))
         }
       }
-      config.module.rules.push({
-        test: /\.(gql|graphql)$/,
-        loader: 'graphql-tag/loader'
-      })
     }
   },
   modules: [
+    ['@nuxtjs/apollo'],
     ['nuxt-sass-resources-loader', [
       path.resolve(process.cwd(), '.compiled/cms/assets/colors.scss')
     ]]
   ],
+  apollo: {
+    clientConfigs: {
+      default: '~/apollo/client-configs/default.js'
+    },
+    includeNodeModules: true
+  },
   vars: {
     colors: {
       primary: '#bada55',

@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import CREATE_ENTITY_GQL from '@/gql/mutations/createENTITY.gql'
-import ENTITIES_ALL_GQL from '@/gql/queries/ENTITIES.gql'
-import ENTITY_GQL from '@/gql/queries/ENTITY.gql'
+import CREATE_ENTITY_TYPE_GQL from '@/gql/mutations/createENTITY_TYPE.gql'
+import ENTITY_TYPES_GQL from '@/gql/queries/ENTITY_TYPES.gql'
+import ENTITY_TYPE_GQL from '@/gql/queries/ENTITY_TYPE.gql'
 
 export const state = () => {
   return {
@@ -213,31 +213,30 @@ export const actions = {
     const entityName = this.app.router.currentRoute.params.name
 
     const query = this.app.apolloProvider.defaultClient.query({
-      query: ENTITY_GQL,
+      query: ENTITY_TYPE_GQL,
       variables: {
         name: entityName
       }
     })
 
     query.then(result => {
-      const entityData = JSON.parse(result.data.ENTITY.data)
+      const entityData = JSON.parse(result.data.ENTITY_TYPE.data)
       commit('UPDATE_ENTITY_DATA', entityData)
       dispatch('GET_FIELDS')
     })
   },
 
   GET_ENTITIES ({ commit, dispatch }) {
-    const query = this.app.apolloProvider.defaultClient.query({query: ENTITIES_ALL_GQL})
-
+    const query = this.app.apolloProvider.defaultClient.query({query: ENTITY_TYPES_GQL})
     query.then(result => {
-      const entitiesData = result.data.ENTITIES
+      const entitiesData = result.data.ENTITY_TYPES
       commit('UPDATE_ENTITIES_DATA', entitiesData)
-    })
+    }).catch(error => console.error(error))
   },
 
   SAVE_ENTITY ({ state }) {
     this.app.apolloProvider.defaultClient.mutate({
-      mutation: CREATE_ENTITY_GQL,
+      mutation: CREATE_ENTITY_TYPE_GQL,
       variables: {
         name: state.entityData._meta.pascal,
         data: JSON.stringify(state.entityData)

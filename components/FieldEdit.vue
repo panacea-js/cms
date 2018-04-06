@@ -99,6 +99,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import _ from 'lodash'
+  import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
 
   export default {
     data() {
@@ -144,7 +145,9 @@
           h.align = 'left'
           h.sortable = false
           return h
-        })
+        }),
+
+        entityTypes: []
       }
     },
     computed: {
@@ -165,8 +168,14 @@
           }
         })
       },
-      entityTypes () {
-        return this.$store.state.entities.entitiesData.map(e => e.name)
+    },
+    apollo: {
+      entityTypes: {
+        fetchPolicy: 'cache-and-network',
+        query: ENTITY_TYPES,
+        update: (data) => {
+          return data.ENTITY_TYPES.map(et => et.name)
+        }
       }
     },
     methods: {

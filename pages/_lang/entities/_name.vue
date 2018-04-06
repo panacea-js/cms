@@ -100,6 +100,7 @@ import EntityEdit from '@/components/EntityEdit.vue'
 import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
+import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 
 export default {
   components: {

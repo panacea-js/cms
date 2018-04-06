@@ -2,7 +2,7 @@
   <div class="EntityEdit">
     <v-dialog v-model="opened" persistent max-width="75%">
 
-      <v-btn fab dark small :color="iconBackgroundColor" slot="activator" class="EntityEdit__activator">
+      <v-btn @click="loadEntityFormData()" fab dark small :color="iconBackgroundColor" slot="activator" class="EntityEdit__activator">
         <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
       </v-btn>
 
@@ -12,28 +12,37 @@
           <span class="headline" v-if="isNew">{{ $t('cms.entities.actions.add') }}</span>
         </v-card-title>
         <v-card-text>
-          <v-form v-model="valid" ref="EntityEditForm" lazy-validation>
+          <v-form v-model="valid" ref="EntityEditForm">
             <v-container fluid grid-list-xl>
               <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
               <v-layout wrap>
                 <v-flex xs12>
-                  <v-text-field box v-model="entityDataForm.name" :label="$t('cms.entities.attributes.name.label')" required @keyup="populateMetaNamePascalCase()"></v-text-field>
+                  <v-text-field box
+                    v-model="entityDataForm.name"
+                    :label="$t('cms.entities.attributes.name.label')"
+                    required
+                    :rules="rules.name" />
                 </v-flex>
               </v-layout>
 
               <v-text-field box
                 :label="$t('cms.entities.attributes.description.label')"
                 v-model="entityDataForm.data.description"
+                v-if="!!entityDataForm.data"
                 :hint="this.$t('cms.entities.attributes.description.hint')" />
 
               <v-text-field box
                 :label="$t('cms.entities.attributes.plural.label')"
+                required
                 v-model="entityDataForm.data.plural"
-                :hint="this.$t('cms.entities.attributes.plural.hint')" />
+                v-if="!!entityDataForm.data"
+                :hint="this.$t('cms.entities.attributes.plural.hint')"
+                :rules="rules.plural" />
 
               <v-text-field box
                 :label="$t('cms.entities.attributes.idLabel.label')"
                 v-model="entityDataForm.data.fields.id.label"
+                v-if="!!entityDataForm.data"
                 :hint="this.$t('cms.entities.attributes.idLabel.hint')" />
 
             </v-container>
@@ -52,101 +61,117 @@
 <script>
   import { mapGetters } from 'vuex'
   import _ from 'lodash'
+  import createENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
+  import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
+  import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+
+  const entityDataForm = {
+    name: '',
+    data: {
+      storage: 'db',
+      description: '',
+      plural: '',
+      fields: {
+        id: {
+          label: 'Unique identifier',
+          type: 'id'
+        }
+      }
+    },
+  }
 
   export default {
     data() {
+
+      const validations = {
+        required: (v) => !!v || this.$t('cms.entities.attributes.validations.required'),
+        entityNameExists: (v) => {
+          if (!v || !this.isNew || !Array.isArray(this.$store.state.entities.entitiesData)) {
+            return true
+          }
+
+          const entityNames = this.$store.state.entities.entitiesData.map(entity => entity.name.toLowerCase())
+          const entityNameAvailable = !entityNames.find((x) => x === v.toLowerCase().trim())
+          return entityNameAvailable || `Entity name ${v} already exists`
+
+        }
+      }
+
+      const entityDataFormOriginal = _.cloneDeep(entityDataForm)
 
       return {
         opened: false,
         valid: false,
         icon: this.isNew ? 'add' : 'edit',
         iconBackgroundColor: this.isNew ? 'primary' : 'amber darken-1',
+        entityDataForm,
+        entityDataFormOriginal,
+        rules: {
+          plural: [validations.required],
+          name: [validations.required, validations.entityNameExists]
+        },
       }
 
     },
-    computed: {
-      entityDataForm: {
-
-        get: function() {
-
-          if (!this.isNew && Array.isArray(this.$store.state.entities.entitiesData)) {
-            return this.$store.state.entities.entitiesData
-              .filter(e => e.name === this.entity)
-              .map(e => {
-                const entity = _.cloneDeep(e)
-                entity.data = JSON.parse(entity.data)
-
-                return entity
-              })[0]
-          }
-          else {
-            return {
-              name: '',
-              data: {
-                _meta: {
-                  pascal: ''
-                },
-                storage: 'db',
-                description: '',
-                plural: '',
-                fields: {
-                  id: {
-                    label: '',
-                    type: 'id'
-                  }
-                }
-              },
-            }
-          }
-
-        },
-
-        set: function(value) {
-          return value
-        }
-      },
-      //entityDataFormOriginal: _.cloneDeep(this.entityDataForm),
-    },
     methods: {
-      populateMetaNamePascalCase() {
-        this.entityDataForm.data._meta.pascal = this.entityDataForm.name
+      loadEntityFormData() {
+        if (!this.isNew) {
+          this.$apollo.query({ query: ENTITY_TYPE, variables: {name: this.entity} })
+            .then(({data: { ENTITY_TYPE }}) => {
+              const entityType = _.cloneDeep(ENTITY_TYPE)
+              entityType.data = JSON.parse(entityType.data)
+              this.entityDataForm = entityType
+              this.entityDataFormOriginal = entityType
+            })
+            .catch(error => console.log(error))
+        }
       },
       submit() {
 
-        // if (!this.$refs.EntityEditForm.validate()) {
-        //   return
-        // }
+        if (!this.$refs.EntityEditForm.validate()) {
+          return
+        }
 
-        // const machineNameCamel = _(this.entityDataForm.machineName).camelCase()
+        const entityName = _.upperFirst(_.camelCase(this.entityDataForm.name))
 
-        // if (!this.isNew && machineNameCamel !== this.field._meta.camel) {
-        //   this.$store.commit('entities/RENAME_FIELD', {
-        //     oldId: this.field._meta.camel,
-        //     newId: machineNameCamel
-        //   })
-        // }
+        const preparedEntityTypeDefinition = {
+          name: entityName,
+          data: JSON.stringify(this.entityDataForm.data)
+        }
 
-        // this.$store.commit('entities/UPDATE_FIELD', {
-        //   id: machineNameCamel,
-        //   fieldData: {
-        //     type: this.entityDataForm.type,
-        //     label: this.entityDataForm.label,
-        //     description: this.entityDataForm.description,
-        //     many: this.entityDataForm.many,
-        //     required: this.entityDataForm.required,
-        //     references: this.entityDataForm.type === 'reference' ? this.entityDataForm.references : null,
-        //   }
-        // })
+        this.$apollo.mutate({
+          mutation: createENTITY_TYPE,
+          variables: preparedEntityTypeDefinition,
+          update: (store, { data: {createENTITY_TYPE} }) => {
 
-        this.$store.commit('entities/UPDATE_ENTITY_DATA', this.entityDataForm.data)
-        this.$store.dispatch('entities/SAVE_ENTITY')
+            const data = store.readQuery({ query: ENTITY_TYPES })
+
+            // Remove old cache entry.
+            data.ENTITY_TYPES.map((element, index) => {
+              if (element.name === entityName) {
+                data.ENTITY_TYPES.splice(index, 1)
+              }
+            })
+
+            // Insert new cache entry.
+            data.ENTITY_TYPES.push({
+              ...preparedEntityTypeDefinition,
+              __typename: 'ENTITY_TYPE'
+            })
+
+            data.ENTITY_TYPES = _.sortBy(data.ENTITY_TYPES, et => et.name)
+
+            store.writeQuery({
+              query: ENTITY_TYPES,
+              data
+            })
+          }
+        })
 
         if (this.isNew) {
           this.$refs.EntityEditForm.reset()
           this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
-          this.$store.dispatch('entities/GET_ENTITIES', this.entityDataForm.data._meta.pascal)
-          this.$store.dispatch('entities/REDIRECT_TO_ENTITY', this.entityDataForm.data._meta.pascal)
-
+          this.$store.dispatch('entities/REDIRECT_TO_ENTITY', entityName)
         }
 
         // Saved data should now be considered the original data.
