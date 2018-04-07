@@ -14,7 +14,7 @@
           <v-card-title>
             <div>
               <h1 class="headline mb-0">{{ entity }}</h1>
-              <div>{{ entityDescription }}</div>
+              <div>{{ entityData.data.description }}</div>
             </div>
           </v-card-title>
           <v-card-text>
@@ -71,11 +71,11 @@
                       </span>
                     </td>
                     <td>
-                      <v-icon color="grey lighten-1" v-if="!!props.item.required">check</v-icon>
-                      <v-icon color="grey lighten-1" v-if="!props.item.required">clear</v-icon>
+                      <v-icon color="grey lighten-1" v-if="!!props.item.required || props.item.type === 'id'">check</v-icon>
+                      <v-icon color="grey lighten-1" v-if="!props.item.required && props.item.type !== 'id'">clear</v-icon>
                     </td>
                     <td>
-                      <FieldEdit :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
+                      <FieldEdit :entity="entity" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
                     </td>
                   </tr>
                 </template>
@@ -83,7 +83,7 @@
             </div>
 
             <div class="entity-field-actions">
-              <FieldEdit :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
+              <FieldEdit :entity="entity" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
             </div>
 
           </v-card-text>
@@ -99,8 +99,9 @@ import EntityList from '@/components/EntityList.vue'
 import EntityEdit from '@/components/EntityEdit.vue'
 import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
-import { mapMutations, mapActions, mapGetters } from 'vuex'
+
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
 export default {
   components: {
@@ -115,7 +116,15 @@ export default {
   },
   mounted () {
     this.sortableInstance = this.initialiseSortableTable()
-    this.$store.dispatch('entities/GET_ENTITY')
+
+    this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+      const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+      entityType.data = JSON.parse(entityType.data)
+      this.entityData = entityType
+
+      this.setDisplayedFields()
+    })
+
   },
   methods: {
     // Local methods.
@@ -134,6 +143,19 @@ export default {
         }
       )
     },
+    setDisplayedFields() {
+      const allFieldsPathOnEntityData = _(this.fieldPathActive).split('.')
+        .filter(p => p !== 'all')
+        .map(p => ['fields', p])
+        .push('fields')
+        .flatten()
+        .value()
+        .join('.')
+
+      const fields = _(this.entityData.data).get(allFieldsPathOnEntityData)
+      const fieldsValues = _(fields).values().value()
+      this.fieldsDisplayed = fieldsValues
+    },
     dragReorder ({item, oldIndex, newIndex}) {
       // Copy computed fieldsDisplayed to prevent mutating store.
       const clonedFieldsDisplayed = _.cloneDeep(this.fieldsDisplayed)
@@ -149,8 +171,38 @@ export default {
         clonedFieldsDisplayed.unshift(idField)
       }
 
-      this.$store.commit('entities/SET_DISPLAYED_FIELDS_FROM_REORDERING', clonedFieldsDisplayed)
-      this.$store.dispatch('entities/SAVE_ENTITY')
+      const fields = clonedFieldsDisplayed.reduce((acc, field) => {
+        acc[field._meta.camel] = field
+        return acc
+      }, {})
+
+      const fieldsFromFieldActivePath = _(this.fieldPathActive).split('.')
+        .filter(p => p !== 'all')
+        .map(p => ['fields', p])
+        .push('fields')
+        .flatten()
+        .value()
+        .join('.')
+
+      _.set(this.entityData.data, fieldsFromFieldActivePath, fields)
+
+      this.$apollo.mutate({
+        mutation: CREATE_ENTITY_TYPE,
+        variables: {
+          name: this.entityData.name,
+          data: JSON.stringify(this.entityData.data)
+        }
+      })
+      .catch(error => console.error(error))
+    },
+    ensureFieldsContainerHeight () {
+      if (typeof document !== 'undefined') {
+        setTimeout(() => {
+          const fieldsTable = document.getElementsByClassName('fields-table')
+          const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
+          fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
+        }, 200)
+      }
     },
     fieldOrderKey (item) {
       if (!this.fieldOrderKeys.has(item)) {
@@ -161,14 +213,14 @@ export default {
     gotoField(path, label = '') {
 
       // Ignore if gotoField request is already active.
-      if (path === this.$store.state.entities.fieldPathActive) {
+      if (path === this.fieldPathActive) {
         return
       }
 
-      this.$store.dispatch('entities/ensureFieldsContainerHeight')
+      this.ensureFieldsContainerHeight()
 
       // Determine the slide action direction.
-      const deeperPath = path.length > this.$store.state.entities.fieldPathActive.length
+      const deeperPath = path.length > this.fieldPathActive.length
       const initialTransition = deeperPath ? 'left' : 'right'
       const resolveTransition = deeperPath ? 'right' : 'left'
 
@@ -177,13 +229,15 @@ export default {
       // Initial slide out and update table.
       setTimeout(() => {
         if (label) {
-          this.$store.dispatch('entities/GOTO_NEW_FIELD_PATH', {path, label})
+          this.fieldPaths.push({path, label})
+          this.fieldPathActive = path
         }
         else {
-          this.$store.dispatch('entities/GOTO_EXISTING_FIELD_PATH', path)
+          this.fieldPathActive = path
+          this.fieldPaths = this.fieldPaths.filter(fp => _(path).startsWith(fp.path))
         }
 
-        this.$store.dispatch('entities/GET_FIELDS')
+        this.setDisplayedFields()
 
         this.fieldsTableTransition = resolveTransition
       }, 400)
@@ -191,7 +245,7 @@ export default {
       // Slide back into view.
       setTimeout(() => {
         this.fieldsTableTransition = null
-        this.$store.dispatch('entities/ensureFieldsContainerHeight')
+        this.ensureFieldsContainerHeight()
       }, 800)
     },
 
@@ -199,23 +253,37 @@ export default {
       return !!isMany ? this.$t('cms.entities.fields.cardinality.many') : this.$t('cms.entities.fields.cardinality.one')
     },
 
-    // Store actions.
-    ...mapActions({
-      redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
-    })
+    getFieldPropertyPath (field) {
+      return [
+        this.entityData.name,
+        this.fieldPathActive
+          .split('.')
+          .filter(p => p !== 'all')
+          .join('.'),
+        field._meta.camel
+      ].filter(i => !!i).join('.')
+    },
+
+    redirectToEntity (entityName) {
+      this.fieldPathActive = 'all'
+
+      this.fieldPaths = [
+        {
+          path: 'all',
+          label: 'cms.entities.fields.breadcrumb.allFields'
+        }
+      ]
+
+      this.$router.push({
+        name: 'lang-entities-name',
+        params: { name: entityName }
+      })
+
+      return false
+    },
+
   },
   computed: {
-    entityData() {
-      return this.$store.state.entities.entityData
-    },
-    entity() {
-      const storeEntityData = this.$store.state.entities.entityData
-      return Object.keys(storeEntityData).length !== 0 ? storeEntityData._meta.pascal : this.$route.params.name
-    },
-    entityDescription() {
-      const storeEntityData = this.$store.state.entities.entityData
-      return Object.keys(storeEntityData).length !== 0 ? storeEntityData.description : ''
-    },
     fieldsTableClasses() {
       const classes = ['fields-table']
       if (this.fieldsTableTransition) {
@@ -224,26 +292,27 @@ export default {
       }
       return classes
     },
-    fieldPaths() {
-      return this.$store.state.entities.fieldPaths
-    },
-    fieldPathActive() {
-      return this.$store.state.entities.fieldPathActive
-    },
-    fieldsDisplayed() {
-      return this.$store.state.entities.fieldsDisplayed
-    },
     fieldTypes () {
       return this.$store.state.entities.fieldTypes
     },
-
-    // Store getters.
-    ...mapGetters({
-      getFieldPropertyPath: 'entities/GET_FIELD_PROPERTY_PATH',
-    })
   },
   data() {
     return {
+      entityData: {
+        name: '',
+        data: {
+          description: '',
+          fields: {}
+        }
+      },
+      fieldsDisplayed: [],
+      fieldPathActive: 'all',
+      fieldPaths: [
+        {
+          path: 'all',
+          label: 'cms.entities.fields.breadcrumb.allFields'
+        }
+      ],
       sortableInstance: {},
       fieldOrderKeys: new WeakMap(),
       currentfieldOrderKey: 0,
@@ -282,9 +351,10 @@ export default {
       graphqlError: false,
     }
   },
-  asyncData({ env, store }) {
+  asyncData({ env, store, params }) {
     return {
-      graphqlEndpoint: env.panacea.main.endpoint
+      graphqlEndpoint: env.panacea.main.endpoint,
+      entity: params.name
     }
   }
 }

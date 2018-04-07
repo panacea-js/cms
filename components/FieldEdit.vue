@@ -68,7 +68,7 @@
 
                   <v-layout>
                     <v-flex x11>
-                      <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypes" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                      <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypeNames" v-model="fieldFormData.references" :rules="rules.references"></v-select>
                     </v-flex>
                     <v-flex xs1>
                     </v-flex>
@@ -100,6 +100,8 @@
   import { mapGetters } from 'vuex'
   import _ from 'lodash'
   import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
+  import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+  import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
   export default {
     data() {
@@ -168,15 +170,24 @@
           }
         })
       },
-    },
-    apollo: {
-      entityTypes: {
-        fetchPolicy: 'cache-and-network',
-        query: ENTITY_TYPES,
-        update: (data) => {
-          return data.ENTITY_TYPES.map(et => et.name)
-        }
+      entityTypeNames() {
+        return this.entityTypes.map(et => et.name)
       }
+    },
+    mounted() {
+      this.$apollo.watchQuery({ query: ENTITY_TYPES }).subscribe(result => {
+        const entityTypes = _.cloneDeep(result.data.ENTITY_TYPES).map(et => {
+          et.data = JSON.parse(et.data)
+          return et
+        })
+        this.entityTypes = entityTypes
+      })
+
+      this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+        const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+        entityType.data = JSON.parse(entityType.data)
+        this.entityData = entityType
+      })
     },
     methods: {
       disableFormElement(element) {
@@ -212,27 +223,76 @@
 
         const machineNameCamel = _(this.fieldFormData.machineName).camelCase()
 
+        // Rename field actions, if machine name has changed.
         if (!this.isNew && machineNameCamel !== this.field._meta.camel) {
-          this.$store.commit('entities/RENAME_FIELD', {
-            oldId: this.field._meta.camel,
-            newId: machineNameCamel
-          })
+
+          // The old machine name is reserved in the _meta.camel attribute.
+          const oldId = this.field._meta.camel
+          const newId = machineNameCamel
+
+          const allFieldsPathOnEntityData = _(this.fieldPath).split('.')
+            .filter(p => p !== 'all')
+            .map(p => ['fields', p])
+            .push('fields')
+            .flatten()
+            .value()
+            .join('.')
+
+          const oldField = _(this.entityData).get(`${allFieldsPathOnEntityData}.${oldId}`)
+
+          // Create new field entry on entityData keyed by the new machine name.
+          _.set(this.entityData, `${allFieldsPathOnEntityData}.${newId}`, oldField)
+          // Update the ._meta.camel attribute to match the new machine name.
+          _.set(this.entityData, `${allFieldsPathOnEntityData}.${newId}._meta.camel`, newId)
+          // Remove the old field entry.
+          _.unset(this.entityData, `${allFieldsPathOnEntityData}.${oldId}`)
         }
 
-        this.$store.commit('entities/UPDATE_FIELD', {
-          id: machineNameCamel,
-          fieldData: {
-            type: this.fieldFormData.type,
-            label: this.fieldFormData.label,
-            description: this.fieldFormData.description,
-            many: this.fieldFormData.many,
-            required: this.fieldFormData.required,
-            references: this.fieldFormData.type === 'reference' ? this.fieldFormData.references : null,
-          }
+        // Update field actions.
+
+        // Serialize field data from the submitted form data.
+        const fieldData = {
+          type: this.fieldFormData.type,
+          label: this.fieldFormData.label,
+          description: this.fieldFormData.description,
+          many: this.fieldFormData.many,
+          required: this.fieldFormData.required,
+          references: this.fieldFormData.type === 'reference' ? this.fieldFormData.references : null,
+        }
+
+        const fieldPathOnEntityData = _(this.fieldPath).split('.')
+          .filter(p => p !== 'all')
+          .map(p => ['fields', p])
+          .push('fields')
+          .push(machineNameCamel)
+
+        _(fieldData).forEach((value, attribute) => {
+          const fieldAttributePathOnEntityData = fieldPathOnEntityData
+            .push(attribute)
+            .flatten()
+            .value()
+            .join('.')
+
+          _.set(this.entityData.data, fieldAttributePathOnEntityData, value)
         })
 
-        this.$store.dispatch('entities/SAVE_ENTITY')
-        this.$store.dispatch('entities/GET_FIELDS')
+        const metaCamelAttributePathOnEntityData = fieldPathOnEntityData
+          .push('_meta')
+          .push('camel')
+          .flatten()
+          .value()
+          .join('.')
+
+        _.set(this.entityData.data, metaCamelAttributePathOnEntityData, machineNameCamel)
+
+        this.$apollo.mutate({
+          mutation: CREATE_ENTITY_TYPE,
+          variables: {
+            name: this.entityData.name,
+            data: JSON.stringify(this.entityData.data)
+          }
+        })
+        .catch(error => console.error(error))
 
         if (this.isNew) {
           this.$refs.fieldEditForm.reset()
@@ -269,6 +329,10 @@
       }
     },
     props: {
+      entity: {
+        type: String,
+        required: true
+      },
       fieldPath: {
         type: String,
         required: true

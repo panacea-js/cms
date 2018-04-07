@@ -59,9 +59,8 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
   import _ from 'lodash'
-  import createENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
+  import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
   import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
   import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 
@@ -116,14 +115,12 @@
     methods: {
       loadEntityFormData() {
         if (!this.isNew) {
-          this.$apollo.query({ query: ENTITY_TYPE, variables: {name: this.entity} })
-            .then(({data: { ENTITY_TYPE }}) => {
-              const entityType = _.cloneDeep(ENTITY_TYPE)
-              entityType.data = JSON.parse(entityType.data)
-              this.entityDataForm = entityType
-              this.entityDataFormOriginal = entityType
-            })
-            .catch(error => console.log(error))
+          this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+            const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+            entityType.data = JSON.parse(entityType.data)
+            this.entityDataForm = entityType
+            this.entityDataFormOriginal = entityType
+          })
         }
       },
       submit() {
@@ -140,7 +137,7 @@
         }
 
         this.$apollo.mutate({
-          mutation: createENTITY_TYPE,
+          mutation: CREATE_ENTITY_TYPE,
           variables: preparedEntityTypeDefinition,
           update: (store, { data: {createENTITY_TYPE} }) => {
 

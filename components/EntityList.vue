@@ -10,7 +10,7 @@
                   <v-list-tile-title v-html="entity.name"></v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <span class="tooltip-text">{{ entity.data | json('description') }}</span>
+              <span class="tooltip-text">{{ entity.data.description }}</span>
             </v-tooltip>
             <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
           </template>
@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import EntityListActions from './EntityListActions'
+
 import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
 
 export default {
@@ -31,39 +31,26 @@ export default {
     EntityListActions
   },
   methods: {
-    itemClasses: function(entityName) {
+    itemClasses: function (entityName) {
       const classes = ['EntityList__item']
       entityName === this.$route.params.name && classes.push('EntityList__item--active')
       return classes.join(' ')
     },
-    ...mapActions({
-      redirectToEntity: 'entities/REDIRECT_TO_ENTITY'
-    })
+    redirectToEntity: function (entityName) {
+      this.$router.push({
+        name: 'lang-entities-name',
+        params: { name: entityName }
+      })
+    }
   },
   mounted() {
-    //this.$store.dispatch('entities/GET_ENTITIES')
-  },
-  // computed: {
-  //   entities() {
-  //     if (Array.isArray(this.$store.state.entities.entitiesData)) {
-  //       return this.$store.state.entities.entitiesData.map(e => {
-  //         const entityData = JSON.parse(e.data)
-  //         return {
-  //           name: e.name,
-  //           description: entityData.description
-  //         }
-  //       })
-  //     }
-  //   },
-  // }
-  apollo: {
-    entities: {
-      fetchPolicy: 'cache-and-network',
-      query: ENTITY_TYPES,
-      update: (data) => {
-        return data.ENTITY_TYPES
-      }
-    }
+    this.$apollo.watchQuery({ query: ENTITY_TYPES }).subscribe(result => {
+      const entityTypes = _.cloneDeep(result.data.ENTITY_TYPES).map(et => {
+        et.data = JSON.parse(et.data)
+        return et
+      })
+      this.entities = entityTypes
+    })
   },
   data() {
     return {
