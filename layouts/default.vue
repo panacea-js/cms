@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app :dark="schemes.nav === 'dark'">
     <v-navigation-drawer :mini-variant="miniVariant" v-model="drawer" clipped fixed app>
       <v-list>
         <v-list-tile router :to="item.to" :key="i" v-for="(item, i) in primaryNavigationItems" exact>
@@ -54,24 +54,28 @@
       <nuxt />
     </v-content>
 
-    <v-footer fixed app>
-      <v-toolbar>
-        <v-toolbar-items class="hidden-sm-and-down">
-          <v-btn v-if="tools.voyager.enable" target="_blank" :href="`/${tools.voyager.endpoint}`" flat>
-            <GraphqlVoyagerLogo/>
-          </v-btn>
-          <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`/${tools.graphiql.endpoint}`" flat>
-            <GraphiqlLogo/>
-          </v-btn>
-        </v-toolbar-items>
+    <v-footer fixed height="auto">
+      <v-layout row wrap justify-center>
+        <v-btn v-if="tools.voyager.enable" target="_blank" :href="`/${tools.voyager.endpoint}`" flat>
+          <GraphqlVoyagerLogo/>
+        </v-btn>
+        <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`/${tools.graphiql.endpoint}`" flat>
+          <GraphiqlLogo/>
+        </v-btn>
+
         <v-spacer></v-spacer>
-        <v-toolbar-items class="hidden-sm-and-down">
-          <v-btn flat target="_blank" href="https://www.panaceajs.org?ref=panacea-cms">Website</v-btn>
-          <v-btn flat target="_blank" href="https://github.com/panacea-js">Github</v-btn>
-          <v-btn flat target="_blank" href="https://www.reallifedigital.com?ref=panacea-cms">&copy; {{ currentYear }} Real Life Digital</v-btn>
-        </v-toolbar-items>
-      </v-toolbar>
+
+        <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="schemes.nav" label="Nav lights" true-value="light" false-value="dark" />
+        <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="schemes.main" label="Main lights" true-value="light" false-value="dark" />
+
+        <v-spacer></v-spacer>
+
+        <v-btn flat target="_blank" href="https://www.panaceajs.org?ref=panacea-cms">Website</v-btn>
+        <v-btn flat target="_blank" href="https://github.com/panacea-js">Github</v-btn>
+        <v-btn flat target="_blank" href="https://www.reallifedigital.com?ref=panacea-cms">&copy; {{ currentYear }} Real Life Digital</v-btn>
+      </v-layout>
     </v-footer>
+
   </v-app>
 </template>
 
@@ -97,6 +101,10 @@ export default {
       miniVariant: false,
       title: process.env.cms.head.title,
       currentYear: new Date().getFullYear(),
+      schemes: {
+        nav: 'dark',
+        main: 'light'
+      },
       tools: {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager
@@ -105,3 +113,13 @@ export default {
   }
 }
 </script>
+
+<style>
+.scheme-switch {
+  height: 24px;
+}
+.scheme-switch label {
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+</style>
