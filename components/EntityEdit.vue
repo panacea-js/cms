@@ -168,7 +168,12 @@
         if (this.isNew) {
           this.$refs.EntityEditForm.reset()
           this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
-          this.$store.dispatch('entities/REDIRECT_TO_ENTITY', entityName)
+
+          this.$router.push({
+            name: 'lang-entities-name',
+            params: { name: entityName }
+          })
+
         }
 
         // Saved data should now be considered the original data.
