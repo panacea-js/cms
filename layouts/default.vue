@@ -56,10 +56,10 @@
 
     <v-footer fixed height="auto">
       <v-layout row wrap justify-center>
-        <v-btn v-if="tools.voyager.enable" target="_blank" :href="`/${tools.voyager.endpoint}`" flat>
+        <v-btn v-if="tools.voyager.enable" target="_blank" :href="`${graphqlServer.protocol}://${graphqlServer.host}:${graphqlServer.port}/${tools.voyager.endpoint}`" flat>
           <GraphqlVoyagerLogo/>
         </v-btn>
-        <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`/${tools.graphiql.endpoint}`" flat>
+        <v-btn v-if="tools.graphiql.enable" target="_blank" :href="`${graphqlServer.protocol}://${graphqlServer.host}:${graphqlServer.port}/${tools.graphiql.endpoint}`" flat>
           <GraphiqlLogo/>
         </v-btn>
 
@@ -109,6 +109,7 @@ export default {
       miniVariant: false,
       title: process.env.cms.head.title,
       currentYear: new Date().getFullYear(),
+      graphqlServer: process.env.panacea.main,
       tools: {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager
