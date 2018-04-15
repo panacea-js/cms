@@ -5,16 +5,17 @@
         <EntityList />
       </v-flex>
       <v-flex xs12 lg10>
-        <v-card dark color="secondary" v-if="graphqlError" flat>
+        <v-card color="secondary" v-if="graphqlError" flat>
           <v-alert color="error" icon="warning" value="true">
             {{ $t('cms.entities.errors.error-loading-entity', {entityName : entity}) }}
           </v-alert>
         </v-card>
-        <v-card dark color="secondary" v-if="!graphqlError" flat>
+        <v-card color="secondary" v-if="!graphqlError" flat>
           <v-card-title>
             <div>
               <h1 class="headline mb-0">{{ entity }}</h1>
               <div>{{ entityData.data.description }}</div>
+              <div>{{ schemes }}</div>
             </div>
           </v-card-title>
           <v-card-text>
@@ -63,11 +64,11 @@
 
                       <span v-if="props.item.type === 'reference'">
                         <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                        <v-btn small flat dark color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
+                        <v-btn small flat color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
                       </span>
                       <span v-if="props.item.type === 'object'">
                         <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                        <v-btn small flat dark color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
+                        <v-btn small flat color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
                       </span>
                     </td>
                     <td>
@@ -103,6 +104,8 @@ import Sortable from 'sortablejs'
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
+import { linkToLocalStateMixin } from '@/apollo/local-state'
+
 export default {
   components: {
     EntityList,
@@ -124,8 +127,13 @@ export default {
 
       this.setDisplayedFields()
     })
-
   },
+  mixins: [
+    linkToLocalStateMixin([
+      { localStateKey: 'schemeNav', dataPath: 'schemes.nav' },
+      { localStateKey: 'schemeMain', dataPath: 'schemes.main' }
+    ])
+  ],
   methods: {
     // Local methods.
     initialiseSortableTable () {

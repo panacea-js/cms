@@ -1,0 +1,6 @@
+query getCmsUiSetting ($key: String!) {
+  getCmsUiSetting(key: $key) @client {
+    key,
+    value
+  }
+}

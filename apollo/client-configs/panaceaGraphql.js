@@ -1,4 +1,4 @@
-import { ApolloLink, concat, split } from 'apollo-link'
+import { ApolloLink, split } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory'
 import { WebSocketLink } from 'apollo-link-ws'
@@ -6,7 +6,8 @@ import { getMainDefinition } from 'apollo-utilities'
 import 'subscriptions-transport-ws' // this is the default of apollo-link-ws
 
 export default (ctx) => {
-  const httpLink = new HttpLink({uri: 'http://localhost:3000/graphql'})
+  const server = ctx.env.panacea.main
+  const httpLink = new HttpLink({uri: `${server.protocol}://${server.host}:${server.port}/${server.endpoint}`})
   const authMiddleware = new ApolloLink((operation, forward) => {
     const token = process.server ? ctx.req.session : window.__NUXT__.state.session
     operation.setContext({
@@ -18,11 +19,12 @@ export default (ctx) => {
   })
 
   const enableSubscriptions = false
-  let link
+  let remoteLink
 
   // Set up subscription
   if (enableSubscriptions) {
     const wsLink = process.client ? new WebSocketLink({
+      // @todo Implement subscriptions and get websocket details from .env variables
       uri: `wss://localhost:3000/graphql`,
       options: {
         reconnect: true,
@@ -35,7 +37,7 @@ export default (ctx) => {
       }
     }) : null
 
-    link = split(
+    remoteLink = split(
       ({query}) => {
         const {kind, operation} = getMainDefinition(query)
         return kind === 'OperationDefinition' && operation === 'subscription'
@@ -44,19 +46,21 @@ export default (ctx) => {
       httpLink
     )
   } else {
-    link = httpLink
+    remoteLink = httpLink
   }
 
-  return {
-    link: concat(authMiddleware, link),
-    cache: new InMemoryCache({
-      dataIdFromObject: object => {
-        switch (object.__typename) {
-          case 'ENTITY_TYPE': return `ENTITY_TYPE:${object.name}` // use `name` as the primary key
-          default: return defaultDataIdFromObject(object) // fall back to default handling
-        }
+  const cacheForRemote = new InMemoryCache({
+    dataIdFromObject: object => {
+      switch (object.__typename) {
+        case 'ENTITY_TYPE': return `ENTITY_TYPE:${object.name}` // use `name` as the primary key
+        default: return defaultDataIdFromObject(object) // fall back to default handling
       }
-    }),
-    connectToDevTools: true
+    }
+  })
+
+  return {
+    link: ApolloLink.from([authMiddleware, remoteLink]),
+    cache: cacheForRemote,
+    connectToDevTools: ctx.isDev
   }
 }

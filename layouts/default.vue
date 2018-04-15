@@ -83,11 +83,19 @@
 import GraphqlVoyagerLogo from "@/components/GraphqlVoyagerLogo"
 import GraphiqlLogo from "@/components/GraphiqlLogo"
 
+import { linkToLocalStateMixin } from '@/apollo/local-state'
+
 export default {
   components: {
     GraphqlVoyagerLogo,
     GraphiqlLogo
   },
+  mixins: [
+    linkToLocalStateMixin([
+      { localStateKey: 'schemeNav', dataPath: 'schemes.nav' },
+      { localStateKey: 'schemeMain', dataPath: 'schemes.main' }
+    ])
+  ],
   data() {
     const locale = this.$i18n.locale
     return {
@@ -101,10 +109,6 @@ export default {
       miniVariant: false,
       title: process.env.cms.head.title,
       currentYear: new Date().getFullYear(),
-      schemes: {
-        nav: 'dark',
-        main: 'light'
-      },
       tools: {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager

@@ -66,7 +66,8 @@ module.exports = {
   ],
   apollo: {
     clientConfigs: {
-      default: '~/apollo/client-configs/default.js'
+      default: '~/apollo/client-configs/panaceaGraphql.js',
+      cmsLocalState: '~/apollo/client-configs/cmsLocalState.js'
     },
     includeNodeModules: true
   },

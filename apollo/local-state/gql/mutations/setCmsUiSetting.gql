@@ -1,0 +1,6 @@
+mutation setCmsUiSetting($key: String!, $value: String!) {
+  setCmsUiSetting (key: $key, value: $value) @client {
+    key,
+    value
+  }
+}
