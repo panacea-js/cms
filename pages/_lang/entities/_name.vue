@@ -220,8 +220,8 @@ export default {
 
       // Determine the slide action direction.
       const deeperPath = path.length > this.fieldPathActive.length
-      const initialTransition = deeperPath ? 'left' : 'right'
-      const resolveTransition = deeperPath ? 'right' : 'left'
+      const initialTransition = deeperPath ? 'transition-left' : 'transition-right'
+      const resolveTransition = deeperPath ? 'transition-right' : 'transition-left'
 
       this.fieldsTableTransition = initialTransition
 
@@ -239,13 +239,13 @@ export default {
         this.setDisplayedFields()
 
         this.fieldsTableTransition = resolveTransition
-      }, 500)
+      }, 750)
 
       // Slide back into view.
       setTimeout(() => {
         this.fieldsTableTransition = null
         this.ensureFieldsContainerHeight()
-      }, 1000)
+      }, 1500)
     },
 
     cardinalityText(isMany) {
@@ -387,25 +387,26 @@ tr.field-type-id {
 }
 
 .fields-table-container {
-  transition: all 0.5s ease;
+  transition: all 0.75s ease;
   .table__overflow {
     overflow-x: hidden;
   }
 }
+
 .fields-table {
-  transition: all 0.5s ease;
+  transition: transform 0.75s ease, opacity 1s ease;
+  transform: translateX(0);
   opacity: 1;
   .datatable {
-    transition: all 0.5s ease;
-    transform: translateX(0);
+    transition: transform 0.75s ease, opacity 1s ease;
   }
   &.transitioning {
     opacity: 0;
-    &.left .datatable {
-      transform: translateX(-50%);
+    &.transition-left .datatable {
+      transform: translateX(-100%);
     }
-    &.right .datatable {
-      transform: translateX(50%);
+    &.transition-right .datatable {
+      transform: translateX(100%);
     }
   }
 }
