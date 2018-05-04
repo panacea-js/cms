@@ -6,11 +6,11 @@ export default {
         __typename: 'cmsUiSetting',
         key,
         value
-      },
+      }
 
       cache.writeData({ data })
       return null
-    },
+    }
   },
   Query: {
     getCmsUiSetting: (_, { key }, { cache }) => {

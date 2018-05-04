@@ -19,7 +19,7 @@ import _ from 'lodash'
  * @return void
  *   The component object is mutated directly
  */
-const linkToLocalState = function(component, mappings) {
+const linkToLocalState = function (component, mappings) {
   const localStateApollo = component.$apolloProvider.clients.cmsLocalState
 
   mappings.map(item => {
@@ -45,7 +45,7 @@ const linkToLocalState = function(component, mappings) {
       if (cacheValue !== newVal) {
         localStateApollo.mutate({
           mutation: setCmsUiSetting,
-          variables: {key: item.localStateKey, value: newVal }
+          variables: { key: item.localStateKey, value: newVal }
         })
       }
     })
@@ -58,7 +58,7 @@ const linkToLocalState = function(component, mappings) {
 const localStateDefaults = _.reduce(defaultCmsUiSettings, (acc, item, key) => {
   acc[key] = item.value
   return acc
-},{})
+}, {})
 
 /**
  * Creates a data object populated from the provided
@@ -96,12 +96,12 @@ const createDataDefaultFromMappings = function (mappings) {
  * @return Object
  *   An object containing Vue Component properties to mix in.
  */
-const linkToLocalStateMixin = function(mappings) {
+const linkToLocalStateMixin = function (mappings) {
   return {
-    data() {
+    data () {
       return createDataDefaultFromMappings(mappings)
     },
-    created() {
+    created () {
       linkToLocalState(this, mappings)
     }
   }

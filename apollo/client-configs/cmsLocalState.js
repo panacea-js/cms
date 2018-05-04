@@ -7,7 +7,6 @@ import localStateResolvers from '../local-state/resolvers'
 import localStateDefaults from '../local-state/defaults'
 
 export default (ctx) => {
-
   const cacheForLocalState = new InMemoryCache({
     dataIdFromObject: object => {
       switch (object.__typename) {
@@ -21,15 +20,15 @@ export default (ctx) => {
   if (typeof window !== 'undefined') {
     persistCache({
       cache: cacheForLocalState,
-      storage: window.localStorage,
-    });
+      storage: window.localStorage
+    })
   }
 
   const clientStateLink = withClientState({
     cache: cacheForLocalState,
     resolvers: localStateResolvers,
     defaults: localStateDefaults
-  });
+  })
 
   return {
     link: ApolloLink.from([clientStateLink]),
