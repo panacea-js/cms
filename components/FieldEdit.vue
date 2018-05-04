@@ -87,6 +87,22 @@
           </v-form>
         </v-card-text>
         <v-card-actions class="FieldEdit__actions">
+
+            <v-dialog v-model="deleteConfirmOpened" max-width="350" v-if="!isNew">
+
+              <v-btn color="red darken-1" flat slot="activator">{{ $t('cms.entities.fields.edit.delete') }}</v-btn>
+
+              <v-card>
+                <v-card-title class="headline">{{ $t('cms.entities.fields.edit.delete') }} {{ field._meta.camel }}?</v-card-title>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="grey darken-1" flat="flat" @click="deleteConfirmOpened = false">Cancel</v-btn>
+                  <v-btn color="red darken-1" flat @click="remove">{{ $t('cms.entities.fields.edit.confirm') }}</v-btn>
+                </v-card-actions>
+              </v-card>
+
+            </v-dialog>
+
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
           <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
@@ -119,6 +135,7 @@
 
       return {
         opened: false,
+        deleteConfirmOpened: false,
         valid: false,
         rules: {
           required: [
@@ -307,6 +324,29 @@
         this.fieldFormDataOriginal = _.cloneDeep(this.fieldFormData)
 
         this.opened = false
+      },
+      remove() {
+        const fieldPathOnEntityData = _(this.fieldPath).split('.')
+          .filter(p => p !== 'all')
+          .map(p => ['fields', p])
+          .push('fields')
+          .push(this.field._meta.camel)
+          .flatten()
+          .value()
+          .join('.')
+
+        _.unset(this.entityData.data, fieldPathOnEntityData)
+
+        this.$apollo.mutate({
+          mutation: CREATE_ENTITY_TYPE,
+          variables: {
+            name: this.entityData.name,
+            data: JSON.stringify(this.entityData.data)
+          }
+        })
+        .catch(error => console.error(error))
+
+        this.deleteConfirmOpened = false
       },
       cancel() {
         if (this.isNew) {

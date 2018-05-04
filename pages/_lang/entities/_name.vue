@@ -5,17 +5,16 @@
         <EntityList />
       </v-flex>
       <v-flex xs12 lg10>
-        <v-card color="secondary" v-if="graphqlError" flat>
+        <v-card v-if="graphqlError">
           <v-alert color="error" icon="warning" value="true">
             {{ $t('cms.entities.errors.error-loading-entity', {entityName : entity}) }}
           </v-alert>
         </v-card>
-        <v-card color="secondary" v-if="!graphqlError" flat>
+        <v-card v-if="!graphqlError">
           <v-card-title>
             <div>
               <h1 class="headline mb-0">{{ entity }}</h1>
               <div>{{ entityData.data.description }}</div>
-              <div>{{ schemes }}</div>
             </div>
           </v-card-title>
           <v-card-text>
@@ -28,7 +27,7 @@
             </v-breadcrumbs>
 
             <div class="fields-table-container">
-              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions class="elevation-1" ref="sortableTable">
+              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions ref="sortableTable">
 
                 <template slot="items" slot-scope="props">
                   <tr :class="`sortable-row field-type-${props.item.type}`" :key="fieldOrderKey(props.item)">
@@ -83,7 +82,7 @@
               </v-data-table>
             </div>
 
-            <div class="entity-field-actions">
+            <div :class="fieldsActionsClasses">
               <FieldEdit :entity="entity" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
             </div>
 
@@ -103,8 +102,6 @@ import Sortable from 'sortablejs'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
-
-import { linkToLocalStateMixin } from '@/apollo/local-state'
 
 export default {
   components: {
@@ -128,12 +125,6 @@ export default {
       this.setDisplayedFields()
     })
   },
-  mixins: [
-    linkToLocalStateMixin([
-      { localStateKey: 'schemeNav', dataPath: 'schemes.nav' },
-      { localStateKey: 'schemeMain', dataPath: 'schemes.main' }
-    ])
-  ],
   methods: {
     // Local methods.
     initialiseSortableTable () {
@@ -209,7 +200,7 @@ export default {
           const fieldsTable = document.getElementsByClassName('fields-table')
           const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
           fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
-        }, 200)
+        }, 0)
       }
     },
     fieldOrderKey (item) {
@@ -248,13 +239,13 @@ export default {
         this.setDisplayedFields()
 
         this.fieldsTableTransition = resolveTransition
-      }, 400)
+      }, 500)
 
       // Slide back into view.
       setTimeout(() => {
         this.fieldsTableTransition = null
         this.ensureFieldsContainerHeight()
-      }, 800)
+      }, 1000)
     },
 
     cardinalityText(isMany) {
@@ -300,9 +291,16 @@ export default {
       }
       return classes
     },
+    fieldsActionsClasses() {
+      const classes = ['entity-field-actions']
+      if (this.fieldsTableTransition) {
+        classes.push('transitioning')
+      }
+      return classes
+    },
     fieldTypes () {
       return this.$store.state.entities.fieldTypes
-    },
+    }
   },
   data() {
     return {
@@ -389,14 +387,16 @@ tr.field-type-id {
 }
 
 .fields-table-container {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
+  .table__overflow {
+    overflow-x: hidden;
+  }
 }
 .fields-table {
-  transition: all 0.4s ease;
+  transition: all 0.5s ease;
   opacity: 1;
-  overflow-x: hidden;
   .datatable {
-    transition: all 0.4s ease;
+    transition: all 0.5s ease;
     transform: translateX(0);
   }
   &.transitioning {
@@ -431,5 +431,10 @@ tr.field-type-id {
 .entity-field-actions {
   margin: 1em auto 0 auto;
   text-align: center;
+  transition: all 0.5s ease;
+  opacity: 1;
+  &.transitioning {
+    opacity: 0;
+  }
 }
 </style>

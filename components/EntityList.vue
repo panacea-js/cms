@@ -1,6 +1,6 @@
 <template>
   <div class="EntityList">
-    <v-card dark color="secondary" flat>
+    <v-card flat>
       <v-card-text class="pa-0">
         <v-list class="pa-0">
           <template v-for="(entity, index) in entities" class="EntityList__items">

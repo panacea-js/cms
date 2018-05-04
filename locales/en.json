@@ -66,8 +66,10 @@
         },
         "edit": {
           "title": "Field edit",
+          "delete": "Delete field",
           "save": "Save",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "confirm": "Confirm"
         },
         "actions": {
           "add": "Add field",

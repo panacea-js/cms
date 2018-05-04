@@ -41,6 +41,7 @@
         "edit": {
           "title": "Edición de campo",
           "indicatesRequiredField": "Indica campo requerido",
+          "delete": "Elimiar",
           "save": "Guardar",
           "cancel": "Cancelar"
         },

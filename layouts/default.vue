@@ -1,5 +1,5 @@
 <template>
-  <v-app :dark="schemes.nav === 'dark'">
+  <v-app :dark="scheme === 'dark'">
     <v-navigation-drawer :mini-variant="miniVariant" v-model="drawer" clipped fixed app>
       <v-list>
         <v-list-tile router :to="item.to" :key="i" v-for="(item, i) in primaryNavigationItems" exact>
@@ -20,7 +20,7 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar fixed app clipped-left>
+    <v-toolbar fixed app clipped-left flat>
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-btn icon @click.stop="miniVariant = !miniVariant" class="hidden-md-and-down">
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
@@ -65,8 +65,7 @@
 
         <v-spacer></v-spacer>
 
-        <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="schemes.nav" label="Nav lights" true-value="light" false-value="dark" />
-        <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="schemes.main" label="Main lights" true-value="light" false-value="dark" />
+        <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="scheme" label="Lights" true-value="light" false-value="dark" />
 
         <v-spacer></v-spacer>
 
@@ -92,8 +91,7 @@ export default {
   },
   mixins: [
     linkToLocalStateMixin([
-      { localStateKey: 'schemeNav', dataPath: 'schemes.nav' },
-      { localStateKey: 'schemeMain', dataPath: 'schemes.main' }
+      { localStateKey: 'scheme', dataPath: 'scheme' },
     ])
   ],
   data() {

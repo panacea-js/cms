@@ -1,8 +1,8 @@
 import _ from 'lodash'
 
+// When changing cache defaults, be sure to clear the browser's apollo-cache-persist local storage.
 const cmsUiSettings = {
-  schemeNav: 'dark',
-  schemeMain: 'light'
+  scheme: 'dark',
 }
 
 export default _(cmsUiSettings).reduce((acc, value, key) => {
