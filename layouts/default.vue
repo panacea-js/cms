@@ -66,7 +66,7 @@
         <v-spacer></v-spacer>
         <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="scheme" label="Lights" true-value="light" false-value="dark" />
         <v-spacer></v-spacer>
-        <v-select d-inline-flex class="pt-2" :items="languages" v-model="activeLanguage"></v-select>
+        <LanguageSwitcher/>
         <v-spacer></v-spacer>
 
         <v-btn flat target="_blank" href="https://www.panaceajs.org?ref=panacea-cms">Website</v-btn>
@@ -81,44 +81,21 @@
 <script>
 import GraphqlVoyagerLogo from "@/components/GraphqlVoyagerLogo"
 import GraphiqlLogo from "@/components/GraphiqlLogo"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 import { linkToLocalStateMixin } from '@/apollo/local-state'
 
 export default {
   components: {
     GraphqlVoyagerLogo,
-    GraphiqlLogo
+    GraphiqlLogo,
+    LanguageSwitcher
   },
   mixins: [
     linkToLocalStateMixin([
       { localStateKey: 'scheme', dataPath: 'scheme' }
     ])
   ],
-  computed: {
-    activeLanguage: {
-      get: function () {
-        if (typeof document !== 'undefined') {
-
-          let activeLanguage = 'en'
-
-          document.cookie.split('; ').map(cookie => {
-            const [ key, value ] = cookie.split('=')
-            if (key === 'PANACEA-CMS-LANGUAGE') {
-              activeLanguage = value
-            }
-          }).filter(x => !!x)[0]
-
-          return activeLanguage
-        }
-      },
-      set: function (language) {
-        if (typeof document !== 'undefined') {
-          document.cookie = `PANACEA-CMS-LANGUAGE=${language}; path=/`
-          location = location
-        }
-      }
-    }
-  },
   data() {
     return {
       drawer: true,
