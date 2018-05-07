@@ -7,7 +7,11 @@ import 'subscriptions-transport-ws' // this is the default of apollo-link-ws
 
 export default (ctx) => {
   const server = ctx.env.panacea.main
-  const httpLink = new HttpLink({uri: `${server.protocol}://${server.host}:${server.port}/${server.endpoint}`})
+  const httpLink = new HttpLink({
+    uri: `${server.protocol}://${server.host}:${server.port}/${server.endpoint}`,
+    credentials: 'include'
+  })
+
   const authMiddleware = new ApolloLink((operation, forward) => {
     const token = process.server ? ctx.req.session : window.__NUXT__.state.session
     operation.setContext({
@@ -53,6 +57,7 @@ export default (ctx) => {
     dataIdFromObject: object => {
       switch (object.__typename) {
         case 'ENTITY_TYPE': return `ENTITY_TYPE:${object.name}` // use `name` as the primary key
+        case 'fieldType': return `fieldType:${object.type}` // use `type` as the primary key
         default: return defaultDataIdFromObject(object) // fall back to default handling
       }
     }

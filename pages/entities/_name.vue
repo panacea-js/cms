@@ -43,7 +43,6 @@
                         <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
                       </v-tooltip>
 
-
                     </td>
                     <td class="field-label">
                       {{ props.item.label }}
@@ -57,7 +56,7 @@
                     </td>
                     <td class="field-type">
 
-                      <span>{{ fieldTypes[props.item.type].label }}</span>
+                      <span>{{ fieldTypeLabel(props.item.type) }}</span>
 
                       <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
 
@@ -101,6 +100,7 @@ import FieldEdit from '@/components/FieldEdit.vue'
 import Sortable from 'sortablejs'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+import FIELD_TYPES from '@/gql/queries/fieldTypes.gql'
 import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
 export default {
@@ -123,6 +123,10 @@ export default {
       this.entityData = entityType
 
       this.setDisplayedFields()
+    })
+
+    this.$apollo.watchQuery({ query: FIELD_TYPES }).subscribe(result => {
+      this.fieldTypes = result.data.fieldTypes
     })
   },
   methods: {
@@ -263,6 +267,14 @@ export default {
       ].filter(i => !!i).join('.')
     },
 
+    fieldTypeLabel (type) {
+      const findType = this.fieldTypes.find(field => field.type === type)
+
+      if (typeof findType !== 'undefined' && findType.hasOwnProperty('label')) {
+        return findType.label
+      }
+    },
+
     redirectToEntity (entityName) {
       this.fieldPathActive = 'all'
 
@@ -274,7 +286,7 @@ export default {
       ]
 
       this.$router.push({
-        name: 'lang-entities-name',
+        name: 'entities-name',
         params: { name: entityName }
       })
 
@@ -297,9 +309,6 @@ export default {
         classes.push('transitioning')
       }
       return classes
-    },
-    fieldTypes () {
-      return this.$store.state.entities.fieldTypes
     }
   },
   data() {
@@ -311,6 +320,7 @@ export default {
           fields: {}
         }
       },
+      fieldTypes: [],
       fieldsDisplayed: [],
       fieldPathActive: 'all',
       fieldPaths: [

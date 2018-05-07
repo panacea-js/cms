@@ -64,9 +64,9 @@
         </v-btn>
 
         <v-spacer></v-spacer>
-
         <v-switch d-inline-flex class="mt-1 pt-1 scheme-switch" color="yellow lighten-3" v-model="scheme" label="Lights" true-value="light" false-value="dark" />
-
+        <v-spacer></v-spacer>
+        <v-select d-inline-flex class="pt-2" :items="languages" v-model="activeLanguage"></v-select>
         <v-spacer></v-spacer>
 
         <v-btn flat target="_blank" href="https://www.panaceajs.org?ref=panacea-cms">Website</v-btn>
@@ -91,18 +91,42 @@ export default {
   },
   mixins: [
     linkToLocalStateMixin([
-      { localStateKey: 'scheme', dataPath: 'scheme' },
+      { localStateKey: 'scheme', dataPath: 'scheme' }
     ])
   ],
+  computed: {
+    activeLanguage: {
+      get: function () {
+        if (typeof document !== 'undefined') {
+
+          let activeLanguage = 'en'
+
+          document.cookie.split('; ').map(cookie => {
+            const [ key, value ] = cookie.split('=')
+            if (key === 'PANACEA-CMS-LANGUAGE') {
+              activeLanguage = value
+            }
+          }).filter(x => !!x)[0]
+
+          return activeLanguage
+        }
+      },
+      set: function (language) {
+        if (typeof document !== 'undefined') {
+          document.cookie = `PANACEA-CMS-LANGUAGE=${language}; path=/`
+          location = location
+        }
+      }
+    }
+  },
   data() {
-    const locale = this.$i18n.locale
     return {
       drawer: true,
       primaryNavigationItems: [
-        { icon: "apps", title: this.$t("cms.sections.dashboard"), to: `/${locale}/dashboard` },
-        { icon: "group_work", title: this.$t("cms.sections.entities"), to: `/${locale}/entities` },
-        { icon: "settings", title: this.$t("cms.sections.settings"), to: `/${locale}/settings` },
-        { icon: "extension", title: this.$t("cms.sections.plugins"), to: `/${locale}/plugins` }
+        { icon: "apps", title: this.$t("cms.sections.dashboard"), to: `/dashboard` },
+        { icon: "group_work", title: this.$t("cms.sections.entities"), to: `/entities` },
+        { icon: "settings", title: this.$t("cms.sections.settings"), to: `/settings` },
+        { icon: "extension", title: this.$t("cms.sections.plugins"), to: `/plugins` }
       ],
       miniVariant: false,
       title: process.env.cms.head.title,
@@ -111,7 +135,17 @@ export default {
       tools: {
         graphiql: process.env.panacea.graphiql,
         voyager: process.env.panacea.voyager
-      }
+      },
+      languages: [
+        {
+          text: 'English',
+          value: 'en'
+        },
+        {
+          text: 'Español',
+          value: 'es'
+        }
+      ]
     }
   }
 }

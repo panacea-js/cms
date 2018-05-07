@@ -159,5 +159,9 @@ const compileLocales = function (config) {
       return acc
     }, {})
 
-  fs.writeJsonSync(path.join(config.srcDir, 'locales/all.json'), allLocaleMessages)
+  _(allLocaleMessages).forEach((messages, locale) => {
+    const keyedMessages = {}
+    keyedMessages[locale] = messages
+    fs.writeJsonSync(path.join(config.srcDir, `locales/${locale}.json`), keyedMessages)
+  })
 }

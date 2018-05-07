@@ -1,0 +1,7 @@
+{
+  fieldTypes {
+    type,
+    label,
+    description
+  }
+}

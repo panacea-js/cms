@@ -52,7 +52,7 @@
                     <v-flex xs1 text-xs-center mt-4>
                       <v-tooltip left content-class="FieldEdit__help-tooltip">
                         <v-icon dark color="primary" slot="activator" class="FieldEdit__help-activator">help</v-icon>
-                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypesSelectHelp" hide-actions class="FieldEdit__help-table elevation-1">
+                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypes" hide-actions class="FieldEdit__help-table elevation-1">
                           <template slot="items" slot-scope="props">
                             <td>
                               {{ props.item.label }}
@@ -117,6 +117,8 @@
   import _ from 'lodash'
   import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
   import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+  import FIELD_TYPES from '@/gql/queries/fieldTypes.gql'
+
   import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
   export default {
@@ -166,26 +168,18 @@
           return h
         }),
 
-        entityTypes: []
+        entityTypes: [],
+        fieldTypes: [],
       }
     },
     computed: {
       fieldTypesSelect () {
-        return _.map(this.$store.state.entities.fieldTypes, (fieldTypeData, fieldType) => {
+        return _.map(this.fieldTypes, (fieldType) => {
           return {
-            value: fieldType,
-            text: fieldTypeData.label
+            value: fieldType.type,
+            text: fieldType.label
           }
         }).filter(field => field.value !== 'id')
-      },
-      fieldTypesSelectHelp () {
-        return _.map(this.$store.state.entities.fieldTypes, (fieldTypeData, fieldType) => {
-          return {
-            fieldType,
-            label: fieldTypeData.label,
-            description: fieldTypeData.description
-          }
-        })
       },
       entityTypeNames() {
         return this.entityTypes.map(et => et.name)
@@ -204,6 +198,10 @@
         const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
         entityType.data = JSON.parse(entityType.data)
         this.entityData = entityType
+      })
+
+      this.$apollo.watchQuery({ query: FIELD_TYPES }).subscribe(result => {
+        this.fieldTypes = result.data.fieldTypes
       })
     },
     methods: {

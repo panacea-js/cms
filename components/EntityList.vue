@@ -38,7 +38,7 @@ export default {
     },
     redirectToEntity: function (entityName) {
       this.$router.push({
-        name: 'lang-entities-name',
+        name: 'entities-name',
         params: { name: entityName }
       })
     }

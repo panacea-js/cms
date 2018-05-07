@@ -81,9 +81,6 @@ module.exports = {
     }
   },
   router: {
-    middleware: [
-      'i18n',
-      'redirects'
-    ]
+    middleware: []
   }
 }
