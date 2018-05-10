@@ -194,7 +194,7 @@
         this.entityTypes = entityTypes
       })
 
-      this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+      this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
         const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
         entityType.data = JSON.parse(entityType.data)
         this.entityData = entityType
@@ -367,7 +367,7 @@
       }
     },
     props: {
-      entity: {
+      entityType: {
         type: String,
         required: true
       },

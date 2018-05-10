@@ -1,95 +1,89 @@
 <template>
-  <v-container grid-list-md fluid>
-    <v-layout row wrap>
-      <v-flex xs12 lg2>
-        <EntityList />
-      </v-flex>
-      <v-flex xs12 lg10>
-        <v-card v-if="graphqlError">
-          <v-alert color="error" icon="warning" value="true">
-            {{ $t('cms.entities.errors.error-loading-entity', {entityName : entity}) }}
-          </v-alert>
-        </v-card>
-        <v-card v-if="!graphqlError">
-          <v-card-title>
-            <div>
-              <h1 class="headline mb-0">{{ entity }}</h1>
-              <div>{{ entityData.data.description }}</div>
-            </div>
-          </v-card-title>
-          <v-card-text>
-            <EntityEdit :isNew="false" :entity="entity" />
-            <v-breadcrumbs>
-              <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
-                {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
-              </v-breadcrumbs-item>
-              <v-icon slot="divider">forward</v-icon>
-            </v-breadcrumbs>
+  <div>
+    <v-card v-if="graphqlError">
+      <v-alert color="error" icon="warning" value="true">
+        {{ $t('cms.entities.errors.error-loading-entity', {entityName : entityType}) }}
+      </v-alert>
+    </v-card>
 
-            <div class="fields-table-container">
-              <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions ref="sortableTable">
+    <v-card v-if="!graphqlError">
+      <v-card-title>
+        <div>
+          <h1 class="headline mb-0">{{ entityType }}</h1>
+          <div>{{ entityData.data.description }}</div>
+        </div>
+      </v-card-title>
+      <v-card-text>
+        <EntityEdit :isNew="false" :entityType="entityType" />
+        <v-breadcrumbs>
+          <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
+            {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
+          </v-breadcrumbs-item>
+          <v-icon slot="divider">forward</v-icon>
+        </v-breadcrumbs>
 
-                <template slot="items" slot-scope="props">
-                  <tr :class="`sortable-row field-type-${props.item.type}`" :key="fieldOrderKey(props.item)">
-                    <td :class="props.item.type !== 'id' ? 'sort-handle' : 'sort-locked'">
+        <div class="fields-table-container">
+          <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions ref="sortableTable">
 
-                      <v-tooltip left>
-                        <v-icon slot="activator" v-if="props.item.type !== 'id'">drag_handle</v-icon>
-                        <span>{{ $t('cms.entities.fields.actions.move') }}</span>
-                      </v-tooltip>
+            <template slot="items" slot-scope="props">
+              <tr :class="`sortable-row field-type-${props.item.type}`" :key="fieldOrderKey(props.item)">
+                <td :class="props.item.type !== 'id' ? 'sort-handle' : 'sort-locked'">
 
-                      <v-tooltip left>
-                        <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'">lock</v-icon>
-                        <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
-                      </v-tooltip>
+                  <v-tooltip left>
+                    <v-icon slot="activator" v-if="props.item.type !== 'id'">drag_handle</v-icon>
+                    <span>{{ $t('cms.entities.fields.actions.move') }}</span>
+                  </v-tooltip>
 
-                    </td>
-                    <td class="field-label">
-                      {{ props.item.label }}
-                      <v-tooltip top v-if="!!props.item.description">
-                        <sup slot="activator"><v-icon small color="grey lighten-1">info</v-icon></sup>
-                        <span>{{ props.item.description }}</span>
-                      </v-tooltip>
-                    </td>
-                    <td class="hidden-sm-and-down">
-                      <code v-html="getFieldPropertyPath(props.item)"></code>
-                    </td>
-                    <td class="field-type">
+                  <v-tooltip left>
+                    <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'">lock</v-icon>
+                    <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
+                  </v-tooltip>
 
-                      <span>{{ fieldTypeLabel(props.item.type) }}</span>
+                </td>
+                <td class="field-label">
+                  {{ props.item.label }}
+                  <v-tooltip top v-if="!!props.item.description">
+                    <sup slot="activator"><v-icon small color="grey lighten-1">info</v-icon></sup>
+                    <span>{{ props.item.description }}</span>
+                  </v-tooltip>
+                </td>
+                <td class="hidden-sm-and-down">
+                  <code v-html="getFieldPropertyPath(props.item)"></code>
+                </td>
+                <td class="field-type">
 
-                      <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
+                  <span>{{ fieldTypeLabel(props.item.type) }}</span>
 
-                      <span v-if="props.item.type === 'reference'">
-                        <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                        <v-btn small flat color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
-                      </span>
-                      <span v-if="props.item.type === 'object'">
-                        <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
-                        <v-btn small flat color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
-                      </span>
-                    </td>
-                    <td>
-                      <v-icon color="grey lighten-1" v-if="!!props.item.required || props.item.type === 'id'">check</v-icon>
-                      <v-icon color="grey lighten-1" v-if="!props.item.required && props.item.type !== 'id'">clear</v-icon>
-                    </td>
-                    <td>
-                      <FieldEdit :entity="entity" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
-                    </td>
-                  </tr>
-                </template>
-              </v-data-table>
-            </div>
+                  <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
 
-            <div :class="fieldsActionsClasses">
-              <FieldEdit :entity="entity" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
-            </div>
+                  <span v-if="props.item.type === 'reference'">
+                    <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
+                    <v-btn small flat color="primary" @click="redirectToEntity(props.item.references)">{{ props.item.references }}</v-btn>
+                  </span>
+                  <span v-if="props.item.type === 'object'">
+                    <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
+                    <v-btn small flat color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
+                  </span>
+                </td>
+                <td>
+                  <v-icon color="grey lighten-1" v-if="!!props.item.required || props.item.type === 'id'">check</v-icon>
+                  <v-icon color="grey lighten-1" v-if="!props.item.required && props.item.type !== 'id'">clear</v-icon>
+                </td>
+                <td>
+                  <FieldEdit :entityType="entityType" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </div>
 
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
-  </v-container>
+        <div :class="fieldsActionsClasses">
+          <FieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
+        </div>
+
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -109,15 +103,10 @@ export default {
     EntityEdit,
     FieldEdit
   },
-  head() {
-    return {
-      title: this.$t('cms.sections.entities')
-    }
-  },
   mounted () {
     this.sortableInstance = this.initialiseSortableTable()
 
-    this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+    this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
       const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
       entityType.data = JSON.parse(entityType.data)
       this.entityData = entityType
@@ -275,7 +264,7 @@ export default {
       }
     },
 
-    redirectToEntity (entityName) {
+    redirectToEntity (entityType) {
       this.fieldPathActive = 'all'
 
       this.fieldPaths = [
@@ -287,7 +276,7 @@ export default {
 
       this.$router.push({
         name: 'entities-name',
-        params: { name: entityName }
+        params: { name: entityType }
       })
 
       return false
@@ -363,16 +352,20 @@ export default {
         return h
       }),
       fieldsTableTransition: null,
-      // @todo link graphql error with store.
+      // @todo link graphql error with apollo error package.
       graphqlError: false,
     }
   },
-  asyncData({ env, store, params }) {
-    return {
-      graphqlEndpoint: env.panacea.main.endpoint,
-      entity: params.name
+  props: {
+    entityType: {
+      type: String,
+      required: true
+    },
+    graphqlEndpoint: {
+      type: String,
+      required: true
     }
-  }
+  },
 }
 </script>
 

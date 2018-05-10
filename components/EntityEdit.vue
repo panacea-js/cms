@@ -8,7 +8,7 @@
 
       <v-card class="EntityEdit__dialog">
         <v-card-title>
-          <span class="headline" v-if="!isNew">{{ $t('cms.entities.actions.edit') }} - {{ entity }}</span>
+          <span class="headline" v-if="!isNew">{{ $t('cms.entities.actions.edit') }} - {{ entityType }}</span>
           <span class="headline" v-if="isNew">{{ $t('cms.entities.actions.add') }}</span>
         </v-card-title>
         <v-card-text>
@@ -115,7 +115,7 @@
     methods: {
       loadEntityFormData() {
         if (!this.isNew) {
-          this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entity} }).subscribe(result => {
+          this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
             const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
             entityType.data = JSON.parse(entityType.data)
             this.entityDataForm = entityType
@@ -190,7 +190,7 @@
       },
     },
     props: {
-      entity: {
+      entityType: {
         type: String,
         required: false
       },
