@@ -12,6 +12,16 @@
       "description": "This is an introduction in English."
     },
     "entities": {
+      "page": {
+        "closeDialog": {
+          "headline": "Are you sure you want to close this tab?",
+          "text": "Any changes made without saving will be lost",
+          "actions": {
+            "close": "Close",
+            "cancel": "Cancel"
+          }
+        }
+      },
       "attributes": {
         "name": {
           "label": "Entity name",
