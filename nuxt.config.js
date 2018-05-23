@@ -56,6 +56,16 @@ module.exports = {
           config.entry.app = config.entry.app.map(x => x.replace('timeout=30000', 'timeout=1000'))
         }
       }
+
+      // Find and append import to app.styl so variables and colors are accessible in .vue files.
+      let vueStyleLoaders = config.module.rules.find(rule => rule.loader === 'vue-loader')
+      let stylus = vueStyleLoaders.options.loaders.stylus.find(e => e.loader == 'stylus-loader')
+      Object.assign(stylus.options, {
+        import: [
+          path.resolve(__dirname, 'assets/style/app.styl')
+        ]
+      })
+
     }
   },
   modules: [

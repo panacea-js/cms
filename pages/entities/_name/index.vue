@@ -2,14 +2,14 @@
   <v-container grid-list-md fluid>
     <v-layout row wrap>
       <v-flex xs12 lg2>
-        <EntityList />
+        <EntityTypesList />
       </v-flex>
 
       <v-flex xs12 lg10>
         <v-tabs
           slot="extension"
           v-model="activeTab"
-          class="EntityTabs"
+          class="EntityTypeTabs"
         >
 
           <!-- Fixed tabs -->
@@ -17,7 +17,7 @@
             v-for="tab in fixedTabs"
             :key="tab.id"
             :href="`#tab-${tab.id}`"
-            class="EntityTabs__tab EntityTabs__tab--fixed"
+            class="EntityTypeTabs__tab EntityTypeTabs__tab--fixed"
           >
             <v-icon small class="pr-2">{{ tab.icon }}</v-icon>
             {{ tab.label }}
@@ -29,7 +29,7 @@
             :key="entity.id"
             :href="`#tab-entity-${entity.id}`"
             :data-tab="`tab-entity-${entity.id}`"
-            class="EntityTabs__tab EntityTabs__tab--open-entities"
+            class="EntityTypeTabs__tab EntityTypeTabs__tab--open-entities"
           >
             <v-dialog v-model="closeTabConfirmDialog" persistent max-width="50%">
               <v-card>
@@ -44,9 +44,9 @@
             </v-dialog>
 
             <v-tooltip bottom>
-              <div slot="activator" class="EntityTabs__tab-wrapper">
-                <span class="EntityTabs__tab-text">{{ entity.title }}</span>
-                <v-icon class="EntityTabs__closer pr-0" slot="activator" @click="closeTabConfirm(entity.id)">clear</v-icon>
+              <div slot="activator" class="EntityTypeTabs__tab-wrapper">
+                <span class="EntityTypeTabs__tab-text">{{ entity.title }}</span>
+                <v-icon class="EntityTypeTabs__closer pr-0" slot="activator" @click="closeTabConfirm(entity.id)">clear</v-icon>
               </div>
               <div>
                 <strong>{{ entity.title }}</strong><br />
@@ -59,11 +59,11 @@
           <v-tabs-items>
 
             <!-- Fixed tabs content -->
-            <v-tab-item :key="`tab-list`" id="tab-list" class="EntityTabs__content">
+            <v-tab-item :key="`tab-list`" id="tab-list" class="EntityTypeTabs__content">
               A list of entities
             </v-tab-item>
-            <v-tab-item :key="`tab-config`" id="tab-config" class="EntityTabs__content">
-              <EntityFields :entityType="entityType" :graphqlEndpoint="graphqlEndpoint" />
+            <v-tab-item :key="`tab-config`" id="tab-config" class="EntityTypeTabs__content">
+              <EntityTypeFieldsConfig :entityType="entityType" :graphqlEndpoint="graphqlEndpoint" />
             </v-tab-item>
 
             <!-- Entity tabs content -->
@@ -71,7 +71,7 @@
               v-for="entity in openEntities"
               :key="`tab-${entity.id}`"
               :id="`tab-entity-${entity.id}`"
-              class="EntityTabs__content"
+              class="EntityTypeTabs__content"
             >
               Content: {{ entity.content }}
             </v-tab-item>
@@ -86,14 +86,24 @@
 </template>
 
 <script>
-import EntityList from '@/components/EntityList.vue'
-import EntityFields from '@/components/EntityFields.vue'
+import EntityTypesList from '@/components/EntityTypesList.vue'
+import EntityTypeFieldsConfig from '@/components/EntityTypeFieldsConfig.vue'
 import _ from 'lodash'
+import gql from 'graphql-tag'
+
+const allEntitiesQuery = gql(`
+{
+  cats {
+    id,
+    name
+  }
+}
+`)
 
 export default {
   components: {
-    EntityList,
-    EntityFields,
+    EntityTypesList,
+    EntityTypeFieldsConfig,
   },
   head() {
     return {
@@ -127,7 +137,7 @@ export default {
       const isFinalTabClosing = closingTabIndex === this.openEntities.length -1 ? true : false
       const closingTabIsActive = this.originatingTab === this.activeTab
 
-      document.querySelectorAll(`[data-tab="${this.closeTabId}"]`)[0].classList.add('EntityTabs__tab--closing')
+      document.querySelectorAll(`[data-tab="${this.closeTabId}"]`)[0].classList.add('EntityTypeTabs__tab--closing')
 
       setTimeout(() => {
 
@@ -197,15 +207,12 @@ export default {
 </script>
 
 <style lang="stylus">
-// https://vuetifyjs.com/en/style/colors
-@import '~vuetify/src/stylus/settings/_colors.styl'
-
-.EntityTabs
+.EntityTypeTabs
 
   &__closer
     padding 0 0.5rem
     &:hover
-      color: $red.darken-1
+      color: $red.darken-1 !important
 
   &__tab
     transition all 1s

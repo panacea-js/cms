@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="EntityTypeFieldsConfig">
     <v-card v-if="graphqlError">
       <v-alert color="error" icon="warning" value="true">
         {{ $t('cms.entities.errors.error-loading-entity', {entityName : entityType}) }}
@@ -14,7 +14,7 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <EntityEdit :isNew="false" :entityType="entityType" />
+        <EntityTypeEdit :isNew="false" :entityType="entityType" />
         <v-breadcrumbs>
           <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
             {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
@@ -22,39 +22,39 @@
           <v-icon slot="divider">forward</v-icon>
         </v-breadcrumbs>
 
-        <div class="fields-table-container">
+        <div class="EntityTypeFieldsConfig__table-container">
           <v-data-table :class="fieldsTableClasses" :headers="fieldHeaders" :items="fieldsDisplayed" hide-actions ref="sortableTable">
 
             <template slot="items" slot-scope="props">
-              <tr :class="`sortable-row field-type-${props.item.type}`" :key="fieldOrderKey(props.item)">
-                <td :class="props.item.type !== 'id' ? 'sort-handle' : 'sort-locked'">
+              <tr :class="`EntityTypeFieldsConfig__row EntityTypeFieldsConfig__row--${props.item.type}`" :key="fieldOrderKey(props.item)">
+                <td class="EntityTypeFieldsConfig__column-handles">
 
                   <v-tooltip left>
-                    <v-icon slot="activator" v-if="props.item.type !== 'id'">drag_handle</v-icon>
+                    <v-icon slot="activator" v-if="props.item.type !== 'id'" class="EntityTypeFieldsConfig__row-handle">drag_handle</v-icon>
                     <span>{{ $t('cms.entities.fields.actions.move') }}</span>
                   </v-tooltip>
 
                   <v-tooltip left>
-                    <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'">lock</v-icon>
+                    <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'" class="EntityTypeFieldsConfig__row-handle EntityTypeFieldsConfig__row-handle--locked">lock</v-icon>
                     <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
                   </v-tooltip>
 
                 </td>
-                <td class="field-label">
+                <td class="EntityTypeFieldsConfig__column-field-label">
                   {{ props.item.label }}
                   <v-tooltip top v-if="!!props.item.description">
                     <sup slot="activator"><v-icon small color="grey lighten-1">info</v-icon></sup>
                     <span>{{ props.item.description }}</span>
                   </v-tooltip>
                 </td>
-                <td class="hidden-sm-and-down">
+                <td class="EntityTypeFieldsConfig__column-field-property-path hidden-sm-and-down">
                   <code v-html="getFieldPropertyPath(props.item)"></code>
                 </td>
-                <td class="field-type">
+                <td class="EntityTypeFieldsConfig__column-field-type">
 
                   <span>{{ fieldTypeLabel(props.item.type) }}</span>
 
-                  <span class="field-type--cardinality" v-html="cardinalityText(props.item.many)"></span>
+                  <span class="EntityTypeFieldsConfig__indicator-cardinality" v-html="cardinalityText(props.item.many)"></span>
 
                   <span v-if="props.item.type === 'reference'">
                     <v-icon color="grey lighten-1">keyboard_arrow_right</v-icon>
@@ -65,12 +65,12 @@
                     <v-btn small flat color="primary" @click="gotoField(`${fieldPathActive}.${props.item._meta.camel}`, props.item.label)">{{ props.item.label }}</v-btn>
                   </span>
                 </td>
-                <td>
+                <td class="EntityTypeFieldsConfig__column-field-required">
                   <v-icon color="grey lighten-1" v-if="!!props.item.required || props.item.type === 'id'">check</v-icon>
                   <v-icon color="grey lighten-1" v-if="!props.item.required && props.item.type !== 'id'">clear</v-icon>
                 </td>
-                <td>
-                  <FieldEdit :entityType="entityType" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
+                <td class="EntityTypeFieldsConfig__column-field-actions">
+                  <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
                 </td>
               </tr>
             </template>
@@ -78,7 +78,7 @@
         </div>
 
         <div :class="fieldsActionsClasses">
-          <FieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
+          <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
         </div>
 
       </v-card-text>
@@ -88,9 +88,9 @@
 
 <script>
 import _ from 'lodash'
-import EntityList from '@/components/EntityList.vue'
-import EntityEdit from '@/components/EntityEdit.vue'
-import FieldEdit from '@/components/FieldEdit.vue'
+import EntityTypesList from '@/components/EntityTypesList.vue'
+import EntityTypeEdit from '@/components/EntityTypeEdit.vue'
+import EntityTypeFieldEdit from '@/components/EntityTypeFieldEdit.vue'
 import Sortable from 'sortablejs'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
@@ -99,9 +99,9 @@ import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
 export default {
   components: {
-    EntityList,
-    EntityEdit,
-    FieldEdit
+    EntityTypesList,
+    EntityTypeEdit,
+    EntityTypeFieldEdit
   },
   mounted () {
     this.sortableInstance = this.initialiseSortableTable()
@@ -124,12 +124,15 @@ export default {
       return new Sortable(
         this.$refs.sortableTable.$el.getElementsByTagName('tbody')[0],
         {
-          draggable: '.sortable-row',
-          handle: '.sort-handle',
+          draggable: '.EntityTypeFieldsConfig__row',
+          handle: '.EntityTypeFieldsConfig__row-handle',
           onEnd: this.dragReorder,
           onMove: function (event, originalEvent) {
             // Don't allow move (visible when draggable) of any items above the ID field.
-            return originalEvent.toElement.parentNode.classList.value.indexOf('field-type-id') === -1
+            const parentClassList = originalEvent.toElement.parentNode.classList.value
+            const parentClassListIsRow = originalEvent.toElement.parentNode.classList.value.indexOf(`EntityTypeFieldsConfig__row`) !== -1
+            const parentClassListIsNotId = originalEvent.toElement.parentNode.classList.value.indexOf(`EntityTypeFieldsConfig__row--id`) === -1
+            return parentClassListIsRow && parentClassListIsNotId
           },
           animation: 250,
         }
@@ -190,8 +193,8 @@ export default {
     ensureFieldsContainerHeight () {
       if (typeof document !== 'undefined') {
         setTimeout(() => {
-          const fieldsTable = document.getElementsByClassName('fields-table')
-          const fieldsTableContainer = document.getElementsByClassName('fields-table-container')
+          const fieldsTable = document.getElementsByClassName('EntityTypeFieldsConfig__fields-table')
+          const fieldsTableContainer = document.getElementsByClassName('EntityTypeFieldsConfig__table-container')
           fieldsTableContainer[0].style.height = fieldsTable[0].clientHeight + 'px'
         }, 0)
       }
@@ -213,8 +216,8 @@ export default {
 
       // Determine the slide action direction.
       const deeperPath = path.length > this.fieldPathActive.length
-      const initialTransition = deeperPath ? 'transition-left' : 'transition-right'
-      const resolveTransition = deeperPath ? 'transition-right' : 'transition-left'
+      const initialTransition = deeperPath ? 'transitioning-left' : 'transitioning-right'
+      const resolveTransition = deeperPath ? 'transitioning-right' : 'transitioning-left'
 
       this.fieldsTableTransition = initialTransition
 
@@ -285,17 +288,17 @@ export default {
   },
   computed: {
     fieldsTableClasses() {
-      const classes = ['fields-table']
+      const classes = ['EntityTypeFieldsConfig__fields-table']
       if (this.fieldsTableTransition) {
-        classes.push('transitioning')
-        classes.push(this.fieldsTableTransition)
+        classes.push('EntityTypeFieldsConfig__fields-table--transitioning')
+        classes.push('EntityTypeFieldsConfig__fields-table--' + this.fieldsTableTransition)
       }
       return classes
     },
     fieldsActionsClasses() {
-      const classes = ['entity-field-actions']
+      const classes = ['EntityTypeFieldsConfig__fields-actions']
       if (this.fieldsTableTransition) {
-        classes.push('transitioning')
+        classes.push('EntityTypeFieldsConfig__fields-actions--transitioning')
       }
       return classes
     }
@@ -369,76 +372,67 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.field-label {
-  white-space: nowrap;
-}
-.field-type {
-  text-transform: uppercase;
-  font-size: 0.9em;
-  white-space: nowrap;
-}
-tr.field-type-id {
-  border-bottom-width: 5px !important;
-  border-bottom-style: double !important;
-}
-.field-type--cardinality {
-  color: $color-primary;
-  font-weight: bold;
-  vertical-align: super;
-  font-size: 0.8em;
-}
+<style lang="stylus">
 
-.fields-table-container {
-  transition: all 0.75s ease;
-  .table__overflow {
-    overflow-x: hidden;
-  }
-}
+@require '~assets/colors.styl'
 
-.fields-table {
-  transition: transform 0.75s ease, opacity 1s ease;
-  transform: translateX(0);
-  opacity: 1;
-  .datatable {
-    transition: transform 0.75s ease, opacity 1s ease;
-  }
-  &.transitioning {
-    opacity: 0;
-    &.transition-left .datatable {
-      transform: translateX(-100%);
-    }
-    &.transition-right .datatable {
-      transform: translateX(100%);
-    }
-  }
-}
+.EntityTypeFieldsConfig
 
-.sort-locked {
-  text-align: center;
-  padding-left: 1.5em !important;
-  padding-right: 0 !important;
-  .icon {
-    cursor: not-allowed;
-  }
-}
+  &__table-container
+    transition: all 0.75s ease
+    .table__overflow
+      overflow-x: hidden
 
-.sort-handle {
-  text-align: center;
-  padding-left: 1.5em !important;
-  padding-right: 0 !important;
-  .icon {
-    cursor: move;
-  }
-}
+  &__fields-table
+    transition: transform 0.75s ease, opacity 1s ease
+    transform: translateX(0)
+    opacity: 1
 
-.entity-field-actions {
-  margin: 1em auto 0 auto;
-  text-align: center;
-  transition: all 0.5s ease;
-  opacity: 1;
-  &.transitioning {
-    opacity: 0;
-  }
-}
+    .datatable
+      transition: transform 0.75s ease, opacity 1s ease
+
+    &--transitioning
+      opacity: 0
+    &--transitioning-left .datatable
+      transform: translateX(-100%)
+    &--transitioning-right .datatable
+      transform: translateX(100%)
+
+  &__row
+    &--id
+      border-bottom-width: 5px !important
+      border-bottom-style: double !important
+
+  &__column-handles
+    text-align: center
+    padding-left: 1.5em !important
+    padding-right: 0 !important
+
+  &__row-handle
+    cursor: move
+    &--locked
+      cursor: not-allowed
+
+  &__column-field-label
+    white-space: nowrap
+
+  &__column-field-type
+    text-transform: uppercase
+    font-size: 0.9em
+    white-space: nowrap
+
+  &__indicator-cardinality
+    color: $color-primary
+    font-weight: bold
+    vertical-align: super
+    font-size: 0.8em
+
+  &__fields-actions
+    margin: 1em auto 0 auto
+    text-align: center
+    transition: all 0.5s ease
+    opacity: 1
+    &--transitioning
+      opacity: 0
+      
 </style>

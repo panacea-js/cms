@@ -133,11 +133,17 @@ const compileVarsAssets = function (config) {
   // Export the vars to json file so they can be referenced publicly and by plugins.
   fs.writeJsonSync(path.resolve(config.srcDir, 'assets/vars.json'), config.vars)
 
-  // Export the vars to scss file so they can be included with nuxt-sass-resources-loader
+  // Export the color vars to scss file so they can be included with nuxt-sass-resources-loader
   // and be used in any Vue component style tag.
   // See nuxt.config.js for nuxt-sass-resources-loader configuration.
   const colorsScss = _(config.vars.colors).map((color, name) => `$color-${name}: ${color};`).join('\n')
   fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.scss'), colorsScss)
+
+  // Export the color vars to styl file so they can be imported in stylus files and components with:
+  // @require '~assets/colors.styl'
+  const colorsStylus = _(config.vars.colors).map((color, name) => `$color-${name} = ${color}`).join('\n')
+  fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.styl'), colorsStylus)
+
 }
 
 /**

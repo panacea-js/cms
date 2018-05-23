@@ -1,18 +1,18 @@
 <template>
-  <div class="EntityEdit">
+  <div class="EntityTypeEdit">
     <v-dialog v-model="opened" persistent max-width="75%">
 
-      <v-btn @click="loadEntityFormData()" fab dark small :color="iconBackgroundColor" slot="activator" class="EntityEdit__activator">
+      <v-btn @click="loadEntityFormData()" fab dark small :color="iconBackgroundColor" slot="activator" class="EntityTypeEdit__activator">
         <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
       </v-btn>
 
-      <v-card class="EntityEdit__dialog">
+      <v-card class="EntityTypeEdit__dialog">
         <v-card-title>
           <span class="headline" v-if="!isNew">{{ $t('cms.entities.actions.edit') }} - {{ entityType }}</span>
           <span class="headline" v-if="isNew">{{ $t('cms.entities.actions.add') }}</span>
         </v-card-title>
         <v-card-text>
-          <v-form v-model="valid" ref="EntityEditForm">
+          <v-form v-model="valid" ref="EntityTypeEditForm">
             <v-container fluid grid-list-xl>
               <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
               <v-layout wrap>
@@ -48,7 +48,7 @@
             </v-container>
           </v-form>
         </v-card-text>
-        <v-card-actions class="EntityEdit__actions">
+        <v-card-actions class="EntityTypeEdit__actions">
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
           <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
@@ -125,7 +125,7 @@
       },
       submit() {
 
-        if (!this.$refs.EntityEditForm.validate()) {
+        if (!this.$refs.EntityTypeEditForm.validate()) {
           return
         }
 
@@ -166,7 +166,7 @@
         })
 
         if (this.isNew) {
-          this.$refs.EntityEditForm.reset()
+          this.$refs.EntityTypeEditForm.reset()
           this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
 
           this.$router.push({
@@ -183,7 +183,7 @@
       },
       cancel() {
         if (this.isNew) {
-          this.$refs.EntityEditForm.reset()
+          this.$refs.EntityTypeEditForm.reset()
         }
         this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
         this.opened = false

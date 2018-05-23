@@ -1,9 +1,9 @@
 <template>
-  <div class="EntityList">
+  <div class="EntityTypesList">
     <v-card flat>
       <v-card-text class="pa-0">
         <v-list class="pa-0">
-          <template v-for="(entity, index) in entities" class="EntityList__items">
+          <template v-for="(entity, index) in entities" class="EntityTypesList__items">
             <v-tooltip v-bind:key="`tooltip-${index}`" right>
               <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="itemClasses(entity.name)" @click="redirectToEntity(entity.name)">
                 <v-list-tile-content>
@@ -17,23 +17,23 @@
         </v-list>
       </v-card-text>
     </v-card>
-    <EntityListActions />
+    <EntityTypesListActions />
   </div>
 </template>
 
 <script>
-import EntityListActions from './EntityListActions'
+import EntityTypesListActions from './EntityTypesListActions'
 
 import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
 
 export default {
   components: {
-    EntityListActions
+    EntityTypesListActions
   },
   methods: {
     itemClasses: function (entityName) {
-      const classes = ['EntityList__item']
-      entityName === this.$route.params.name && classes.push('EntityList__item--active')
+      const classes = ['EntityTypesList__item']
+      entityName === this.$route.params.name && classes.push('EntityTypesList__item--active')
       return classes.join(' ')
     },
     redirectToEntity: function (entityName) {
@@ -61,11 +61,11 @@ export default {
 </script>
 
 <style lang="scss">
-.EntityList__item {
+.EntityTypesList__item {
   border-left: 3px solid transparent;
   opacity: 0.5;
 }
-.EntityList__item--active {
+.EntityTypesList__item--active {
   border-left-color: $color-accent;
   opacity: 1;
 }
