@@ -14,9 +14,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.EntityTypesListActions {
-  margin: 1em auto;
-  text-align: center;
-}
+<style lang="stylus">
+.EntityTypesListActions
+  margin 1em auto
+  text-align center
 </style>

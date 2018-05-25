@@ -401,11 +401,11 @@
 <style lang="stylus">
 .EntityTypeFieldEdit
   &__help-tooltip
-    opacity: 1 !important
+    opacity 1 !important
 
   &__help-table
     table
-      background-color: $color-secondary !important
-    tbody td
-      height: 24px !important
+      background-color $color-secondary !important
+    td
+      height 32px !important
 </style>

@@ -60,13 +60,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.EntityTypesList__item {
-  border-left: 3px solid transparent;
-  opacity: 0.5;
-}
-.EntityTypesList__item--active {
-  border-left-color: $color-accent;
-  opacity: 1;
-}
+<style lang="stylus">
+.EntityTypesList
+  &__item
+    border-left 3px solid transparent
+    opacity 0.5
+    &--active
+      border-left-color $color-accent
+      opacity 1
 </style>

@@ -376,60 +376,60 @@ export default {
 .EntityTypeFieldsConfig
 
   &__table-container
-    transition: all 0.75s ease
+    transition all 0.75s ease
     .table__overflow
-      overflow-x: hidden
+      overflow-x hidden
 
   &__fields-table
-    transition: transform 0.75s ease, opacity 1s ease
-    transform: translateX(0)
-    opacity: 1
+    transition transform 0.75s ease, opacity 1s ease
+    transform translateX(0)
+    opacity 1
 
     .datatable
-      transition: transform 0.75s ease, opacity 1s ease
+      transition transform 0.75s ease, opacity 1s ease
 
     &--transitioning
-      opacity: 0
+      opacity 0
     &--transitioning-left .datatable
-      transform: translateX(-100%)
+      transform translateX(-100%)
     &--transitioning-right .datatable
-      transform: translateX(100%)
+      transform translateX(100%)
 
   &__row
     &--id
-      border-bottom-width: 5px !important
-      border-bottom-style: double !important
+      border-bottom-width 5px !important
+      border-bottom-style double !important
 
   &__column-handles
-    text-align: center
-    padding-left: 1.5em !important
-    padding-right: 0 !important
+    text-align center
+    padding-left 1.5em !important
+    padding-right 0 !important
 
   &__row-handle
-    cursor: move
+    cursor move
     &--locked
-      cursor: not-allowed
+      cursor not-allowed
 
   &__column-field-label
-    white-space: nowrap
+    white-space nowrap
 
   &__column-field-type
-    text-transform: uppercase
-    font-size: 0.9em
-    white-space: nowrap
+    text-transform uppercase
+    font-size 0.9em
+    white-space nowrap
 
   &__indicator-cardinality
-    color: $color-primary
-    font-weight: bold
-    vertical-align: super
-    font-size: 0.8em
+    color $color-primary
+    font-weight bold
+    vertical-align super
+    font-size 0.8em
 
   &__fields-actions
-    margin: 1em auto 0 auto
-    text-align: center
-    transition: all 0.5s ease
-    opacity: 1
+    margin 1em auto 0 auto
+    text-align center
+    transition all 0.5s ease
+    opacity 1
     &--transitioning
-      opacity: 0
+      opacity 0
 
 </style>

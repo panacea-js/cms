@@ -213,7 +213,6 @@ export default {
     padding 0 0.5rem
     &:hover
       color: $red.darken-1 !important
-
   &__tab
     transition all 1s
     overflow-x hidden
