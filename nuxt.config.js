@@ -1,14 +1,16 @@
 import path from 'path'
+import glob from 'glob'
 
 const { options } = Panacea.container
 const publicPrefix = options.cms.build.publicPath
 
+const stylusLibraries = glob.sync(path.resolve(process.cwd(), '.compiled/cms/assets/style/libraries/*.styl'))
+const stylusGlobals = glob.sync(path.resolve(process.cwd(), '.compiled/cms/assets/style/globals/*.styl'))
+
 module.exports = {
-  /*
-  ** Headers of the page
-  */
+  // Headers of the page
   head: {
-    title: 'panacea-cms',
+    title: 'Panacea CMS',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -19,31 +21,24 @@ module.exports = {
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' }
     ]
   },
-  /*
-  ** Customize the progress bar color
-  */
+  // Customize the progress bar color
   loading: { color: options.cms.vars.colors.primary },
   plugins: [
     '@/plugins/i18n.js',
     '@/plugins/vuetify.js',
     '@/plugins/filters.js'
   ],
-  css: [
-    '@/assets/style/app.styl'
-  ],
-  /*
-  ** Build configuration
-  */
+  css: stylusLibraries,
+  // Build configuration
   build: {
     vendor: [
       'vue-i18n',
       '@/plugins/vuetify.js'
     ],
-    /*
-    ** Run ESLint on save
-    */
+    extractCSS: true,
     extend (config, ctx) {
       if (ctx.isDev && ctx.isClient) {
+        // Run ESLint on save
         config.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
@@ -57,15 +52,12 @@ module.exports = {
         }
       }
 
-      // Find and append import to app.styl so variables and colors are accessible in .vue files.
+      // Find and append import to *.styl so variables and colors are accessible in .vue files.
       let vueStyleLoaders = config.module.rules.find(rule => rule.loader === 'vue-loader')
-      let stylus = vueStyleLoaders.options.loaders.stylus.find(e => e.loader == 'stylus-loader')
-      Object.assign(stylus.options, {
-        import: [
-          path.resolve(__dirname, 'assets/style/app.styl')
-        ]
+      let stylusLoader = vueStyleLoaders.options.loaders.stylus.find(e => e.loader === 'stylus-loader')
+      Object.assign(stylusLoader.options, {
+        import: stylusGlobals
       })
-
     }
   },
   modules: [

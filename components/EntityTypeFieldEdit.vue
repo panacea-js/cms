@@ -1,12 +1,12 @@
 <template>
-  <div class="FieldEdit">
+  <div class="EntityTypeFieldEdit">
     <v-dialog v-model="opened" persistent max-width="75%">
 
-      <v-btn fab dark small :color="iconBackgroundColor" slot="activator" class="FieldEdit__activator">
+      <v-btn fab dark small :color="iconBackgroundColor" slot="activator" class="EntityTypeFieldEdit__activator">
         <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
       </v-btn>
 
-      <v-card class="FieldEdit__dialog">
+      <v-card class="EntityTypeFieldEdit__dialog">
         <v-card-title>
           <span class="headline" v-if="!isNew">{{ $t('cms.entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
           <span class="headline" v-if="isNew">{{ $t('cms.entities.fields.actions.add') }}</span>
@@ -50,9 +50,9 @@
                       <v-select :label="$t('cms.entities.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
                     </v-flex>
                     <v-flex xs1 text-xs-center mt-4>
-                      <v-tooltip left content-class="FieldEdit__help-tooltip">
-                        <v-icon dark color="primary" slot="activator" class="FieldEdit__help-activator">help</v-icon>
-                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypes" hide-actions class="FieldEdit__help-table elevation-1">
+                      <v-tooltip left content-class="EntityTypeFieldEdit__help-tooltip">
+                        <v-icon dark color="primary" slot="activator" class="EntityTypeFieldEdit__help-activator">help</v-icon>
+                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypes" hide-actions class="EntityTypeFieldEdit__help-table elevation-1">
                           <template slot="items" slot-scope="props">
                             <td>
                               {{ props.item.label }}
@@ -86,7 +86,7 @@
             </v-container>
           </v-form>
         </v-card-text>
-        <v-card-actions class="FieldEdit__actions">
+        <v-card-actions class="EntityTypeFieldEdit__actions">
 
             <v-dialog v-model="deleteConfirmOpened" max-width="350" v-if="!isNew">
 
@@ -113,7 +113,6 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
   import _ from 'lodash'
   import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
   import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
@@ -399,17 +398,14 @@
   }
 </script>
 
-<style lang="scss">
-.FieldEdit__help-tooltip {
-  opacity: 1 !important;
-}
-.FieldEdit__help-table table {
-  background-color: $color-secondary !important;
-  thead tr {
-    height: 32px;
-  }
-  tbody td {
-    height: 24px;
-  }
-}
+<style lang="stylus">
+.EntityTypeFieldEdit
+  &__help-tooltip
+    opacity: 1 !important
+
+  &__help-table
+    table
+      background-color: $color-secondary !important
+    tbody td
+      height: 24px !important
 </style>

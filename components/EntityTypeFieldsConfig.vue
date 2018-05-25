@@ -373,9 +373,6 @@ export default {
 </script>
 
 <style lang="stylus">
-
-@require '~assets/colors.styl'
-
 .EntityTypeFieldsConfig
 
   &__table-container
@@ -434,5 +431,5 @@ export default {
     opacity: 1
     &--transitioning
       opacity: 0
-      
+
 </style>
