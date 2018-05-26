@@ -10,7 +10,7 @@
       <v-card-title>
         <div>
           <h1 class="headline mb-0">{{ entityType }}</h1>
-          <div>{{ entityData.data.description }}</div>
+          <div>{{ entityTypeData.data.description }}</div>
         </div>
       </v-card-title>
       <v-card-text>
@@ -109,7 +109,7 @@ export default {
     this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
       const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
       entityType.data = JSON.parse(entityType.data)
-      this.entityData = entityType
+      this.entityTypeData = entityType
 
       this.setDisplayedFields()
     })
@@ -147,7 +147,7 @@ export default {
         .value()
         .join('.')
 
-      const fields = _(this.entityData.data).get(allFieldsPathOnEntityData)
+      const fields = _(this.entityTypeData.data).get(allFieldsPathOnEntityData)
       const fieldsValues = _(fields).values().value()
       this.fieldsDisplayed = fieldsValues
     },
@@ -179,13 +179,13 @@ export default {
         .value()
         .join('.')
 
-      _.set(this.entityData.data, fieldsFromFieldActivePath, fields)
+      _.set(this.entityTypeData.data, fieldsFromFieldActivePath, fields)
 
       this.$apollo.mutate({
         mutation: CREATE_ENTITY_TYPE,
         variables: {
-          name: this.entityData.name,
-          data: JSON.stringify(this.entityData.data)
+          name: this.entityTypeData.name,
+          data: JSON.stringify(this.entityTypeData.data)
         }
       })
       .catch(error => console.error(error))
@@ -250,7 +250,7 @@ export default {
 
     getFieldPropertyPath (field) {
       return [
-        this.entityData.name,
+        this.entityTypeData.name,
         this.fieldPathActive
           .split('.')
           .filter(p => p !== 'all')
@@ -305,7 +305,7 @@ export default {
   },
   data() {
     return {
-      entityData: {
+      entityTypeData: {
         name: '',
         data: {
           description: '',

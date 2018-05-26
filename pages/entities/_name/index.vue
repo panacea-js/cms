@@ -60,7 +60,7 @@
 
             <!-- Fixed tabs content -->
             <v-tab-item :key="`tab-list`" id="tab-list" class="EntityTypeTabs__content">
-              A list of entities
+              <EntitiesList :entityType="entityType" />
             </v-tab-item>
             <v-tab-item :key="`tab-config`" id="tab-config" class="EntityTypeTabs__content">
               <EntityTypeFieldsConfig :entityType="entityType" :graphqlEndpoint="graphqlEndpoint" />
@@ -88,22 +88,16 @@
 <script>
 import EntityTypesList from '@/components/EntityTypesList.vue'
 import EntityTypeFieldsConfig from '@/components/EntityTypeFieldsConfig.vue'
+import EntitiesList from '@/components/EntitiesList.vue'
 import _ from 'lodash'
-import gql from 'graphql-tag'
 
-const allEntitiesQuery = gql(`
-{
-  cats {
-    id,
-    name
-  }
-}
-`)
+import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 
 export default {
   components: {
     EntityTypesList,
     EntityTypeFieldsConfig,
+    EntitiesList
   },
   head() {
     return {
