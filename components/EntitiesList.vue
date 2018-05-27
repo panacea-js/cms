@@ -14,7 +14,12 @@
           </td>
           <template v-for="field in columns">
             <td :class="`EntitiesList__field-${field}`" :key="`field-${field}__${props.item.id}`">
-              {{ formatFieldValue(props.item[field]) }}
+              <template v-if="entityTypeData.data.fields[field].type === 'id'">
+                <pre>{{ props.item[field] }}</pre>
+              </template>
+              <template v-else>
+                {{ formatFieldValue(props.item[field]) }}
+              </template>
             </td>
           </template>
           <td class="EntitiesList__actions">
@@ -76,7 +81,14 @@ export default {
     },
     setColumns() {
       // @todo - Create setting in UI to include fields in list. Objects and reference will require special handling.
-      this.columns = ['id', 'name', 'breed']
+      const entityTypeFields = this.entityTypeData.data.fields
+      const defaultCandidates = ['id', 'title', 'label', 'name', 'created', 'updated', 'published']
+      const allowedFieldTypes = ['string', 'id', 'int', 'float']
+      const defaultColumns = defaultCandidates.filter(field =>
+        typeof entityTypeFields[field] !== 'undefined'
+        && allowedFieldTypes.indexOf(entityTypeFields[field].type) !== -1
+      )
+      this.columns = defaultColumns
     },
     getEntitiesList() {
       const pluralQueryToken = this.entityTypeData.data._meta.pluralCamel
@@ -169,6 +181,9 @@ export default {
 
 <style lang="stylus">
 .EntitiesList
+  &__row
+    td:first-child
+      width: 2rem
   &__footer
     transition all 1s
     opacity 0
