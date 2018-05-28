@@ -1,6 +1,10 @@
 <template>
   <div class="EntitiesList">
 
+    <div class="EntitiesList__header-actions">
+      <EntityEdit :entityTypeData="entityTypeData" />
+    </div>
+
     <v-data-table :headers="tableHeaders" :items="entities" ref="sortableTable" v-model="selected" select-all :rows-per-page-items="rowsPerPageItems">
 
       <template slot="items" slot-scope="props">
@@ -22,8 +26,9 @@
               </template>
             </td>
           </template>
-          <td class="EntitiesList__actions">
-            Actions
+          <td class="EntitiesList__entity-actions">
+            <EntityEdit :entityTypeData="entityTypeData" :entityData="props.item"/>
+            <EntityDelete :entityType="entityType" :entityId="props.item.id" />
           </td>
         </tr>
       </template>
@@ -59,11 +64,16 @@
 <script>
 import _ from 'lodash'
 
+import EntityEdit from '@/components/EntityEdit.vue'
+import EntityDelete from '@/components/EntityDelete.vue'
+
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 import gql from 'graphql-tag'
 
 export default {
   components: {
+    EntityEdit,
+    EntityDelete
   },
   mounted() {
     this.getEntityTypeData()
@@ -93,7 +103,16 @@ export default {
     getEntitiesList() {
       const pluralQueryToken = this.entityTypeData.data._meta.pluralCamel
 
-      const getAllEntitiesQuery = `{ ${pluralQueryToken} { ${this.columns} } }`
+      let getAllEntitiesQuery
+
+      // @todo Make generic for all entity type data
+      if (this.entityType === 'Cat') {
+        getAllEntitiesQuery = `{ cats { id, name, breed, toys { name, size, quantity, attributes { key, value } } } }`
+      }
+      else {
+        getAllEntitiesQuery = `{ ${pluralQueryToken} { ${this.columns} } }`
+      }
+
       const getAllEntitiesGql = gql(getAllEntitiesQuery)
 
       this.$apollo.watchQuery({ query: getAllEntitiesGql }).subscribe(result => {
@@ -118,7 +137,7 @@ export default {
 
       headers.push({
         text: '',
-        value: 'actions',
+        value: 'entity-actions',
         sortable: false
       })
 
@@ -183,7 +202,14 @@ export default {
 .EntitiesList
   &__row
     td:first-child
-      width: 2rem
+      width 2rem
+  &__header-actions
+    text-align center
+    padding 1rem
+  &__entity-actions
+    text-align right
+    & > *
+      padding 0 0.5rem
   &__footer
     transition all 1s
     opacity 0

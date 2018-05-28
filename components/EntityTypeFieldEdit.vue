@@ -2,9 +2,9 @@
   <div class="EntityTypeFieldEdit">
     <v-dialog v-model="opened" persistent max-width="75%">
 
-      <v-btn fab dark small :color="iconBackgroundColor" slot="activator" class="EntityTypeFieldEdit__activator">
-        <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
-      </v-btn>
+      <a href="#" onclick="return false" slot="activator" class="EntityTypeFieldEdit__activator">
+        <v-icon>{{ this.icon }}</v-icon>
+      </a>
 
       <v-card class="EntityTypeFieldEdit__dialog">
         <v-card-title>
@@ -400,6 +400,11 @@
 
 <style lang="stylus">
 .EntityTypeFieldEdit
+  &__activator
+    text-decoration none
+    .icon
+      color: $amber.darken-1
+
   &__help-tooltip
     opacity 1 !important
 
