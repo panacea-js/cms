@@ -25,11 +25,11 @@
 
           <!-- Entity tabs -->
           <v-tab
-            v-for="entity in openEntities"
+            v-for="entity in entityTypeOpenEntities"
             :key="entity.id"
             :href="`#tab-entity-${entity.id}`"
             :data-tab="`tab-entity-${entity.id}`"
-            class="EntityTypeTabs__tab EntityTypeTabs__tab--open-entities"
+            :class="entityTabClasses(entity)"
           >
             <v-dialog v-model="closeTabConfirmDialog" persistent max-width="50%">
               <v-card>
@@ -45,11 +45,11 @@
 
             <v-tooltip bottom>
               <div slot="activator" class="EntityTypeTabs__tab-wrapper">
-                <span class="EntityTypeTabs__tab-text">{{ entity.title }}</span>
+                <span class="EntityTypeTabs__tab-text">{{ getTitle(entity) }}</span>
                 <v-icon class="EntityTypeTabs__closer pr-0" slot="activator" @click="closeTabConfirm(entity.id)">clear</v-icon>
               </div>
               <div>
-                <strong>{{ entity.title }}</strong><br />
+                <strong>{{ getTitle(entity) }}</strong><br />
                 <em>ID: {{ entity.id }}</em><br />
                 Last updated: 25th Feb 2018
               </div>
@@ -68,7 +68,7 @@
 
             <!-- Entity tabs content -->
             <v-tab-item
-              v-for="entity in openEntities"
+              v-for="entity in entityTypeOpenEntities"
               :key="`tab-${entity.id}`"
               :id="`tab-entity-${entity.id}`"
               class="EntityTypeTabs__content"
@@ -93,12 +93,19 @@ import _ from 'lodash'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 
+import { linkToLocalStateMixin } from '@/apollo/local-state'
+
 export default {
   components: {
     EntityTypesList,
     EntityTypeFieldsConfig,
     EntitiesList
   },
+  mixins: [
+    linkToLocalStateMixin([
+      { localStateKey: 'openEntities', dataPath: 'openEntities' }
+    ])
+  ],
   head() {
     return {
       title: this.$t('cms.sections.entities')
@@ -147,8 +154,8 @@ export default {
             this.activeTab = 'tab-entity-' + newActiveTab.id
           }
           else {
-            // Set active tab to last fixed tab.
-            this.activeTab = 'tab-' + this.fixedTabs[this.fixedTabs.length-1].id
+            // Set active tab to first fixed tab.
+            this.activeTab = 'tab-' + this.fixedTabs[0].id
           }
         }
         else {
@@ -158,13 +165,38 @@ export default {
         this.closeTabId = false
         this.originatingTab = false
 
-      }, 1000)
+      }, 500)
 
       this.closeTabConfirmDialog = false
 
+    },
+    getTitle(entity) {
+      const titleFieldCandidates = ['title', 'name', 'key']
+      let title
+      titleFieldCandidates.forEach(test => {
+        if (entity.hasOwnProperty(test)) {
+          title = entity[test]
+          return
+        }
+      })
+
+      return !!title ? title : entity.id
+    },
+    entityTabClasses(entity) {
+      const classes = ['EntityTypeTabs__tab', 'EntityTypeTabs__tab--open-entity']
+      if (entity.id === 'new') {
+        classes.push('EntityTypeTabs__tab--new-entity')
+      }
+      return classes
     }
   },
   computed: {
+    entityTypeOpenEntities() {
+      if (!Array.isArray(this.openEntities)) {
+        return []
+      }
+      return this.openEntities.filter(item => item.__typename === this.entityType)
+    }
   },
   data() {
     return {
@@ -179,16 +211,6 @@ export default {
         {id: 'config', label: 'Config', icon: 'settings'},
       ],
       activeTab: 'tab-list',
-      openEntities: [
-        {id: '1', title: 'Beautiful Case Study', content: 'Test 123'},
-        {id: '2', title: 'Large Case Study', content: 'Test 456'},
-        {id: '3', title: 'Covent Garden Exhibition 2018', content: 'Test 789'},
-        // {id: '4', title: 'Brunch on Tuesday', content: 'Test 789'},
-        // {id: '5', title: 'Another case study', content: 'Test 789'},
-        // {id: '6', title: 'This is a very long title to see what happens when a long title is set', content: 'Test 789'},
-        // {id: '7', title: 'Yet another case study', content: 'Test 789'},
-        // {id: '8', title: 'And another for good luck', content: 'Test 789'},
-      ]
     }
   },
   asyncData({ env, store, params }) {
@@ -217,13 +239,17 @@ export default {
       opacity 0
       max-width: 0
 
-    &--open-entities
+    &--open-entity
       :root .theme--dark &
         background-color: $grey.darken-2
 
-    &--open-entities
+    &--open-entity
       :root .theme--light &
         background-color: $grey.lighten-2
+
+    &--new-entity {
+      color: $color-primary !important
+    }
 
     &--fixed
       :root .theme--dark &

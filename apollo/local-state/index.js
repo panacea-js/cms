@@ -33,7 +33,7 @@ const linkToLocalState = function (component, mappings) {
 
     // When apollo local state changes, update the data item on the component.
     localStateApollo.watchQuery({ query: getCmsUiSetting, variables: { key: item.localStateKey } }).subscribe(result => {
-      _.set(component, item.dataPath, result.data.getCmsUiSetting.value)
+      _.set(component, item.dataPath, JSON.parse(result.data.getCmsUiSetting.value))
     })
 
     // When the component data item changes, update (mutate) the apollo local state.
@@ -42,12 +42,14 @@ const linkToLocalState = function (component, mappings) {
 
       // Ensure cache mutation only happens once
       // - i.e. when the cached item doesn't match the updated value.
-      if (cacheValue !== newVal) {
+      if (cacheValue !== JSON.stringify(newVal)) {
         localStateApollo.mutate({
           mutation: setCmsUiSetting,
-          variables: { key: item.localStateKey, value: newVal }
+          variables: { key: item.localStateKey, value: JSON.stringify(newVal) }
         })
       }
+    }, {
+      deep: true
     })
   })
 }
@@ -101,7 +103,7 @@ const linkToLocalStateMixin = function (mappings) {
     data () {
       return createDataDefaultFromMappings(mappings)
     },
-    created () {
+    mounted () {
       linkToLocalState(this, mappings)
     }
   }
