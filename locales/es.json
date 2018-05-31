@@ -12,56 +12,104 @@
       "description": "Esta es una introducción en español."
     },
     "entities": {
-      "fields": {
-        "breadcrumb": {
-          "allFields": "Todos los campos"
-        },
-        "cardinality": {
-          "many": "Muchos",
-          "one": "Uno"
-        },
+      "types": {
         "attributes": {
-          "label": "Etiqueta",
-          "path": "Ruta de campo",
-          "type": "Tipo",
-          "required": "Obligatorio",
-          "references": "Entidad objetivo",
-          "machineName": "Nombre de la máquina",
-          "description": "Descripción"
+          "name": {
+            "label": "Nobre de tipo de entidad",
+            "hint": "El nombre en singular"
+          },
+          "description": {
+            "label": "Descripción",
+            "hint": "Una descripción útil de este tipo de entidad"
+          },
+          "plural": {
+            "label": "Plural",
+            "hint": "La forma plural del nombre de este tipo de entidad"
+          },
+          "idLabel": {
+            "label": "ID ediqueta",
+            "hint": "Una descripción para el campo <code> id </ code> de este tipo de entidad"
+          },
+          "storage": {
+            "label": "Almacenamiento",
+            "db": "Base de datos",
+            "fs": "Sistema de archivos"
+          },
+          "validations": {
+            "required": "Este atributo es obligatorio"
+          }
         },
-        "machineName": {
-          "synced": "Nombre de la máquina generado automáticamente desde la etiqueta.",
-          "locked": "Nombre de la máquina bloqueado de cambios de etiqueta. Eliminar para volver a sincronizar.",
-          "noChangeId": "El nombre de la máquina no se puede cambiar para el campo <code>id</code>.",
-          "hint": "La tecla direccionable para el campo. Se convertirá en camelCase."
-        },
-        "description": {
-          "hint": "Una breve descripción sobre el contexto de este campo."
-        },
-        "edit": {
-          "title": "Edición de campo",
-          "indicatesRequiredField": "Indica campo requerido",
-          "delete": "Elimiar",
-          "save": "Guardar",
-          "cancel": "Cancelar"
+        "fields": {
+          "breadcrumb": {
+            "allFields": "Todos los campos"
+          },
+          "cardinality": {
+            "many": "Muchos",
+            "one": "Uno"
+          },
+          "attributes": {
+            "label": "Etiqueta",
+            "path": "Ruta de campo",
+            "type": "Tipo",
+            "required": "Requerido",
+            "references": "Entidad objetivo",
+            "machineName": "Nombre de la máquina",
+            "description": "Descripción"
+          },
+          "machineName": {
+            "synced": "Nombre de la máquina generado automáticamente desde la etiqueta.",
+            "locked": "Nombre de la máquina bloqueado de cambios de etiqueta. Eliminar para volver a sincronizar.",
+            "noChangeId": "El nombre de la máquina no se puede cambiar para el campo <code>id</code>.",
+            "hint": "La tecla direccionable para el campo. Se convertirá en camelCase."
+          },
+          "description": {
+            "hint": "Una breve descripción sobre el contexto de este campo."
+          },
+          "edit": {
+            "title": "Edición de campo",
+            "indicatesRequiredField": "Indica campo requerido",
+            "delete": "Elimiar",
+            "save": "Guardar",
+            "cancel": "Cancelar"
+          },
+          "actions": {
+            "add": "Crear campo",
+            "move": "Mover",
+            "idNoMove": "ID permanece en la parte superior"
+          },
+          "validations": {
+            "required": "El campo es requerido",
+            "selectReference": "Elija una entidad para referencia"
+          }
         },
         "actions": {
-          "add": "Crear campo",
-          "move": "Mover",
-          "idNoMove": "ID permanece en la parte superior"
+          "add": "Crear tipo de entidad",
+          "edit": "Editar tipo de entidad"
         },
-        "validations": {
-          "required": "El campo es obligatorio",
-          "selectReference": "Elija una entidad para referencia"
+        "errors": {
+          "error-loading-entity": "Se produjo un error al cargar {entityName}"
         }
       },
       "actions": {
-        "add": "Crear entidad",
-        "edit": "Edición de entidad"
+        "add": "Crear {entityType}",
+        "edit": "Editar {entityType}"
       },
-      "errors": {
-        "error-loading-entity": "Se produjo un error al cargar {entityName}"
+      "tabs": {
+        "list": "Lista",
+        "config": "Config",
+        "ctrlOpenTip": "Mantenga presionado ctrl para abrir la pestaña sin navegar",
+        "closeDialog": {
+          "headline": "¿Seguro que quieres cerrar esta pestaña?",
+          "text": "Cualquier cambio realizado sin guardar se perderá",
+          "actions": {
+            "close": "Cerrar",
+            "cancel": "Cancelar"
+          }
+        }
       }
+    },
+    "forms": {
+      "indicatesRequiredField": "Indica mando requerido"
     }
   }
 }

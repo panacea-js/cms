@@ -1,11 +1,11 @@
 <template>
 <div class="EntityEdit">
 
-  <a href="#" v-if="!isNew" @click="openEntityTab" onclick="return false" title="Hold ctrl to open tab without navigating to it" class="EntityEdit__activator--edit">
+  <a href="#" v-if="!isNew" @click="openEntityTab" :title="$t('cms.entities.tabs.ctrlOpenTip')" class="EntityEdit__activator--edit">
     <v-icon v-ripple>edit</v-icon>
   </a>
 
-  <v-btn fab small dark color="primary" v-if="isNew" @click="openEntityTab" class="EntityEdit__activator--new">
+  <v-btn fab small dark color="primary" v-if="isNew" @click="openEntityTab" :title="$t('cms.entities.tabs.ctrlOpenTip')" class="EntityEdit__activator--new">
     <v-icon color="grey darken-4">add</v-icon>
   </v-btn>
 
@@ -28,8 +28,8 @@
       </v-card-text>
       <v-card-actions class="EntityEdit__actions">
         <v-spacer></v-spacer>
-        <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
-        <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
+        <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.types.fields.edit.save') }}</v-btn>
+        <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.types.fields.edit.cancel') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog> -->
@@ -58,7 +58,7 @@ export default {
       if (this.isNew && this.openEntities.findIndex(entity => entity.id === 'new') === -1) {
         // Create 'new' placeholder entity tab.
         this.openEntities.push({
-          title: `* New ${this.entityTypeData.name}`,
+          title: '* ' + this.$t('cms.entities.actions.add', { entityType: this.entityTypeData.name }),
           id: 'new',
           __typename: this.entityTypeData.name
         })
@@ -72,6 +72,10 @@ export default {
       if (!$event.ctrlKey) {
         this.gotoTab()
       }
+
+      $event.preventDefault()
+
+      return false
     },
     gotoTab() {
       setTimeout(() => {

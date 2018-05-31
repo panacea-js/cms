@@ -2,7 +2,7 @@
   <div class="EntityTypeFieldsConfig">
     <v-card v-if="graphqlError">
       <v-alert color="error" icon="warning" value="true">
-        {{ $t('cms.entities.errors.error-loading-entity', {entityName : entityType}) }}
+        {{ $t('cms.entities.types.errors.error-loading-entity', {entityName : entityType}) }}
       </v-alert>
     </v-card>
 
@@ -31,12 +31,12 @@
 
                   <v-tooltip left>
                     <v-icon slot="activator" v-if="props.item.type !== 'id'" class="EntityTypeFieldsConfig__row-handle">drag_handle</v-icon>
-                    <span>{{ $t('cms.entities.fields.actions.move') }}</span>
+                    <span>{{ $t('cms.entities.types.fields.actions.move') }}</span>
                   </v-tooltip>
 
                   <v-tooltip left>
                     <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'" class="EntityTypeFieldsConfig__row-handle EntityTypeFieldsConfig__row-handle--locked">lock</v-icon>
-                    <span>{{ $t('cms.entities.fields.actions.idNoMove') }}</span>
+                    <span>{{ $t('cms.entities.types.fields.actions.idNoMove') }}</span>
                   </v-tooltip>
 
                 </td>
@@ -245,7 +245,7 @@ export default {
     },
 
     cardinalityText(isMany) {
-      return !!isMany ? this.$t('cms.entities.fields.cardinality.many') : this.$t('cms.entities.fields.cardinality.one')
+      return !!isMany ? this.$t('cms.entities.types.fields.cardinality.many') : this.$t('cms.entities.types.fields.cardinality.one')
     },
 
     getFieldPropertyPath (field) {
@@ -318,7 +318,7 @@ export default {
       fieldPaths: [
         {
           path: 'all',
-          label: 'cms.entities.fields.breadcrumb.allFields'
+          label: 'cms.entities.types.fields.breadcrumb.allFields'
         }
       ],
       sortableInstance: {},
@@ -329,20 +329,20 @@ export default {
           class: 'sort-handle'
         },
         {
-          text: this.$t('cms.entities.fields.attributes.label'),
+          text: this.$t('cms.entities.types.fields.attributes.label'),
           value: 'label'
         },
         {
-          text: this.$t('cms.entities.fields.attributes.path'),
+          text: this.$t('cms.entities.types.fields.attributes.path'),
           value: 'id',
           class: 'hidden-sm-and-down'
         },
         {
-          text: this.$t('cms.entities.fields.attributes.type'),
+          text: this.$t('cms.entities.types.fields.attributes.type'),
           value: 'type'
         },
         {
-          text: this.$t('cms.entities.fields.attributes.required'),
+          text: this.$t('cms.entities.types.fields.attributes.required'),
           value: 'required'
         },
         {

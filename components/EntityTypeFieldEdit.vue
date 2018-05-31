@@ -8,8 +8,8 @@
 
       <v-card class="EntityTypeFieldEdit__dialog">
         <v-card-title>
-          <span class="headline" v-if="!isNew">{{ $t('cms.entities.fields.edit.title') }} - {{ fieldFormData.label }}</span>
-          <span class="headline" v-if="isNew">{{ $t('cms.entities.fields.actions.add') }}</span>
+          <span class="headline" v-if="!isNew">{{ $t('cms.entities.types.fields.edit.title') }} - {{ fieldFormData.label }}</span>
+          <span class="headline" v-if="isNew">{{ $t('cms.entities.types.fields.actions.add') }}</span>
         </v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
@@ -21,17 +21,17 @@
                 </v-flex>
                 <v-flex xs12 lg6>
 
-                  <v-text-field box :label="$t('cms.entities.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
+                  <v-text-field box :label="$t('cms.entities.types.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.types.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
 
                   <div class="text-lg-center pa-2">
                     <div v-if="machineNameAlterable">
                       <v-icon color="green">brightness_auto</v-icon>
-                      <span v-if="showFormElement('machineNameAutoText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.synced')"></span>
+                      <span v-if="showFormElement('machineNameAutoText')" class="pl-2" v-html="$t('cms.entities.types.fields.machineName.synced')"></span>
                     </div>
                     <div v-if="!machineNameAlterable">
                       <v-icon color="red">lock</v-icon>
-                      <span v-if="showFormElement('machineNameLockText')" class="pl-2" v-html="$t('cms.entities.fields.machineName.locked')"></span>
-                      <span v-if="showFormElement('machineNameLockIdText')" class="pl-2" v-html="this.$t('cms.entities.fields.machineName.noChangeId')"></span>
+                      <span v-if="showFormElement('machineNameLockText')" class="pl-2" v-html="$t('cms.entities.types.fields.machineName.locked')"></span>
+                      <span v-if="showFormElement('machineNameLockIdText')" class="pl-2" v-html="this.$t('cms.entities.types.fields.machineName.noChangeId')"></span>
                     </div>
                   </div>
 
@@ -39,7 +39,7 @@
 
               </v-layout>
 
-              <v-text-field box :label="$t('cms.entities.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.fields.description.hint')"></v-text-field>
+              <v-text-field box :label="$t('cms.entities.types.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.types.fields.description.hint')"></v-text-field>
 
               <v-layout wrap v-if="fieldFormData.type !== 'id'">
 
@@ -47,7 +47,7 @@
 
                   <v-layout>
                     <v-flex xs11>
-                      <v-select :label="$t('cms.entities.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                      <v-select :label="$t('cms.entities.types.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
                     </v-flex>
                     <v-flex xs1 text-xs-center mt-4>
                       <v-tooltip left content-class="EntityTypeFieldEdit__help-tooltip">
@@ -68,7 +68,7 @@
 
                   <v-layout>
                     <v-flex x11>
-                      <v-select :label="$t('cms.entities.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypeNames" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                      <v-select :label="$t('cms.entities.types.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypeNames" v-model="fieldFormData.references" :rules="rules.references"></v-select>
                     </v-flex>
                     <v-flex xs1>
                     </v-flex>
@@ -77,8 +77,8 @@
                 </v-flex>
 
                 <v-flex xs12 lg6>
-                  <v-switch :label="$t('cms.entities.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
-                  <v-switch :label="$t('cms.entities.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+                  <v-switch :label="$t('cms.entities.types.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
+                  <v-switch :label="$t('cms.entities.types.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
                 </v-flex>
 
               </v-layout>
@@ -90,22 +90,22 @@
 
             <v-dialog v-model="deleteConfirmOpened" max-width="350" v-if="!isNew">
 
-              <v-btn color="red darken-1" flat slot="activator">{{ $t('cms.entities.fields.edit.delete') }}</v-btn>
+              <v-btn color="red darken-1" flat slot="activator">{{ $t('cms.entities.types.fields.edit.delete') }}</v-btn>
 
               <v-card>
                 <v-card-title class="headline">{{ $t('cms.entities.fields.edit.delete') }} {{ field._meta.camel }}?</v-card-title>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="grey darken-1" flat="flat" @click="deleteConfirmOpened = false">Cancel</v-btn>
-                  <v-btn color="red darken-1" flat @click="remove">{{ $t('cms.entities.fields.edit.confirm') }}</v-btn>
+                  <v-btn color="red darken-1" flat @click="remove">{{ $t('cms.entities.types.fields.edit.confirm') }}</v-btn>
                 </v-card-actions>
               </v-card>
 
             </v-dialog>
 
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
-          <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
+          <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.types.fields.edit.save') }}</v-btn>
+          <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.types.fields.edit.cancel') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -140,10 +140,10 @@
         valid: false,
         rules: {
           required: [
-            (v) => !!v || this.$t('cms.entities.fields.validations.required')
+            (v) => !!v || this.$t('cms.entities.types.fields.validations.required')
           ],
           references: [
-            (v) => (this.fieldFormData.type !== 'reference' || !!v) || this.$t('cms.entities.fields.validations.selectReference')
+            (v) => (this.fieldFormData.type !== 'reference' || !!v) || this.$t('cms.entities.types.fields.validations.selectReference')
           ]
         },
         icon: this.isNew ? 'add' : 'edit',

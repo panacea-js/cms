@@ -8,8 +8,8 @@
 
       <v-card class="EntityTypeEdit__dialog">
         <v-card-title>
-          <span class="headline" v-if="!isNew">{{ $t('cms.entities.actions.edit') }} - {{ entityType }}</span>
-          <span class="headline" v-if="isNew">{{ $t('cms.entities.actions.add') }}</span>
+          <span class="headline" v-if="!isNew">{{ $t('cms.entities.types.actions.edit') }} - {{ entityType }}</span>
+          <span class="headline" v-if="isNew">{{ $t('cms.entities.types.actions.add') }}</span>
         </v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="EntityTypeEditForm">
@@ -19,39 +19,39 @@
                 <v-flex xs12>
                   <v-text-field box
                     v-model="entityDataForm.name"
-                    :label="$t('cms.entities.attributes.name.label')"
+                    :label="$t('cms.entities.types.attributes.name.label')"
                     required
                     :rules="rules.name" />
                 </v-flex>
               </v-layout>
 
               <v-text-field box
-                :label="$t('cms.entities.attributes.description.label')"
+                :label="$t('cms.entities.types.attributes.description.label')"
                 v-model="entityDataForm.data.description"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.attributes.description.hint')" />
+                :hint="this.$t('cms.entities.types.attributes.description.hint')" />
 
               <v-text-field box
-                :label="$t('cms.entities.attributes.plural.label')"
+                :label="$t('cms.entities.types.attributes.plural.label')"
                 required
                 v-model="entityDataForm.data.plural"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.attributes.plural.hint')"
+                :hint="this.$t('cms.entities.types.attributes.plural.hint')"
                 :rules="rules.plural" />
 
               <v-text-field box
-                :label="$t('cms.entities.attributes.idLabel.label')"
+                :label="$t('cms.entities.types.attributes.idLabel.label')"
                 v-model="entityDataForm.data.fields.id.label"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.attributes.idLabel.hint')" />
+                :hint="this.$t('cms.entities.types.attributes.idLabel.hint')" />
 
             </v-container>
           </v-form>
         </v-card-text>
         <v-card-actions class="EntityTypeEdit__actions">
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.fields.edit.save') }}</v-btn>
-          <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.fields.edit.cancel') }}</v-btn>
+          <v-btn color="green darken-1" flat @click="submit">{{ $t('cms.entities.types.fields.edit.save') }}</v-btn>
+          <v-btn color="grey darken-1" flat @click="cancel">{{ $t('cms.entities.types.fields.edit.cancel') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -83,7 +83,7 @@
     data() {
 
       const validations = {
-        required: (v) => !!v || this.$t('cms.entities.attributes.validations.required'),
+        required: (v) => !!v || this.$t('cms.entities.types.attributes.validations.required'),
         entityNameExists: (v) => {
           if (!v || !this.isNew || !Array.isArray(this.$store.state.entities.entitiesData)) {
             return true

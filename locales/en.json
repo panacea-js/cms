@@ -12,7 +12,92 @@
       "description": "This is an introduction in English."
     },
     "entities": {
-      "page": {
+      "types": {
+        "attributes": {
+          "name": {
+            "label": "Entity type name",
+            "hint": "The singular name of this entity type"
+          },
+          "description": {
+            "label": "Description",
+            "hint": "A useful description of this entity type"
+          },
+          "plural": {
+            "label": "Plural",
+            "hint": "The plural form of this entity type's name"
+          },
+          "idLabel": {
+            "label": "ID label",
+            "hint": "A description for this entity type's <code>id</code> field"
+          },
+          "storage": {
+            "label": "Storage",
+            "db": "Database",
+            "fs": "File system"
+          },
+          "validations": {
+            "required": "This attribute is required"
+          }
+        },
+        "fields": {
+          "breadcrumb": {
+            "allFields": "All fields"
+          },
+          "cardinality": {
+            "many": "Many",
+            "one": "One"
+          },
+          "attributes": {
+            "label": "Label",
+            "path": "Field path",
+            "type": "Type",
+            "required": "Required",
+            "references": "References entity",
+            "machineName": "Machine name",
+            "description": "Description"
+          },
+          "machineName": {
+            "synced": "Machine name auto generated from label.",
+            "locked": "Machine name locked from label changes. Delete it to re-sync.",
+            "noChangeId": "Machine name cannot be changed for <code>id</code> field.",
+            "hint": "The addressable key for the field. Will be converted to camelCase."
+          },
+          "description": {
+            "hint": "A short description about the context of this field."
+          },
+          "edit": {
+            "title": "Field edit",
+            "delete": "Delete field",
+            "save": "Save",
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+          },
+          "actions": {
+            "add": "Add field",
+            "move": "Move",
+            "idNoMove": "ID stays at top"
+          },
+          "validations": {
+            "required": "This field is required",
+            "selectReference": "Select an entity to reference"
+          }
+        },
+        "actions": {
+          "add": "Add entity type",
+          "edit": "Edit entity type"
+        },
+        "errors": {
+          "error-loading-entity": "There was an error loading {entityName}"
+        }
+      },
+      "actions": {
+        "add": "Add {entityType}",
+        "edit": "Edit {entityType}"
+      },
+      "tabs": {
+        "list": "List",
+        "config": "Config",
+        "ctrlOpenTip": "Hold ctrl to open tab without navigating",
         "closeDialog": {
           "headline": "Are you sure you want to close this tab?",
           "text": "Any changes made without saving will be lost",
@@ -21,82 +106,6 @@
             "cancel": "Cancel"
           }
         }
-      },
-      "attributes": {
-        "name": {
-          "label": "Entity name",
-          "hint": "The singular name of this entity"
-        },
-        "description": {
-          "label": "Description",
-          "hint": "A useful description of this entity"
-        },
-        "plural": {
-          "label": "Plural",
-          "hint": "The plural form of this entity's name"
-        },
-        "idLabel": {
-          "label": "ID label",
-          "hint": "A description for this entity's <code>id</code> field"
-        },
-        "storage": {
-          "label": "Storage",
-          "db": "Database",
-          "fs": "File system"
-        },
-        "validations": {
-          "required": "This attribute is required"
-        }
-      },
-      "fields": {
-        "breadcrumb": {
-          "allFields": "All fields"
-        },
-        "cardinality": {
-          "many": "Many",
-          "one": "One"
-        },
-        "attributes": {
-          "label": "Label",
-          "path": "Field path",
-          "type": "Type",
-          "required": "Required",
-          "references": "References entity",
-          "machineName": "Machine name",
-          "description": "Description"
-        },
-        "machineName": {
-          "synced": "Machine name auto generated from label.",
-          "locked": "Machine name locked from label changes. Delete it to re-sync.",
-          "noChangeId": "Machine name cannot be changed for <code>id</code> field.",
-          "hint": "The addressable key for the field. Will be converted to camelCase."
-        },
-        "description": {
-          "hint": "A short description about the context of this field."
-        },
-        "edit": {
-          "title": "Field edit",
-          "delete": "Delete field",
-          "save": "Save",
-          "cancel": "Cancel",
-          "confirm": "Confirm"
-        },
-        "actions": {
-          "add": "Add field",
-          "move": "Move",
-          "idNoMove": "ID stays at top"
-        },
-        "validations": {
-          "required": "This field is required",
-          "selectReference": "Select an entity to reference"
-        }
-      },
-      "actions": {
-        "add": "Add entity",
-        "edit": "Edit entity"
-      },
-      "errors": {
-        "error-loading-entity": "There was an error loading {entityName}"
       }
     },
     "forms": {

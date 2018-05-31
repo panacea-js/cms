@@ -33,12 +33,12 @@
           >
             <v-dialog v-model="closeTabConfirmDialog" persistent max-width="50%">
               <v-card>
-                <v-card-title class="headline">{{ $t('cms.entities.page.closeDialog.headline') }}</v-card-title>
-                <v-card-text>{{ $t('cms.entities.page.closeDialog.text') }}</v-card-text>
+                <v-card-title class="headline">{{ $t('cms.entities.tabs.closeDialog.headline') }}</v-card-title>
+                <v-card-text>{{ $t('cms.entities.tabs.closeDialog.text') }}</v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="grey darken-1" flat @click.native="closeTabCancel()">{{ $t('cms.entities.page.closeDialog.actions.cancel') }}</v-btn>
-                  <v-btn color="red darken-1" flat @click.native="closeTab()">{{ $t('cms.entities.page.closeDialog.actions.close') }}</v-btn>
+                  <v-btn color="grey darken-1" flat @click.native="closeTabCancel()">{{ $t('cms.entities.tabs.closeDialog.actions.cancel') }}</v-btn>
+                  <v-btn color="red darken-1" flat @click.native="closeTab()">{{ $t('cms.entities.tabs.closeDialog.actions.close') }}</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -207,8 +207,8 @@ export default {
       graphqlError: false,
       fixedTabs: [
         // @todo add translate string
-        {id: 'list', label: 'List', icon: 'list'},
-        {id: 'config', label: 'Config', icon: 'settings'},
+        {id: 'list', label: this.$t('cms.entities.tabs.list'), icon: 'list'},
+        {id: 'config', label: this.$t('cms.entities.tabs.config'), icon: 'settings'},
       ],
       activeTab: 'tab-list',
     }
