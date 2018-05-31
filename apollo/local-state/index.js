@@ -12,6 +12,16 @@ const convertMappingItemStringToObject = function (item) {
   }
   return item
 }
+
+const isJsonString = function (string) {
+  try {
+    JSON.parse(string)
+  } catch (error) {
+    return false
+  }
+  return true
+}
+
 /**
  * Mapper to link a components data object with an apollo local state setting.
  *
@@ -44,7 +54,11 @@ const linkToLocalState = function (component, mappings) {
 
     // When apollo local state changes, update the data item on the component.
     localStateApollo.watchQuery({ query: getCmsUiSetting, variables: { key: item.localStateKey } }).subscribe(result => {
-      _.set(component, item.dataPath, JSON.parse(result.data.getCmsUiSetting.value))
+      let value = result.data.getCmsUiSetting.value
+      if (isJsonString(value)) {
+        value = JSON.parse(value)
+      }
+      _.set(component, item.dataPath, value)
     })
 
     // When the component data item changes, update (mutate) the apollo local state.
