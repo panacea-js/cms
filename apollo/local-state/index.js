@@ -3,6 +3,15 @@ import setCmsUiSetting from './gql/mutations/setCmsUiSetting.gql'
 import defaultCmsUiSettings from './defaults'
 import _ from 'lodash'
 
+const convertMappingItemStringToObject = function (item) {
+  if (typeof item === 'string') {
+    item = {
+      localStateKey: item,
+      dataPath: item
+    }
+  }
+  return item
+}
 /**
  * Mapper to link a components data object with an apollo local state setting.
  *
@@ -23,6 +32,8 @@ const linkToLocalState = function (component, mappings) {
   const localStateApollo = component.$apolloProvider.clients.cmsLocalState
 
   mappings.map(item => {
+    item = convertMappingItemStringToObject(item)
+
     const localStateCache = localStateApollo.cache.data.data
     const cacheKey = `cmsUiSetting:${item.localStateKey}`
 
@@ -75,6 +86,8 @@ const createDataDefaultFromMappings = function (mappings) {
   const data = {}
 
   mappings.map(item => {
+    item = convertMappingItemStringToObject(item)
+
     if (!localStateDefaults.hasOwnProperty(item.localStateKey)) {
       console.error(Error(`Could not create data ${item.dataPath} because ${item.localStateKey} doesn't exist as a local state setting with a default value`))
       return
