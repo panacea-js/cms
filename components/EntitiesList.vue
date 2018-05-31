@@ -2,7 +2,7 @@
   <div class="EntitiesList">
 
     <div class="EntitiesList__header-actions">
-      <EntityEdit :entityTypeData="entityTypeData" />
+      <EntityEditButton :entityTypeData="entityTypeData" />
     </div>
 
     <v-data-table :headers="tableHeaders" :items="entities" ref="sortableTable" v-model="selected" select-all :rows-per-page-items="rowsPerPageItems">
@@ -27,8 +27,8 @@
             </td>
           </template>
           <td class="EntitiesList__entity-actions">
-            <EntityEdit :entityTypeData="entityTypeData" :entityData="props.item"/>
-            <EntityDelete :entityType="entityType" :entityId="props.item.id" />
+            <EntityEditButton :entityTypeData="entityTypeData" :entityData="props.item"/>
+            <EntityDeleteButton :entityType="entityType" :entityId="props.item.id" />
           </td>
         </tr>
       </template>
@@ -64,16 +64,16 @@
 <script>
 import _ from 'lodash'
 
-import EntityEdit from '@/components/EntityEdit.vue'
-import EntityDelete from '@/components/EntityDelete.vue'
+import EntityEditButton from '@/components/EntityEditButton.vue'
+import EntityDeleteButton from '@/components/EntityDeleteButton.vue'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 import gql from 'graphql-tag'
 
 export default {
   components: {
-    EntityEdit,
-    EntityDelete
+    EntityEditButton,
+    EntityDeleteButton
   },
   mounted() {
     this.getEntityTypeData()

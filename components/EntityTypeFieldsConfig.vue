@@ -364,10 +364,6 @@ export default {
       type: String,
       required: true
     },
-    graphqlEndpoint: {
-      type: String,
-      required: true
-    }
   },
 }
 </script>
