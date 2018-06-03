@@ -82,16 +82,11 @@ import _ from 'lodash'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 
-import { linkToLocalStateMixin } from '@/apollo/local-state'
-
 export default {
   components: {
     EntityTypeFieldsConfig,
     EntitiesList
   },
-  mixins: [
-    linkToLocalStateMixin(['openEntities'])
-  ],
   methods: {
     closeTabConfirm (id) {
       this.originatingTab = this.activeTab
@@ -178,6 +173,9 @@ export default {
       }
       return this.openEntities.filter(item => item.__typename === this.entityType)
     }
+  },
+  sharedData() {
+    return ['openEntities']
   },
   data() {
     return {

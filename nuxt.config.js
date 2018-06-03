@@ -26,7 +26,8 @@ module.exports = {
   plugins: [
     '@/plugins/i18n.js',
     '@/plugins/vuetify.js',
-    '@/plugins/filters.js'
+    '@/plugins/filters.js',
+    '@/plugins/apolloLinkState.js'
   ],
   css: stylusLibraries,
   // Build configuration

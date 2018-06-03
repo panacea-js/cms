@@ -38,9 +38,10 @@
 </template>
 
 <script>
-import { linkToLocalStateMixin } from '@/apollo/local-state'
-
 export default {
+  sharedData() {
+    return ['openEntities']
+  },
   data() {
     return {
       opened: false,
@@ -48,9 +49,6 @@ export default {
       isNew: !this.entityData,
     }
   },
-  mixins: [
-    linkToLocalStateMixin(['openEntities'])
-  ],
   methods: {
     openEntityTab($event) {
       if (this.isNew && this.openEntities.findIndex(entity => entity.id === 'new') === -1) {

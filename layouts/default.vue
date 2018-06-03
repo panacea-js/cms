@@ -83,19 +83,15 @@ import GraphqlVoyagerLogo from "@/components/GraphqlVoyagerLogo"
 import GraphiqlLogo from "@/components/GraphiqlLogo"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
 
-import { linkToLocalStateMixin } from '@/apollo/local-state'
-
 export default {
   components: {
     GraphqlVoyagerLogo,
     GraphiqlLogo,
     LanguageSwitcher
   },
-  mixins: [
-    linkToLocalStateMixin([
-      { localStateKey: 'scheme', dataPath: 'scheme' }
-    ])
-  ],
+  sharedData() {
+    return ['scheme']
+  },
   data() {
     return {
       drawer: true,

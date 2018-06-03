@@ -35,11 +35,19 @@ const isJsonString = function (string) {
  *   - localStateKey: The key on the local state cache
  *   - dataPath: The dot separated path to the item being mapped in the components data object
  *
+ * @param String clientConfigKey
+ *   The apollo client config key
+ *
  * @return void
  *   The component object is mutated directly
  */
-const linkToLocalState = function (component, mappings) {
-  const localStateApollo = component.$apolloProvider.clients.cmsLocalState
+const linkToLocalState = function (component, mappings, clientConfigKey) {
+  if (typeof component.$apolloProvider.clients[clientConfigKey] === 'undefined') {
+    console.error(`${clientConfigKey} is not a valid client config key`)
+    return
+  }
+
+  const localStateApollo = component.$apolloProvider.clients[clientConfigKey]
 
   mappings.map(item => {
     item = convertMappingItemStringToObject(item)
@@ -92,6 +100,9 @@ const localStateDefaults = _.reduce(defaultCmsUiSettings, (acc, item, key) => {
  * mappings and imported local state default values.
  *
  * @param [Object] mappings
+ *   An array of objects, each with the keys:
+ *   - localStateKey: The key on the local state cache.
+ *   - dataPath: The dot separated path to the item being mapped in the components data object.
  *
  * @return Object
  *   Vue data object.
@@ -113,27 +124,28 @@ const createDataDefaultFromMappings = function (mappings) {
   return data
 }
 
-/**
- * A Vue mixing to reactively link data properties to apollo link
- * state settings based on the provided mappings.
- *
- * @param [Object] mappings
- *   An array of objects, each with the keys:
- *   - localStateKey: The key on the local state cache.
- *   - dataPath: The dot separated path to the item being mapped in the components data object.
- *
- * @return Object
- *   An object containing Vue Component properties to mix in.
- */
-const linkToLocalStateMixin = function (mappings) {
-  return {
+const sharedDataMixin = function () {}
+
+sharedDataMixin.install = function (Vue, options) {
+  if (!options || !options.clientConfigKey) {
+    console.error('sharedDataMixin must define a clientConfigKey')
+    return
+  }
+  Vue.mixin({
     data () {
-      return createDataDefaultFromMappings(mappings)
+      if (typeof this.$options.sharedData === 'function') {
+        const mappings = this.$options.sharedData()
+        return Object.assign(this.$options.data, createDataDefaultFromMappings(mappings))
+      }
+      return {}
     },
     mounted () {
-      linkToLocalState(this, mappings)
+      if (typeof this.$options.sharedData === 'function') {
+        const mappings = this.$options.sharedData()
+        linkToLocalState(this, mappings, options.clientConfigKey)
+      }
     }
-  }
+  })
 }
 
-export { linkToLocalStateMixin, localStateDefaults }
+export { sharedDataMixin }
