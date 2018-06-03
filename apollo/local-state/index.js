@@ -66,6 +66,9 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
       if (isJsonString(value)) {
         value = JSON.parse(value)
       }
+      if (value.hasOwnProperty('type') && value.type === 'json') {
+        value = value.json
+      }
       _.set(component, item.dataPath, value)
     })
 
