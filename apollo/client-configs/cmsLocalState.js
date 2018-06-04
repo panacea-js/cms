@@ -10,7 +10,7 @@ export default (ctx) => {
   const cacheForLocalState = new InMemoryCache({
     dataIdFromObject: object => {
       switch (object.__typename) {
-        case 'cmsUiSetting': return `cmsUiSetting:${object.key}`
+        case 'keyValue': return `keyValue:${object.key}`
         default: return defaultDataIdFromObject(object) // fall back to default handling
       }
     }
@@ -20,7 +20,8 @@ export default (ctx) => {
   if (typeof window !== 'undefined') {
     persistCache({
       cache: cacheForLocalState,
-      storage: window.localStorage
+      storage: window.localStorage,
+      key: 'panacea-cms'
     })
   }
 

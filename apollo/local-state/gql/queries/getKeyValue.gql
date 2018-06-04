@@ -1,0 +1,6 @@
+query getKeyValue ($key: String!) {
+  getKeyValue(key: $key) @client {
+    key,
+    value
+  }
+}

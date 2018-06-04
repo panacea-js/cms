@@ -1,9 +1,9 @@
 export default {
   Mutation: {
-    setCmsUiSetting: (_, { key, value }, { cache }) => {
+    setKeyValue: (_, { key, value }, { cache }) => {
       const data = {}
       data[key] = {
-        __typename: 'cmsUiSetting',
+        __typename: 'keyValue',
         key,
         value
       }
@@ -13,8 +13,8 @@ export default {
     }
   },
   Query: {
-    getCmsUiSetting: (_, { key }, { cache }) => {
-      const settingKey = `cmsUiSetting:${key}`
+    getKeyValue: (_, { key }, { cache }) => {
+      const settingKey = `keyValue:${key}`
       if (!cache.data.data.hasOwnProperty(settingKey)) {
         console.error(Error(`Setting key ${key} doesn't exist`))
       }

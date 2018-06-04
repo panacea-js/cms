@@ -1,6 +1,6 @@
-import getCmsUiSetting from './gql/queries/getCmsUiSetting.gql'
-import setCmsUiSetting from './gql/mutations/setCmsUiSetting.gql'
-import defaultCmsUiSettings from './defaults'
+import getKeyValue from './gql/queries/getKeyValue.gql'
+import setKeyValue from './gql/mutations/setKeyValue.gql'
+import defaultKeyValues from './defaults'
 import _ from 'lodash'
 
 const convertMappingItemStringToObject = function (item) {
@@ -53,7 +53,7 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
     item = convertMappingItemStringToObject(item)
 
     const localStateCache = localStateApollo.cache.data.data
-    const cacheKey = `cmsUiSetting:${item.localStateKey}`
+    const cacheKey = `keyValue:${item.localStateKey}`
 
     if (!localStateCache.hasOwnProperty(cacheKey)) {
       console.error(Error(`Could not link ${item.dataPath} to local state because ${item.localStateKey} doesn't exist as a local setting key`))
@@ -61,8 +61,8 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
     }
 
     // When apollo local state changes, update the data item on the component.
-    localStateApollo.watchQuery({ query: getCmsUiSetting, variables: { key: item.localStateKey } }).subscribe(result => {
-      let value = result.data.getCmsUiSetting.value
+    localStateApollo.watchQuery({ query: getKeyValue, variables: { key: item.localStateKey } }).subscribe(result => {
+      let value = result.data.getKeyValue.value
       if (isJsonString(value)) {
         value = JSON.parse(value)
       }
@@ -80,7 +80,7 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
       // - i.e. when the cached item doesn't match the updated value.
       if (cacheValue !== JSON.stringify(newVal)) {
         localStateApollo.mutate({
-          mutation: setCmsUiSetting,
+          mutation: setKeyValue,
           variables: { key: item.localStateKey, value: JSON.stringify(newVal) }
         })
       }
@@ -93,7 +93,7 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
 /**
  * Reduce apollo-link-state cache store to a key/value based object.
  */
-const localStateDefaults = _.reduce(defaultCmsUiSettings, (acc, item, key) => {
+const localStateDefaults = _.reduce(defaultKeyValues, (acc, item, key) => {
   acc[key] = item.value
   return acc
 }, {})

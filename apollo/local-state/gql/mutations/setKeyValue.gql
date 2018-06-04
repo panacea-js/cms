@@ -1,0 +1,6 @@
+mutation setKeyValue($key: String!, $value: String!) {
+  setKeyValue (key: $key, value: $value) @client {
+    key,
+    value
+  }
+}
