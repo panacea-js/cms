@@ -66,7 +66,7 @@
         :id="`tab-entity-${entity.id}`"
         class="EntityTabs__content"
       >
-        Content: {{ entity.name }}
+        Content: {{ entity }}
       </v-tab-item>
 
     </v-tabs-items>

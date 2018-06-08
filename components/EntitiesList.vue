@@ -100,18 +100,31 @@ export default {
       )
       this.columns = defaultColumns
     },
+    getEntitiesQueryBuilder(entityTypeData) {
+      const data = entityTypeData.data
+      const queryName = data._meta.pluralCamel
+
+      const generateFieldNest = function(fields) {
+        return Object.keys(fields).map(field => {
+          switch (fields[field].type) {
+            case 'object':
+              return `${field} { ${generateFieldNest(fields[field].fields)} }`
+            case 'reference':
+              // @todo references require all entityTypes to lookup target entity type. Also, prevent recursion to the source entityType.
+              return
+            default:
+              return field
+          }
+        }).filter(x => !!x)
+      }
+      const fields = generateFieldNest(data.fields).join(', ')
+      return `{ ${queryName} { ${fields} } }`
+    },
     getEntitiesList() {
       const pluralQueryToken = this.entityTypeData.data._meta.pluralCamel
 
-      let getAllEntitiesQuery
-
-      // @todo Make generic for all entity type data
-      if (this.entityType === 'Cat') {
-        getAllEntitiesQuery = `{ cats { id, name, breed, toys { name, size, quantity, attributes { key, value } } } }`
-      }
-      else {
-        getAllEntitiesQuery = `{ ${pluralQueryToken} { ${this.columns} } }`
-      }
+      const queryName = this.entityTypeData.data._meta.pluralCamel
+      const getAllEntitiesQuery = this.getEntitiesQueryBuilder(this.entityTypeData)
 
       const getAllEntitiesGql = gql(getAllEntitiesQuery)
 
