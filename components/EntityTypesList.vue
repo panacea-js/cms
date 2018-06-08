@@ -3,16 +3,16 @@
     <v-card flat>
       <v-card-text class="pa-0">
         <v-list class="pa-0">
-          <template v-for="(entity, index) in entities" class="EntityTypesList__items">
+          <template v-for="(entityType, index) in entityTypes" class="EntityTypesList__items">
             <v-tooltip v-bind:key="`tooltip-${index}`" right>
-              <v-list-tile slot="activator" v-bind:key="`entity-${index}`" :class="itemClasses(entity.name)" @click="redirectToEntity(entity.name)">
+              <v-list-tile slot="activator" v-bind:key="`entity-type-${index}`" :class="itemClasses(entityType.name)" @click="redirectToEntityType(entityType.name)">
                 <v-list-tile-content>
-                  <v-list-tile-title v-html="entity.name"></v-list-tile-title>
+                  <v-list-tile-title v-html="entityType.name"></v-list-tile-title>
                 </v-list-tile-content>
               </v-list-tile>
-              <span class="tooltip-text">{{ entity.data.description }}</span>
+              <span class="tooltip-text">{{ entityType.data.description }}</span>
             </v-tooltip>
-            <v-divider v-bind:key="`entity-divider-${index}`" v-if="index + 1 !== entities.length"></v-divider>
+            <v-divider v-bind:key="`entity-type-divider-${index}`" v-if="index + 1 !== entityTypes.length"></v-divider>
           </template>
         </v-list>
       </v-card-text>
@@ -31,15 +31,15 @@ export default {
     EntityTypesListActions
   },
   methods: {
-    itemClasses: function (entityName) {
+    itemClasses: function (entityTypeName) {
       const classes = ['EntityTypesList__item']
-      entityName === this.$route.params.name && classes.push('EntityTypesList__item--active')
+      entityTypeName === this.$route.params.name && classes.push('EntityTypesList__item--active')
       return classes.join(' ')
     },
-    redirectToEntity: function (entityName) {
+    redirectToEntityType: function (entityTypeName) {
       this.$router.push({
         name: 'entities-name',
-        params: { name: entityName }
+        params: { name: entityTypeName }
       })
     }
   },
@@ -49,12 +49,12 @@ export default {
         et.data = JSON.parse(et.data)
         return et
       })
-      this.entities = entityTypes
+      this.entityTypes = entityTypes
     })
   },
   data() {
     return {
-      entities: []
+      entityTypes: []
     }
   }
 }
