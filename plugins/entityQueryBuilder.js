@@ -1,6 +1,31 @@
 import Vue from 'vue'
 import gql from 'graphql-tag'
 
+function transformQueryParams (queryParams) {
+  if (Object.keys(queryParams).length) {
+    const paramsList = []
+    Object.keys(queryParams).forEach(key => {
+      paramsList.push(`${key}: "${queryParams[key]}"`)
+    })
+    return ` (${paramsList.join(', ')})`
+  }
+  return ''
+}
+
+function generateFieldNest (fields) {
+  return Object.keys(fields).map(field => {
+    switch (fields[field].type) {
+      case 'object':
+        return `${field} { ${generateFieldNest(fields[field].fields)} }`
+      case 'reference':
+        // @todo references require all entityTypes to lookup target entity type. Also, prevent recursion to the source entityType.
+        return
+      default:
+        return field
+    }
+  }).filter(x => !!x)
+}
+
 Vue.mixin({
   methods: {
     /**
@@ -15,30 +40,8 @@ Vue.mixin({
      */
     entityQueryBuilder (queryName, entityTypeData, queryParams = {}) {
       const data = entityTypeData.data
-
-      const generateFieldNest = function (fields) {
-        return Object.keys(fields).map(field => {
-          switch (fields[field].type) {
-            case 'object':
-              return `${field} { ${generateFieldNest(fields[field].fields)} }`
-            case 'reference':
-              // @todo references require all entityTypes to lookup target entity type. Also, prevent recursion to the source entityType.
-              return
-            default:
-              return field
-          }
-        }).filter(x => !!x)
-      }
       const fields = generateFieldNest(data.fields).join(', ')
-
-      let params = ''
-      if (Object.keys(queryParams).length) {
-        const paramsList = []
-        Object.keys(queryParams).forEach(key => {
-          paramsList.push(`${key}: "${queryParams[key]}"`)
-        })
-        params = ` (${paramsList.join(', ')})`
-      }
+      const params = transformQueryParams(queryParams)
 
       return gql(`{ ${queryName}${params} { ${fields} } }`)
     }

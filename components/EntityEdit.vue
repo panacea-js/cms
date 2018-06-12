@@ -6,6 +6,7 @@
     <div class="EntityEdit_form" v-if="entityData">
       <h3>Entity ID: {{ entityData.id }}</h3>
       <h3>Entity name: {{ entityData.name }}</h3>
+      {{ entityData }}
     </div>
   </div>
 </template>
