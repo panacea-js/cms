@@ -37,7 +37,7 @@ Vue.mixin({
         Object.keys(queryParams).forEach(key => {
           paramsList.push(`${key}: "${queryParams[key]}"`)
         })
-        params = ` (${paramsList.join(' ,')})`
+        params = ` (${paramsList.join(', ')})`
       }
 
       return gql(`{ ${queryName}${params} { ${fields} } }`)
