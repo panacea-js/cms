@@ -66,7 +66,7 @@
         :id="`tab-entity-${entity.id}`"
         class="EntityTabs__content"
       >
-        Content: {{ entity }}
+        <EntityEdit :entityType="entityType" :entityID="entity.id !== 'new' ? entity.id : null" />
       </v-tab-item>
 
     </v-tabs-items>
@@ -78,6 +78,7 @@
 <script>
 import EntityTypeFieldsConfig from '@/components/EntityTypeFieldsConfig.vue'
 import EntitiesList from '@/components/EntitiesList.vue'
+import EntityEdit from '@/components/EntityEdit.vue'
 import _ from 'lodash'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
@@ -85,7 +86,8 @@ import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
 export default {
   components: {
     EntityTypeFieldsConfig,
-    EntitiesList
+    EntitiesList,
+    EntityEdit
   },
   methods: {
     closeTabConfirm (id) {
@@ -147,7 +149,7 @@ export default {
 
     },
     getTitle(entity) {
-      const titleFieldCandidates = ['title', 'name', 'key']
+      const titleFieldCandidates = ['title', 'name', 'headline', 'key']
       let title
       titleFieldCandidates.forEach(test => {
         if (entity.hasOwnProperty(test)) {
@@ -155,7 +157,7 @@ export default {
           return
         }
       })
-
+      // Fallback to the entity's ID which is always present.
       return !!title ? title : entity.id
     },
     entityTabClasses(entity) {

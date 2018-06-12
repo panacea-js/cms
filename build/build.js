@@ -143,7 +143,6 @@ const compileVarsAssets = function (config) {
   // @require '~assets/colors.styl'
   const colorsStylus = _(config.vars.colors).map((color, name) => `$color-${name} = ${color}`).join('\n')
   fs.writeFileSync(path.resolve(config.srcDir, 'assets/colors.styl'), colorsStylus)
-
 }
 
 /**

@@ -68,7 +68,6 @@ import EntityEditButton from '@/components/EntityEditButton.vue'
 import EntityDeleteButton from '@/components/EntityDeleteButton.vue'
 
 import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
-import gql from 'graphql-tag'
 
 export default {
   components: {
@@ -100,35 +99,13 @@ export default {
       )
       this.columns = defaultColumns
     },
-    getEntitiesQueryBuilder(entityTypeData) {
-      const data = entityTypeData.data
-      const queryName = data._meta.pluralCamel
-
-      const generateFieldNest = function(fields) {
-        return Object.keys(fields).map(field => {
-          switch (fields[field].type) {
-            case 'object':
-              return `${field} { ${generateFieldNest(fields[field].fields)} }`
-            case 'reference':
-              // @todo references require all entityTypes to lookup target entity type. Also, prevent recursion to the source entityType.
-              return
-            default:
-              return field
-          }
-        }).filter(x => !!x)
-      }
-      const fields = generateFieldNest(data.fields).join(', ')
-      return `{ ${queryName} { ${fields} } }`
-    },
     getEntitiesList() {
       const pluralQueryToken = this.entityTypeData.data._meta.pluralCamel
 
       const queryName = this.entityTypeData.data._meta.pluralCamel
-      const getAllEntitiesQuery = this.getEntitiesQueryBuilder(this.entityTypeData)
+      const getAllEntitiesQuery = this.entityQueryBuilder(queryName, this.entityTypeData)
 
-      const getAllEntitiesGql = gql(getAllEntitiesQuery)
-
-      this.$apollo.watchQuery({ query: getAllEntitiesGql }).subscribe(result => {
+      this.$apollo.watchQuery({ query: getAllEntitiesQuery }).subscribe(result => {
         this.updateTableHeaders()
         this.entities = result.data[pluralQueryToken]
       })

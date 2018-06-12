@@ -27,14 +27,16 @@ module.exports = {
     '@/plugins/i18n.js',
     '@/plugins/vuetify.js',
     '@/plugins/filters.js',
-    '@/plugins/apolloLinkState.js'
+    '@/plugins/apolloLinkState.js',
+    '@/plugins/entityQueryBuilder.js'
   ],
   css: stylusLibraries,
   // Build configuration
   build: {
     vendor: [
       'vue-i18n',
-      '@/plugins/vuetify.js'
+      '@/plugins/vuetify.js',
+      'lodash.get'
     ],
     extractCSS: true,
     extend (config, ctx) {
