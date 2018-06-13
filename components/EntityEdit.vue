@@ -1,11 +1,23 @@
 <template>
   <div class="EntityEdit" v-if="entityTypeData">
-    <div class="EntityEdit_form--new" v-if="!entityData">
+    <v-layout justify-end>
+      <v-flex xs3 class="EntityEdit__toolbar">
+        <v-switch v-model="expandAllPanels" :title="expandAllPanels ? 'Click to close all fields with nested information' : 'Click to open all fields with nested information'" :label="expandAllPanels ? 'Close all panels' : 'Open all panels'" />
+      </v-flex>
+    </v-layout>
+
+    <div class="EntityEdit__form" v-if="!entityData">
       <h3>This is a new entity</h3>
     </div>
-    <div class="EntityEdit_form" v-if="entityData">
-      <EntityEditFields v-if="fields" :fields="fields" />
+
+    <div class="EntityEdit__form" v-if="entityData">
+      <v-card flat>
+        <v-card-text>
+          <EntityEditFields v-if="fields" :fields="fields" />
+        </v-card-text>
+      </v-card>
     </div>
+
   </div>
 </template>
 
@@ -24,7 +36,8 @@ export default {
       isNew: !this.entityID,
       entityTypeData: {},
       entityData: null,
-      fields: []
+      fields: [],
+      expandAllPanels: false
     }
   },
   mounted() {
@@ -85,6 +98,22 @@ export default {
       }
 
       this.fields = recurseFields('', this.entityTypeData.data.fields)
+    },
+  },
+  watch: {
+    expandAllPanels: function(value) {
+      console.log(value)
+      console.log(this)
+      if (value === true) {
+        this.$el
+          .querySelectorAll('.expansion-panel__container:not(.expansion-panel__container--active) .expansion-panel__header')
+          .forEach(element => element.click())
+      }
+      else {
+        this.$el
+          .querySelectorAll('.expansion-panel__container--active .expansion-panel__header')
+          .forEach(element => element.click())
+      }
     }
   },
   props: {
@@ -99,3 +128,7 @@ export default {
   },
 }
 </script>
+<style lang="stylus">
+.EntityEdit
+  margin 2rem
+</style>
