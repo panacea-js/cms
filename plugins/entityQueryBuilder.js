@@ -18,8 +18,9 @@ function generateFieldNest (fields) {
       case 'object':
         return `${field} { ${generateFieldNest(fields[field].fields)} }`
       case 'reference':
+        return `${field} { name }`
         // @todo references require all entityTypes to lookup target entity type. Also, prevent recursion to the source entityType.
-        return
+
       default:
         return field
     }
