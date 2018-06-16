@@ -13,7 +13,7 @@
     <div class="EntityEdit__form" v-if="entityData">
       <v-card flat>
         <v-card-text>
-          <EntityEditFields v-if="fields" :fields="fields" />
+          <EntityEditFields v-if="fields" :fields="fields" :values="fieldValues" />
         </v-card-text>
       </v-card>
     </div>
@@ -37,6 +37,7 @@ export default {
       entityTypeData: {},
       entityData: null,
       fields: [],
+      fieldValues: {},
       expandAllPanels: false
     }
   },
@@ -68,42 +69,71 @@ export default {
       })
     },
     transposeFields() {
+
+      const fieldValues = {}
+
       const recurseFields = (parentPath, fields) => {
         const transposedFields = []
         const depth = parentPath.split('.').length
 
         Object.keys(fields).forEach(fieldId => {
           const fieldPath = parentPath ? `${parentPath}.${fieldId}` : fieldId
+
           const fieldData = fields[fieldId]
 
           if (fieldData.fields) {
-            fieldData.fields = recurseFields(fieldPath, fieldData.fields)
+            fieldData.fields = recurseFields(`${fieldPath}`, fieldData.fields)
           }
 
-          const data = {
+          const recurseValues = (fieldPath) => {
+            const values = _(this.entityData).get(fieldPath)
+
+            if (typeof values === 'object') {
+              _(values).forEach((value, fieldName) => {
+                if (fieldName === '__typename') {
+                  return
+                }
+                const fieldPathNested = `${fieldPath}.${fieldName}`
+                recurseValues(fieldPathNested)
+              })
+            }
+
+            if (Array.isArray(values)) {
+              values.forEach((value, delta) => {
+                const fieldPathWithDelta = `${fieldPath}.${delta}`
+                if (typeof value === 'object') {
+                  recurseValues(fieldPathWithDelta)
+                }
+              })
+            }
+
+            if (!Array.isArray(values) && typeof values !== 'object' && typeof values !== 'undefined') {
+              _.set(fieldValues, fieldPath, values)
+            }
+
+          }
+
+          recurseValues(fieldPath)
+
+          transposedFields.push({
             depth,
             key: fieldPath,
             ...fieldData
-          }
+          })
 
-          let values = _(this.entityData).get(fieldPath)
-          if (Array.isArray(values) && values.length === 0) {
-            values = null
-          }
-          data.values = Array.isArray(values) ? values : [values]
-
-          transposedFields.push(data)
         })
+
         return transposedFields
       }
 
-      this.fields = recurseFields('', this.entityTypeData.data.fields)
+      const transposedFields = recurseFields('', this.entityTypeData.data.fields)
+
+      this.fieldValues = fieldValues
+      this.fields = transposedFields
     },
   },
   watch: {
     expandAllPanels: function(value) {
-      console.log(value)
-      console.log(this)
       if (value === true) {
         this.$el
           .querySelectorAll('.expansion-panel__container:not(.expansion-panel__container--active) .expansion-panel__header')
