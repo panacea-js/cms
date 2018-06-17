@@ -57,9 +57,17 @@
             <!-- TODO: Add many objects with drag reordering -->
             <!-- TODO: Add + more link for objects -->
             <v-card-text>
-              <div v-if="Array.isArray(values[field._meta.camel])" class="EntityEditFields__field-object-item" v-for="(item, delta) in (ensureNestedFields(values[field._meta.camel], field.fields))">
+              <div v-if="Array.isArray(values[field._meta.camel])" class="EntityEditFields__field-object-item" v-for="(item, delta) in values[field._meta.camel]">
                 <EntityEditFields :fields="field.fields" :values="item" />
               </div>
+
+              <v-layout row wrap v-if="field.many">
+                <v-flex xs12 text-xs-center>
+                  <v-btn fab small color="primary" @click="addAnotherNestedField(values, field)">
+                    <v-icon color="grey darken-4">add</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
 
             </v-card-text>
           </v-card>
@@ -79,23 +87,39 @@ export default {
     getFieldComponent(fieldType) {
        return 'v-text-field'
     },
-    ensureNestedFields(values, fields) {
+    addAnotherNestedField(values, field) {
 
-      values = values || {}
-
-      _(fields).forEach(field => {
-        _(values).forEach((value, index) => {
-          if (!value.hasOwnProperty(field._meta.camel)) {
-            values[index][field._meta.camel] = field.many ? [] : ''
-            if (field.fields) {
-              // TODO: Fix this to prepopulate blank nested values
-              values[index][field._meta.camel] = this.ensureNestedFields({}, field.fields)
+      const recurseFields = (field, structure) => {
+        _(field.fields).forEach(subField => {
+          if (subField.fields) {
+            if (subField.many) {
+              structure[subField._meta.camel] = structure[subField._meta.camel] || []
+              structure[subField._meta.camel].push(recurseFields(subField.fields, structure))
+            }
+            else {
+              structure[subField._meta.camel] = recurseFields(subField.fields, structure)
             }
           }
+          else {
+            structure[subField._meta.camel] = subField.many ? [] : ''
+          }
         })
-      })
+        return structure
+      }
 
-      return values
+      const newField = recurseFields(field, {})
+
+      if (field.many) {
+        values[field._meta.camel] = values[field._meta.camel] || []
+        values[field._meta.camel].push(newField)
+      }
+      else {
+        values[field._meta.camel] = values[field._meta.camel] || {}
+        values[field._meta.camel] = newField
+      }
+
+      this.$forceUpdate()
+
     }
   },
   props: {
