@@ -7,7 +7,11 @@
     </v-layout>
 
     <div class="EntityEdit__form" v-if="!entityData">
-      <h3>This is a new entity</h3>
+      <v-card flat>
+        <v-card-text>
+          <EntityEditFields v-if="fields" :fields="fields" :values="fieldValues" />
+        </v-card-text>
+      </v-card>
     </div>
 
     <div class="EntityEdit__form" v-if="entityData">
@@ -35,7 +39,7 @@ export default {
     return {
       isNew: !this.entityID,
       entityTypeData: {},
-      entityData: null,
+      entityData: {},
       fields: [],
       fieldValues: {},
       expandAllPanels: false
@@ -50,10 +54,11 @@ export default {
         const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
         entityType.data = JSON.parse(entityType.data)
         this.entityTypeData = entityType
-
-        if (!this.isNew) {
-          this.getEntityData()
+        if (this.isNew) {
+          this.getNewEntityData()
+          return
         }
+        this.getEntityData()
       })
     },
     getEntityData() {
@@ -68,18 +73,45 @@ export default {
         this.transposeFields()
       })
     },
-    transposeFields() {
+    getNewEntityData() {
+      const recurseFields = (field) => {
+        const structure = {}
+        _(field.fields).forEach((subField, subFieldId) => {
+          if (subField.fields) {
+            if (subField.many) {
+              structure[subFieldId] = []
+              structure[subFieldId].push(recurseFields(subField))
+            }
+            else {
+              structure[subFieldId] = recurseFields(subField)
+            }
+          }
+          else {
+            structure[subFieldId] = subField.many ? [''] : ''
+          }
+        })
+        return structure
+      }
 
+      const values = recurseFields(this.entityTypeData.data)
+
+      this.entityData = values
+
+      this.transposeFields()
+    },
+    transposeFields() {
       const fieldValues = {}
 
       const recurseFields = (parentPath, fields) => {
         const transposedFields = []
         const depth = parentPath.split('.').length
 
-        Object.keys(fields).forEach(fieldId => {
-          const fieldPath = parentPath ? `${parentPath}.${fieldId}` : fieldId
+        _(fields).forEach((fieldData, fieldId) => {
+          if (this.isNew && fieldData.type === 'id') {
+            return
+          }
 
-          const fieldData = fields[fieldId]
+          const fieldPath = parentPath ? `${parentPath}.${fieldId}` : fieldId
 
           if (fieldData.fields) {
             fieldData.fields = recurseFields(`${fieldPath}`, fieldData.fields)
