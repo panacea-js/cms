@@ -252,14 +252,14 @@
             .value()
             .join('.')
 
-          const oldField = _(this.entityData).get(`${allFieldsPathOnEntityData}.${oldId}`)
+          const oldField = _(this.entityData.data).get(`${allFieldsPathOnEntityData}.${oldId}`)
 
           // Create new field entry on entityData keyed by the new machine name.
-          _.set(this.entityData, `${allFieldsPathOnEntityData}.${newId}`, oldField)
+          _.set(this.entityData.data, `${allFieldsPathOnEntityData}.${newId}`, oldField)
           // Update the ._meta.camel attribute to match the new machine name.
-          _.set(this.entityData, `${allFieldsPathOnEntityData}.${newId}._meta.camel`, newId)
+          _.set(this.entityData.data, `${allFieldsPathOnEntityData}.${newId}._meta.camel`, newId)
           // Remove the old field entry.
-          _.unset(this.entityData, `${allFieldsPathOnEntityData}.${oldId}`)
+          _.unset(this.entityData.data, `${allFieldsPathOnEntityData}.${oldId}`)
         }
 
         // Update field actions.
