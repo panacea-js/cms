@@ -45,11 +45,11 @@ export default {
       expandAllPanels: false
     }
   },
-  mounted() {
+  mounted () {
     this.getEntityTypeData()
   },
   methods: {
-    getEntityTypeData() {
+    getEntityTypeData () {
       this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
         const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
         entityType.data = JSON.parse(entityType.data)
@@ -61,7 +61,7 @@ export default {
         this.getEntityData()
       })
     },
-    getEntityData() {
+    getEntityData () {
       const queryName = this.entityTypeData.data._meta.camel
       const queryParams = {
         id: this.entityID
@@ -69,11 +69,31 @@ export default {
       const getEntityQuery = this.entityQueryBuilder(queryName, this.entityTypeData, queryParams)
 
       this.$apollo.watchQuery({ query: getEntityQuery }).subscribe(result => {
-        this.entityData = result.data[queryName]
+        const entityData = _.cloneDeep(result.data[queryName])
+        const emptyEntityStructure = this.getEmptyEntityStructure()
+
+        // Entity data retrieved via API call can have missing (null) data.
+        // Iterate the full empty structure to discover and populate blank
+        // initial values.
+        const populateMissingDefaults = (defaults, data) => {
+          _(data).forEach((value, key) => {
+            if (value == null) {
+              data[key] = defaults[key]
+            }
+            if (Array.isArray(value)) {
+              _(value).forEach((arrayValue) => {
+                populateMissingDefaults(defaults[key][0], arrayValue)
+              })
+            }
+          })
+        }
+        populateMissingDefaults(emptyEntityStructure, entityData)
+
+        this.entityData = entityData
         this.transposeFields()
       })
     },
-    getNewEntityData() {
+    getEmptyEntityStructure () {
       const recurseFields = (field) => {
         const structure = {}
         _(field.fields).forEach((subField, subFieldId) => {
@@ -93,10 +113,10 @@ export default {
         return structure
       }
 
-      const values = recurseFields(this.entityTypeData.data)
-
-      this.entityData = values
-
+      return recurseFields(this.entityTypeData.data)
+    },
+    getNewEntityData () {
+      this.entityData = this.getEmptyEntityStructure()
       this.transposeFields()
     },
     transposeFields() {
@@ -139,10 +159,7 @@ export default {
               })
             }
 
-            if (!Array.isArray(values) && typeof values !== 'object' && typeof values !== 'undefined') {
-              _.set(fieldValues, fieldPath, values)
-            }
-
+            _.set(fieldValues, fieldPath, values)
           }
 
           recurseValues(fieldPath)
