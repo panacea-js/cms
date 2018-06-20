@@ -40,7 +40,7 @@
                 </v-flex>
               </v-layout>
 
-              <v-layout row wrap>
+              <v-layout row wrap class="EntityEditFields__add-scalar-item">
                 <v-flex xs12 text-xs-center>
                   <v-btn fab small color="primary" @click="values[field._meta.camel].push('')">
                     <v-icon color="grey darken-4">add</v-icon>
