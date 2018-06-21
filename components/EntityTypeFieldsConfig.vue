@@ -74,11 +74,20 @@
                 </td>
               </tr>
             </template>
+
           </v-data-table>
         </div>
 
-        <div :class="fieldsActionsClasses">
+        <div :class="fieldsActionsClasses" v-if="fieldsDisplayed.length">
           <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
+        </div>
+
+        <div :class="fieldsActionsClasses" v-if="!fieldsDisplayed.length">
+          <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`">
+            <v-btn large slot="button" color="primary" light>
+              <v-icon left>add</v-icon>{{ $t('cms.entities.types.fields.actions.addFirstFieldOnObject', { fieldName: fieldPaths[fieldPaths.length-1].label }) }}
+            </v-btn>
+          </EntityTypeFieldEdit>
         </div>
 
       </v-card-text>
@@ -285,6 +294,11 @@ export default {
       return false
     },
 
+  },
+  provide () {
+    return {
+      gotoField: this.gotoField
+    }
   },
   computed: {
     fieldsTableClasses() {

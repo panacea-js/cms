@@ -16,6 +16,11 @@ function generateFieldNest (fields) {
   return Object.keys(fields).map(field => {
     switch (fields[field].type) {
       case 'object':
+        if (!fields[field].fields) {
+          // Skip where an object field is missing sub-fields.
+          delete fields[field]
+          return
+        }
         return `${field} { ${generateFieldNest(fields[field].fields)} }`
       case 'reference':
         return `${field} { name }`

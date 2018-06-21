@@ -74,6 +74,8 @@
           },
           "actions": {
             "add": "Add field",
+            "addOnObject": "Add field to {fieldName}",
+            "addFirstFieldOnObject": "Add the first field on {fieldName}",
             "move": "Move",
             "idNoMove": "ID stays at top"
           },

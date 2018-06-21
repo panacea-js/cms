@@ -2,14 +2,17 @@
   <div class="EntityTypeFieldEdit">
     <v-dialog v-model="opened" persistent max-width="75%">
 
-      <a href="#" onclick="return false" slot="activator" class="EntityTypeFieldEdit__activator">
-        <v-icon>{{ this.icon }}</v-icon>
-      </a>
+      <template slot="activator">
+        <slot name="button">
+          <v-btn fab light small color="primary" class="EntityTypeFieldEdit__activator">
+            <v-icon color="grey darken-4">{{ this.icon }}</v-icon>
+          </v-btn>
+        </slot>
+      </template>
 
       <v-card class="EntityTypeFieldEdit__dialog">
         <v-card-title>
-          <span class="headline" v-if="!isNew">{{ $t('cms.entities.types.fields.edit.title') }} - {{ fieldFormData.label }}</span>
-          <span class="headline" v-if="isNew">{{ $t('cms.entities.types.fields.actions.add') }}</span>
+          <span class="headline" v-html="getTitle()"></span>
         </v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
@@ -121,6 +124,7 @@
   import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
 
   export default {
+    inject: ['gotoField'],
     data() {
       const fieldFormData = {
         type: this.field.type,
@@ -168,6 +172,7 @@
         }),
 
         entityTypes: [],
+        entityData: {},
         fieldTypes: [],
       }
     },
@@ -204,6 +209,25 @@
       })
     },
     methods: {
+      getTitle() {
+        if (this.isNew) {
+          if (this.fieldPath === 'all') {
+            return this.$t('cms.entities.types.fields.actions.add')
+          }
+          const objectFieldLabelPath = _(this.fieldPath.split('.'))
+            .filter(p => p !== 'all')
+            .flatMap(p => ['fields', p])
+            .flatten()
+            .push('label')
+            .value()
+            .join('.')
+
+          const fieldName = _.get(this.entityData.data, objectFieldLabelPath)
+
+          return this.$t('cms.entities.types.fields.actions.addOnObject', { fieldName } )
+        }
+        return `${this.$t('cms.entities.types.fields.edit.title')} &ndash; ${this.fieldFormData.label}`
+      },
       disableFormElement(element) {
         let disable = false
 
@@ -319,6 +343,10 @@
 
         // Saved data should now be considered the original data.
         this.fieldFormDataOriginal = _.cloneDeep(this.fieldFormData)
+
+        if (this.isNew && fieldData.type === 'object') {
+          this.gotoField(`${this.fieldPath}.${machineNameCamel}`, fieldData.label)
+        }
 
         this.opened = false
       },
