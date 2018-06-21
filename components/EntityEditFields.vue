@@ -1,10 +1,12 @@
 <template>
-  <div class="EntityEditFields" v-if="fields">
-    <div class="EntityEditFields__field" v-for="field in fields" :key="field.key">
-      <!-- TODO: Bind to required (and other rules?) using v-model -->
-      <div class="EntityEditFields__field-single" v-if="!field.fields && !field.many">
+  <div class="EntityEditFields" v-if="fields && values">
+    <div class="EntityEditFields__field" v-for="field in fields" :data-field="field.key" :key="field.key">
+
+      <!-- Single scalar value -->
+      <div class="EntityEditFields__field-scalar-single">
         <component
-          class="EntityEditFields__field-one"
+          v-if="!field.fields && !field.many"
+          class="EntityEditFields__value-scalar-single"
           :key="`${field.key}.0`"
           :is="getFieldComponent(field.type)"
           :label="field.label"
@@ -15,14 +17,15 @@
         />
       </div>
 
-      <v-expansion-panel class="EntityEditFields__field-many" v-if="!field.fields && field.many" :inset="field.depth > 1">
+      <!-- Many scalar values panel -->
+      <v-expansion-panel class="EntityEditFields__field-scalar-many" v-if="!field.fields && field.many" :inset="field.depth > 1">
         <v-expansion-panel-content>
-          <div class="EntityEditFields__field-many-header" slot="header"><v-icon>list</v-icon> {{ field.label }}</div>
-          <v-card class="EntityEditFields__field-many-card">
+          <div class="EntityEditFields__field-scalar-many-header" slot="header"><v-icon>list</v-icon> {{ field.label }}</div>
+          <v-card class="EntityEditFields__field-scalar-many-card">
             <v-card-text>
               <v-subheader v-if="field.description">{{ field.description }}</v-subheader>
               <!-- TODO: Add many items with drag reordering -->
-              <v-layout row wrap class="EntityEditFields__field-many-items" v-for="(value, index) in values[field._meta.camel]" :key="`${field.key}.${index}`">
+              <v-layout row wrap class="EntityEditFields__value-scalar-many" v-for="(value, index) in values[field._meta.camel]" :key="`${field.key}.${index}`">
                 <v-flex xs9 offset-xs1>
                   <component
                     :is="getFieldComponent(field.type)"
@@ -33,11 +36,11 @@
                   />
                 </v-flex>
                 <v-flex xs1 text-xs-center>
-                  <v-icon class="EntityEditFields__remove-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
+                  <v-icon class="EntityEditFields__remove-scalar-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
                 </v-flex>
               </v-layout>
 
-              <v-layout row wrap>
+              <v-layout row wrap class="EntityEditFields__add-scalar-item">
                 <v-flex xs12 text-xs-center>
                   <v-btn fab small color="primary" @click="values[field._meta.camel].push('')">
                     <v-icon color="grey darken-4">add</v-icon>
@@ -50,13 +53,27 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
 
+      <!-- Object panel -->
       <v-expansion-panel class="EntityEditFields__field-object" v-if="field.fields" :inset="field.depth > 1">
         <v-expansion-panel-content>
-          <div class="EntityEditFields__field-object-card-header" slot="header"><v-icon>subdirectory_arrow_right</v-icon> {{ field.label }}</div>
+          <div class="EntityEditFields__field-object-header" slot="header"><v-icon>subdirectory_arrow_right</v-icon> {{ field.label }}</div>
           <v-subheader v-if="field.description">{{ field.description }}</v-subheader>
-          <v-layout class="EntityEditFields__field-object-item" v-if="Array.isArray(values[field._meta.camel])" v-for="(item, delta) in values[field._meta.camel]" :key="`${field._meta.camel}.${delta}`">
+
+          <!-- Single nested object values -->
+          <v-layout class="EntityEditFields__value-object-item EntityEditFields__value-object-item--single" v-if="!Array.isArray(values[field._meta.camel])">
+            <v-flex xs10 offset-xs1>
+              <v-card>
+                <v-card-text>
+                  <EntityEditFields :fields="field.fields" :values="values[field._meta.camel]" />
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+
+          <!-- Many nested object values -->
+          <v-layout class="EntityEditFields__value-object-item EntityEditFields__value-object-item--many" v-if="Array.isArray(values[field._meta.camel])" v-for="(item, delta) in values[field._meta.camel]" :key="`${field._meta.camel}.${delta}`">
             <v-flex xs1 d-inline-flex align-center>
-              <div class="EntityEditFields__field-object-item-delta-text">{{ delta + 1 }}</div>
+              <div class="EntityEditFields__value-object-item-delta-text">{{ delta + 1 }}</div>
               <!-- TODO: Add many objects with drag reordering -->
               <v-icon class="EntityEditFields__item-dragger">drag_handle</v-icon>
             </v-flex>
@@ -68,11 +85,12 @@
               </v-card>
             </v-flex>
             <v-flex xs1 text-xs-center>
-              <v-icon class="EntityEditFields__remove-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
+              <v-icon class="EntityEditFields__remove-object-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
             </v-flex>
           </v-layout>
 
-          <v-layout row wrap v-if="field.many" class="EntityEditFields__field-object-add">
+          <!-- Add another nested object -->
+          <v-layout row wrap v-if="field.many" class="EntityEditFields__add-object-item">
             <v-flex xs12 text-xs-center>
               <v-btn fab small color="primary" @click="addAnotherNestedField(values, field)">
                 <v-icon color="grey darken-4">add</v-icon>
@@ -150,7 +168,7 @@ export default {
 </script>
 <style lang="stylus">
 .EntityEditFields
-  &__field-object, &__field-many
+  &__field-object, &__field-scalar-many
     margin-top 3rem
     margin-bottom 3rem
     .expansion-panel__container
@@ -158,18 +176,13 @@ export default {
         background-color: $grey.darken-2
       :root .theme--light &
         background-color: $grey.lighten-3
-  &__field-object-item
+  &__value-object-item
     border-top: 4px solid $grey.darken-3
     padding-top 1rem !important
     padding-bottom 1rem !important
     :root .theme--light &
       border-color white
-  &__field-object-add
-    border-top: 4px solid $grey.darken-3
-    margin-bottom 0.3rem !important
-    :root .theme--light &
-      border-color white
-  &__field-object-item-delta-text
+  &__value-object-item-delta-text
     flex 0 0 auto !important
     width 25px
     height 25px
@@ -182,7 +195,12 @@ export default {
     color: $grey.darken-3
   &__item-dragger
     cursor move
-  &__remove-item
+  &__add-object-item
+    border-top: 4px solid $grey.darken-3
+    margin-bottom 0.3rem !important
+    :root .theme--light &
+      border-color white
+  &__remove-object-item, &__remove-scalar-item
     padding-top 0.5rem
     &:hover
       cursor pointer
