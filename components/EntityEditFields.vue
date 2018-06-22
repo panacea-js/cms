@@ -71,23 +71,23 @@
           </v-layout>
 
           <!-- Many nested object values -->
-          <v-layout class="EntityEditFields__value-object-item EntityEditFields__value-object-item--many" v-if="Array.isArray(values[field._meta.camel])" v-for="(item, delta) in values[field._meta.camel]" :key="`${field._meta.camel}.${delta}`">
-            <v-flex xs1 d-inline-flex align-center>
-              <div class="EntityEditFields__value-object-item-delta-text">{{ delta + 1 }}</div>
-              <!-- TODO: Add many objects with drag reordering -->
-              <v-icon class="EntityEditFields__item-dragger">drag_handle</v-icon>
-            </v-flex>
-            <v-flex xs10>
-              <v-card>
-                <v-card-text>
-                  <EntityEditFields :fields="field.fields" :values="item" />
-                </v-card-text>
-              </v-card>
-            </v-flex>
-            <v-flex xs1 text-xs-center>
-              <v-icon class="EntityEditFields__remove-object-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
-            </v-flex>
-          </v-layout>
+          <div v-if="Array.isArray(values[field._meta.camel])" class="EntityEditFields__sortable-group">
+            <v-layout class="EntityEditFields__value-object-item EntityEditFields__value-object-item--many EntityEditFields__sortable-item" v-for="(item, delta) in values[field._meta.camel]" :key="`${field._meta.camel}.${delta}`">
+              <v-flex xs1 d-inline-flex justify-center>
+                <div class="EntityEditFields__value-object-item-delta-text">{{ delta + 1 }} <v-icon class="EntityEditFields__item-dragger">drag_handle</v-icon></div>
+              </v-flex>
+              <v-flex xs10>
+                <v-card>
+                  <v-card-text>
+                    <EntityEditFields :fields="field.fields" :values="item" />
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+              <v-flex xs1 text-xs-center>
+                <v-icon class="EntityEditFields__remove-object-item" v-if="values[field._meta.camel].length > 1 || !field.required" @click="removeItem(field._meta.camel, values, delta)">clear</v-icon>
+              </v-flex>
+            </v-layout>
+          </div>
 
           <!-- Add another nested object -->
           <v-layout row wrap v-if="field.many" class="EntityEditFields__add-object-item">
@@ -107,9 +107,13 @@
 
 <script>
 import _ from 'lodash'
+import Sortable from 'sortablejs'
 
 export default {
   name: 'EntityEditFields',
+  mounted() {
+    this.initialiseSortableItems()
+  },
   methods: {
     getFieldComponent(fieldType) {
        return 'v-text-field'
@@ -152,7 +156,29 @@ export default {
     removeItem (fieldId, values, delta) {
       values[fieldId].splice(delta, 1)
       this.$forceUpdate()
-    }
+    },
+    initialiseSortableItems () {
+      const sortableGroups = this.$el.querySelectorAll('.EntityEditFields__sortable-group')
+      sortableGroups.forEach(sortableGroup => {
+        new Sortable(
+          sortableGroup,
+          {
+            draggable: '.EntityEditFields__sortable-item',
+            handle: '.EntityEditFields__item-dragger',
+            scrollSensitivity: 0,
+            scrollSpeed: 1,
+            onEnd: function (event) {
+              event.to.querySelectorAll(':scope .EntityEditFields__field--collapsed').forEach(field => field.classList.remove('EntityEditFields__field--collapsed'))
+            },
+            onStart: function (event) {
+              const fieldsToCollapse = event.from.querySelectorAll('.EntityEditFields__sortable-item .EntityEditFields__field:nth-child(n+2)')
+              fieldsToCollapse.forEach(field => field.classList.add('EntityEditFields__field--collapsed'))
+            },
+            animation: 250
+          }
+        )
+      })
+    },
   },
   props: {
     fields: {
@@ -168,6 +194,11 @@ export default {
 </script>
 <style lang="stylus">
 .EntityEditFields
+  &__field
+    &--collapsed
+      background hotpink
+      max-height 0
+      overflow hidden
   &__field-object, &__field-scalar-many
     margin-top 3rem
     margin-bottom 3rem
@@ -205,4 +236,10 @@ export default {
     &:hover
       cursor pointer
       color: $red.darken-1 !important
+.sortable-ghost
+  background: $grey.base
+.sortable-chosen
+  opacity 0.1
+  .EntityEditFields__field:nth-child(n+2)
+    display: none
 </style>

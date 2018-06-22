@@ -96,7 +96,7 @@
               <v-btn color="red darken-1" flat slot="activator">{{ $t('cms.entities.types.fields.edit.delete') }}</v-btn>
 
               <v-card>
-                <v-card-title class="headline">{{ $t('cms.entities.fields.edit.delete') }} {{ field._meta.camel }}?</v-card-title>
+                <v-card-title class="headline">{{ $t('cms.entities.types.fields.edit.delete') }} {{ field.label }}?</v-card-title>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="grey darken-1" flat="flat" @click="deleteConfirmOpened = false">Cancel</v-btn>

@@ -113,7 +113,7 @@ export default {
     EntityTypeFieldEdit
   },
   mounted () {
-    this.sortableInstance = this.initialiseSortableTable()
+    this.initialiseSortableTable()
 
     this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
       const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
@@ -130,8 +130,9 @@ export default {
   methods: {
     // Local methods.
     initialiseSortableTable () {
+      const wrapper = this.$refs.sortableTable.$el.getElementsByTagName('tbody')[0]
       return new Sortable(
-        this.$refs.sortableTable.$el.getElementsByTagName('tbody')[0],
+        wrapper,
         {
           draggable: '.EntityTypeFieldsConfig__row',
           handle: '.EntityTypeFieldsConfig__row-handle',
@@ -335,7 +336,6 @@ export default {
           label: 'cms.entities.types.fields.breadcrumb.allFields'
         }
       ],
-      sortableInstance: {},
       fieldOrderKeys: new WeakMap(),
       currentfieldOrderKey: 0,
       fieldHeaders: [
