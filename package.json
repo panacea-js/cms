@@ -18,7 +18,8 @@
     "parser": "babel-eslint",
     "globals": [
       "Panacea",
-      "Panacea_Testing"
+      "Panacea_Testing",
+      "localStorage"
     ]
   },
   "dependencies": {

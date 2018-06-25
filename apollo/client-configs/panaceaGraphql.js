@@ -12,8 +12,17 @@ export default (ctx) => {
     credentials: 'include'
   })
 
+  const authTokenId = 'panacea-cms-auth'
+
+  const getBrowserAuthToken = function () {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(authTokenId)
+    }
+    console.error(`Attempting to get browser auth token from local storage within the server environment`)
+  }
+
   const authMiddleware = new ApolloLink((operation, forward) => {
-    const token = process.server ? ctx.req.session : window.__NUXT__.state.session
+    const token = process.server ? ctx.req[authTokenId] : getBrowserAuthToken()
     operation.setContext({
       headers: {
         Authorization: token ? `Bearer ${token}` : null
@@ -33,7 +42,7 @@ export default (ctx) => {
       options: {
         reconnect: true,
         connectionParams: () => {
-          const token = process.server ? ctx.req.session : window.__NUXT__.state.session
+          const token = process.server ? ctx.req[authTokenId] : getBrowserAuthToken()
           return {
             Authorization: token ? `Bearer ${token}` : null
           }
