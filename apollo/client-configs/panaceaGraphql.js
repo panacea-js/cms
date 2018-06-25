@@ -56,8 +56,8 @@ export default (ctx) => {
   const cacheForRemote = new InMemoryCache({
     dataIdFromObject: object => {
       switch (object.__typename) {
-        case 'ENTITY_TYPE': return `ENTITY_TYPE:${object.name}` // use `name` as the primary key
-        case 'fieldType': return `fieldType:${object.type}` // use `type` as the primary key
+        case '_entityType': return `_entityType:${object.name}` // use `name` as the primary key
+        case '_fieldType': return `_fieldType:${object.type}` // use `type` as the primary key
         default: return defaultDataIdFromObject(object) // fall back to default handling
       }
     }

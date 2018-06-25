@@ -67,7 +67,7 @@ import _ from 'lodash'
 import EntityEditButton from '@/components/EntityEditButton.vue'
 import EntityDeleteButton from '@/components/EntityDeleteButton.vue'
 
-import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+import _entityType from '@/gql/queries/_entityType.gql'
 
 export default {
   components: {
@@ -79,8 +79,8 @@ export default {
   },
   methods: {
     getEntityTypeData() {
-      this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
-        const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+      this.$apollo.watchQuery({ query: _entityType, variables: {name: this.entityType} }).subscribe(result => {
+        const entityType = _.cloneDeep(result.data._entityType)
         entityType.data = JSON.parse(entityType.data)
         this.entityTypeData = entityType
 

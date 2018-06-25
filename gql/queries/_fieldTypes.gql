@@ -1,5 +1,5 @@
 {
-  fieldTypes {
+  _fieldTypes {
     type,
     label,
     description

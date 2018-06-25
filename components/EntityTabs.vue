@@ -81,7 +81,7 @@ import EntitiesList from '@/components/EntitiesList.vue'
 import EntityEdit from '@/components/EntityEdit.vue'
 import _ from 'lodash'
 
-import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+import _entityType from '@/gql/queries/_entityType.gql'
 
 export default {
   components: {

@@ -60,9 +60,9 @@
 
 <script>
   import _ from 'lodash'
-  import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
-  import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
-  import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
+  import _createEntityType from '@/gql/mutations/_createEntityType.gql'
+  import _entityTypes from '@/gql/queries/_entityTypes.gql'
+  import _entityType from '@/gql/queries/_entityType.gql'
 
   const entityDataForm = {
     name: '',
@@ -115,8 +115,8 @@
     methods: {
       loadEntityFormData() {
         if (!this.isNew) {
-          this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
-            const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+          this.$apollo.watchQuery({ query: _entityType, variables: {name: this.entityType} }).subscribe(result => {
+            const entityType = _.cloneDeep(result.data._entityType)
             entityType.data = JSON.parse(entityType.data)
             this.entityDataForm = entityType
             this.entityDataFormOriginal = entityType
@@ -137,29 +137,29 @@
         }
 
         this.$apollo.mutate({
-          mutation: CREATE_ENTITY_TYPE,
+          mutation: _createEntityType,
           variables: preparedEntityTypeDefinition,
-          update: (store, { data: {createENTITY_TYPE} }) => {
+          update: (store, { data: {_createEntityType} }) => {
 
-            const data = store.readQuery({ query: ENTITY_TYPES })
+            const data = store.readQuery({ query: _entityTypes })
 
             // Remove old cache entry.
-            data.ENTITY_TYPES.map((element, index) => {
+            data._entityTypes.map((element, index) => {
               if (element.name === entityName) {
-                data.ENTITY_TYPES.splice(index, 1)
+                data._entityTypes.splice(index, 1)
               }
             })
 
             // Insert new cache entry.
-            data.ENTITY_TYPES.push({
+            data._entityTypes.push({
               ...preparedEntityTypeDefinition,
-              __typename: 'ENTITY_TYPE'
+              __typename: '_entityType'
             })
 
-            data.ENTITY_TYPES = _.sortBy(data.ENTITY_TYPES, et => et.name)
+            data._entityTypes = _.sortBy(data._entityTypes, et => et.name)
 
             store.writeQuery({
-              query: ENTITY_TYPES,
+              query: _entityTypes,
               data
             })
           }
@@ -170,7 +170,7 @@
           this.entityDataForm = _.cloneDeep(this.entityDataFormOriginal)
 
           this.$router.push({
-            name: 'lang-entities-name',
+            name: 'entities-name',
             params: { name: entityName }
           })
 

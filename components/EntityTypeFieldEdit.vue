@@ -117,11 +117,11 @@
 
 <script>
   import _ from 'lodash'
-  import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
-  import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
-  import FIELD_TYPES from '@/gql/queries/fieldTypes.gql'
+  import _entityTypes from '@/gql/queries/_entityTypes.gql'
+  import _entityType from '@/gql/queries/_entityType.gql'
+  import _fieldTypes from '@/gql/queries/_fieldTypes.gql'
 
-  import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
+  import _createEntityType from '@/gql/mutations/_createEntityType.gql'
 
   export default {
     inject: ['gotoField'],
@@ -190,22 +190,22 @@
       }
     },
     mounted() {
-      this.$apollo.watchQuery({ query: ENTITY_TYPES }).subscribe(result => {
-        const entityTypes = _.cloneDeep(result.data.ENTITY_TYPES).map(et => {
+      this.$apollo.watchQuery({ query: _entityTypes }).subscribe(result => {
+        const entityTypes = _.cloneDeep(result.data._entityTypes).map(et => {
           et.data = JSON.parse(et.data)
           return et
         })
         this.entityTypes = entityTypes
       })
 
-      this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
-        const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+      this.$apollo.watchQuery({ query: _entityType, variables: {name: this.entityType} }).subscribe(result => {
+        const entityType = _.cloneDeep(result.data._entityType)
         entityType.data = JSON.parse(entityType.data)
         this.entityData = entityType
       })
 
-      this.$apollo.watchQuery({ query: FIELD_TYPES }).subscribe(result => {
-        this.fieldTypes = result.data.fieldTypes
+      this.$apollo.watchQuery({ query: _fieldTypes }).subscribe(result => {
+        this.fieldTypes = result.data._fieldTypes
       })
     },
     methods: {
@@ -324,7 +324,7 @@
         _.set(this.entityData.data, metaCamelAttributePathOnEntityData, machineNameCamel)
 
         this.$apollo.mutate({
-          mutation: CREATE_ENTITY_TYPE,
+          mutation: _createEntityType,
           variables: {
             name: this.entityData.name,
             data: JSON.stringify(this.entityData.data)
@@ -363,7 +363,7 @@
         _.unset(this.entityData.data, fieldPathOnEntityData)
 
         this.$apollo.mutate({
-          mutation: CREATE_ENTITY_TYPE,
+          mutation: _createEntityType,
           variables: {
             name: this.entityData.name,
             data: JSON.stringify(this.entityData.data)
@@ -372,6 +372,7 @@
         .catch(error => console.error(error))
 
         this.deleteConfirmOpened = false
+        this.opened = false
       },
       cancel() {
         if (this.isNew) {

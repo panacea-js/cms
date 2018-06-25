@@ -102,9 +102,9 @@ import EntityTypeEdit from '@/components/EntityTypeEdit.vue'
 import EntityTypeFieldEdit from '@/components/EntityTypeFieldEdit.vue'
 import Sortable from 'sortablejs'
 
-import ENTITY_TYPE from '@/gql/queries/ENTITY_TYPE.gql'
-import FIELD_TYPES from '@/gql/queries/fieldTypes.gql'
-import CREATE_ENTITY_TYPE from '@/gql/mutations/createENTITY_TYPE.gql'
+import _entityType from '@/gql/queries/_entityType.gql'
+import _fieldTypes from '@/gql/queries/_fieldTypes.gql'
+import _createEntityType from '@/gql/mutations/_createEntityType.gql'
 
 export default {
   components: {
@@ -115,16 +115,16 @@ export default {
   mounted () {
     this.initialiseSortableTable()
 
-    this.$apollo.watchQuery({ query: ENTITY_TYPE, variables: {name: this.entityType} }).subscribe(result => {
-      const entityType = _.cloneDeep(result.data.ENTITY_TYPE)
+    this.$apollo.watchQuery({ query: _entityType, variables: {name: this.entityType} }).subscribe(result => {
+      const entityType = _.cloneDeep(result.data._entityType)
       entityType.data = JSON.parse(entityType.data)
       this.entityTypeData = entityType
 
       this.setDisplayedFields()
     })
 
-    this.$apollo.watchQuery({ query: FIELD_TYPES }).subscribe(result => {
-      this.fieldTypes = result.data.fieldTypes
+    this.$apollo.watchQuery({ query: _fieldTypes }).subscribe(result => {
+      this.fieldTypes = result.data._fieldTypes
     })
   },
   methods: {
@@ -192,7 +192,7 @@ export default {
       _.set(this.entityTypeData.data, fieldsFromFieldActivePath, fields)
 
       this.$apollo.mutate({
-        mutation: CREATE_ENTITY_TYPE,
+        mutation: _createEntityType,
         variables: {
           name: this.entityTypeData.name,
           data: JSON.stringify(this.entityTypeData.data)

@@ -1,5 +1,5 @@
 {
-  ENTITY_TYPES {
+  _entityTypes {
     name,
     data
   }

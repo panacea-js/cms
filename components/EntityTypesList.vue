@@ -24,7 +24,7 @@
 <script>
 import EntityTypesListActions from './EntityTypesListActions'
 
-import ENTITY_TYPES from '@/gql/queries/ENTITY_TYPES.gql'
+import _entityTypes from '@/gql/queries/_entityTypes.gql'
 
 export default {
   components: {
@@ -44,8 +44,8 @@ export default {
     }
   },
   mounted() {
-    this.$apollo.watchQuery({ query: ENTITY_TYPES }).subscribe(result => {
-      const entityTypes = _.cloneDeep(result.data.ENTITY_TYPES).map(et => {
+    this.$apollo.watchQuery({ query: _entityTypes }).subscribe(result => {
+      const entityTypes = _.cloneDeep(result.data._entityTypes).map(et => {
         et.data = JSON.parse(et.data)
         return et
       })
