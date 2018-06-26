@@ -73,7 +73,7 @@ const linkToLocalState = function (component, mappings, clientConfigKey) {
     })
 
     // When the component data item changes, update (mutate) the apollo local state.
-    component.$watch(item.dataPath, (newVal, oldVal) => {
+    component.$watch(item.dataPath, function (newVal, oldVal) {
       const cacheValue = localStateCache[cacheKey].value
 
       // Ensure cache mutation only happens once
