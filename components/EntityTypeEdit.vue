@@ -85,14 +85,9 @@
       const validations = {
         required: (v) => !!v || this.$t('cms.entities.types.attributes.validations.required'),
         entityNameExists: (v) => {
-          if (!v || !this.isNew || !Array.isArray(this.$store.state.entities.entitiesData)) {
-            return true
-          }
-
-          const entityNames = this.$store.state.entities.entitiesData.map(entity => entity.name.toLowerCase())
-          const entityNameAvailable = !entityNames.find((x) => x === v.toLowerCase().trim())
-          return entityNameAvailable || `Entity name ${v} already exists`
-
+          const entityTypeNames = _(this.entityTypes).map(entity => entity.name.toLowerCase())
+          const entityTypeNameAvailable = !entityTypeNames.find(x => x === v.toLowerCase().trim())
+          return entityTypeNameAvailable || this.$t('cms.entities.types.attributes.validations.exists', { entityTypeName : v })
         }
       }
 
@@ -105,6 +100,7 @@
         iconBackgroundColor: this.isNew ? 'primary' : 'amber darken-1',
         entityDataForm,
         entityDataFormOriginal,
+        entityTypes: {},
         rules: {
           plural: [validations.required],
           name: [validations.required, validations.entityNameExists]
@@ -122,6 +118,9 @@
             this.entityDataFormOriginal = entityType
           })
         }
+        this.$apollo.watchQuery({ query: _entityTypes }).subscribe(result => {
+          this.entityTypes = result.data._entityTypes
+        })
       },
       submit() {
 

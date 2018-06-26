@@ -36,7 +36,8 @@
             "fs": "File system"
           },
           "validations": {
-            "required": "This attribute is required"
+            "required": "This attribute is required",
+            "exists": "The entity type {entityTypeName} already exists"
           }
         },
         "fields": {
