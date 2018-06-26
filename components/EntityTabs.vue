@@ -20,8 +20,8 @@
     <v-tab
       v-for="entity in matchedOpenEntities"
       :key="entity.id"
-      :href="`#tab-entity-${entity.id}`"
-      :data-tab="`tab-entity-${entity.id}`"
+      :href="`#tab-entity-${entityType}-${entity.id}`"
+      :data-tab="`tab-entity-${entityType}-${entity.id}`"
       :class="entityTabClasses(entity)"
     >
       <v-dialog v-model="closeTabConfirmDialog" persistent max-width="50%">
@@ -62,8 +62,8 @@
       <!-- Entity tabs content -->
       <v-tab-item
         v-for="entity in matchedOpenEntities"
-        :key="`tab-${entity.id}`"
-        :id="`tab-entity-${entity.id}`"
+        :key="`tab-${entityType}-${entity.id}`"
+        :id="`tab-entity-${entityType}-${entity.id}`"
         class="EntityTabs__content"
       >
         <EntityEdit :entityType="entityType" :entityID="entity.id !== 'new' ? entity.id : null" />
@@ -93,10 +93,10 @@ export default {
     closeTabConfirm (id) {
       this.originatingTab = this.activeTab
 
-      this.closeTabId = 'tab-entity-' + id
+      this.closeTabId = `tab-entity-${this.entityType}-${id}`
 
-      const closingTabIndex = this.openEntities.findIndex(entity => entity.id === id)
-      const closingTabIsActive = 'tab-entity-' + this.openEntities[closingTabIndex].id === this.activeTab
+      const closingTabIndex = this.openEntities[this.entityType].findIndex(entity => entity.id === id)
+      const closingTabIsActive = `tab-entity-${this.entityType}-${this.openEntities[this.entityType][closingTabIndex].id}` === this.activeTab
 
       // Wait 500ms to allow tab content to pan into view before asking
       // confimation to close.
@@ -112,28 +112,30 @@ export default {
     },
     closeTab () {
 
-      const closingTabIndex = this.openEntities.findIndex(entity => 'tab-entity-' + entity.id === this.closeTabId)
-      const isFinalTabClosing = closingTabIndex === this.openEntities.length -1 ? true : false
+      const tabs = this.openEntities[this.entityType]
+
+      const closingTabIndex = tabs.findIndex(entity => `tab-entity-${this.entityType}-${entity.id}` === this.closeTabId)
+      const isFinalTabClosing = closingTabIndex === (tabs.length -1) ? true : false
       const closingTabIsActive = this.originatingTab === this.activeTab
 
-      document.querySelectorAll(`[data-tab="${this.closeTabId}"]`)[0].classList.add('EntityTabs__tab--closing')
+      document.querySelector(`[data-tab="${this.closeTabId}"]`).classList.add('EntityTabs__tab--closing')
 
       setTimeout(() => {
 
-        this.openEntities.splice(closingTabIndex, 1)
+        tabs.splice(closingTabIndex, 1)
 
         if (closingTabIsActive) {
 
-          if (this.openEntities.length > 0) {
+          if (tabs.length > 0) {
             // Set active tab to nearest open entity.
-            const newFinalTab = this.openEntities[this.openEntities.length-1]
-            const samePositionTab = this.openEntities[closingTabIndex]
+            const newFinalTab = tabs[tabs.length-1]
+            const samePositionTab = tabs[closingTabIndex]
             const newActiveTab = isFinalTabClosing ? newFinalTab : samePositionTab
-            this.activeTab = 'tab-entity-' + newActiveTab.id
+            this.activeTab = `tab-entity-${this.entityType}-${newActiveTab.id}`
           }
           else {
             // Set active tab to first fixed tab.
-            this.activeTab = 'tab-' + this.fixedTabs[0].id
+            this.activeTab = `tab-${this.fixedTabs[0].id}`
           }
         }
         else {
@@ -170,10 +172,10 @@ export default {
   },
   computed: {
     matchedOpenEntities() {
-      if (!Array.isArray(this.openEntities)) {
+      if (!this.openEntities || !this.openEntities[this.entityType]) {
         return []
       }
-      return this.openEntities.filter(item => item.__typename === this.entityType)
+      return this.openEntities[this.entityType]
     }
   },
   sharedData() {

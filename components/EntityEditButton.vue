@@ -51,17 +51,27 @@ export default {
   },
   methods: {
     openEntityTab($event) {
-      if (this.isNew && this.openEntities.findIndex(entity => entity.id === 'new') === -1) {
+      const entityType = this.entityTypeData.name
+
+      // Ensure this entity type's tabs exist.
+      if (!this.openEntities[entityType]) {
+        // Set new object key for reactivity.
+        this.$set(this.openEntities, entityType, [])
+      }
+
+      const hasNewTabOpened = this.openEntities[entityType].findIndex(entity => entity.id === 'new') !== -1
+
+      if (this.isNew && !hasNewTabOpened) {
         // Create 'new' placeholder entity tab.
-        this.openEntities.push({
-          title: '* ' + this.$t('cms.entities.actions.add', { entityType: this.entityTypeData.name }),
+        this.openEntities[entityType].push({
+          title: '* ' + this.$t('cms.entities.actions.add', { entityType }),
           id: 'new',
-          __typename: this.entityTypeData.name
+          __typename: entityType
         })
       }
-      else if (!this.isNew && this.openEntities.findIndex(entity => entity.id === this.entityData.id) === -1) {
+      else if (!this.isNew && this.openEntities[entityType].findIndex(entity => entity.id === this.entityData.id) === -1) {
         // Create edit tab for existing entity.
-        this.openEntities.push(this.entityData)
+        this.openEntities[entityType].push(this.entityData)
       }
       // Holding ctrl prevent navigation to the tab if the user wants to open
       // several entities.
@@ -76,8 +86,10 @@ export default {
     gotoTab() {
       setTimeout(() => {
         const tabId = this.isNew ? 'new' : this.entityData.id
-        const tab = document.querySelector(`[href="#tab-entity-${tabId}"]`)
-        tab.click()
+        const tab = document.querySelector(`[href="#tab-entity-${this.entityTypeData.name}-${tabId}"]`)
+        if (tab) {
+          tab.click()
+        }
       }, 100)
     },
     cancel() {
