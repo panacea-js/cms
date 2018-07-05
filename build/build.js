@@ -8,8 +8,7 @@ import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
  *   Nuxt options (not Panacea's container options.)
  */
 export default async function (params = {}) {
-  await new Bootstrap().all()
-
+  await new Bootstrap().runStages([1, 2, 3])
   const { _, path, options } = Panacea.container
 
   // Load defaults nuxt.config.js and override with options loaded in container.
