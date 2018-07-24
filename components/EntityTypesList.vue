@@ -1,22 +1,22 @@
 <template>
   <div class="EntityTypesList">
-    <v-card flat>
-      <v-card-text class="pa-0">
-        <v-list class="pa-0">
-          <template v-for="(entityType, index) in entityTypes" class="EntityTypesList__items">
-            <v-tooltip v-bind:key="`tooltip-${index}`" right>
-              <v-list-tile slot="activator" v-bind:key="`entity-type-${index}`" :class="itemClasses(entityType.name)" @click="redirectToEntityType(entityType.name)">
-                <v-list-tile-content>
-                  <v-list-tile-title v-html="entityType.name"></v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
-              <span class="tooltip-text">{{ entityType.data.description }}</span>
-            </v-tooltip>
-            <v-divider v-bind:key="`entity-type-divider-${index}`" v-if="index + 1 !== entityTypes.length"></v-divider>
-          </template>
-        </v-list>
-      </v-card-text>
-    </v-card>
+    <v-expansion-panel expand>
+      <v-expansion-panel-content v-for="(_entityTypes, group) in groupedEntityTypes" :key="group" class="EntityTypesList__items" value="true">
+        <div slot="header" class="primary--text" v-html="group"></div>
+        <template v-for="(entityType, index) in _entityTypes" class="EntityTypesList__items">
+          <v-tooltip v-bind:key="`entity-type-tooltip-${group}-${index}`" right>
+            <v-list-tile slot="activator" v-bind:key="`entity-type-${index}`" :class="itemClasses(entityType.name)" @click="redirectToEntityType(entityType.name)">
+              <v-list-tile-content class="pl-1">
+                <v-list-tile-title v-html="entityType.name" />
+                <v-list-tile-sub-title v-if="!!entityTypeSubTitle(entityType)"><sup>{{ entityTypeSubTitle(entityType) }}</sup></v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <span class="tooltip-text">{{ entityType.data.description }}</span>
+          </v-tooltip>
+        </template>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
     <EntityTypesListActions />
   </div>
 </template>
@@ -41,9 +41,12 @@ export default {
         name: 'entities-name',
         params: { name: entityTypeName }
       })
+    },
+    entityTypeSubTitle: function (entityType) {
+      return entityType.data._locationKey !== 'app' && entityType.data._locationKey !== 'core' ? entityType.data._locationKey : ''
     }
   },
-  mounted() {
+  mounted () {
     this.$apollo.watchQuery({ query: _entityTypes }).subscribe(result => {
       const entityTypes = _.cloneDeep(result.data._entityTypes).map(et => {
         et.data = JSON.parse(et.data)
@@ -55,6 +58,34 @@ export default {
   data() {
     return {
       entityTypes: []
+    }
+  },
+  computed: {
+    groupedEntityTypes () {
+      if (this.entityTypes.length > 0) {
+        return this.entityTypes.reduce((acc, et) => {
+          const locationKey = et.data._locationKey
+          let group = et.data.group
+
+          if (!group) {
+            if (locationKey === 'app') {
+              group = this.$t('cms.entities.types.locations.app')
+            }
+            else if (locationKey === 'core') {
+              group = this.$t('cms.entities.types.locations.core')
+            }
+            else {
+              group = this.$t('cms.entities.types.locations.plugin')
+            }
+          }
+
+          acc[group] = acc[group] || []
+          acc[group].push(et)
+          return acc
+        }, {})
+      }
+
+      return []
     }
   }
 }

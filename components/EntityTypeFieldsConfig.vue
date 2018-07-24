@@ -14,7 +14,7 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <EntityTypeEdit :isNew="false" :entityType="entityType" />
+        <EntityTypeEdit v-if="editable" :isNew="false" :entityType="entityType" />
         <v-breadcrumbs>
           <v-breadcrumbs-item v-for="fieldPath in fieldPaths" :key="fieldPath.path" @click.native="gotoField(fieldPath.path)">
             {{ fieldPath.path === 'all' ? $t(fieldPath.label) : fieldPath.label }}
@@ -30,12 +30,12 @@
                 <td class="EntityTypeFieldsConfig__column-handles">
 
                   <v-tooltip left>
-                    <v-icon slot="activator" v-if="props.item.type !== 'id'" class="EntityTypeFieldsConfig__row-handle">drag_handle</v-icon>
+                    <v-icon slot="activator" v-if="editable && props.item.type !== 'id'" class="EntityTypeFieldsConfig__row-handle">drag_handle</v-icon>
                     <span>{{ $t('cms.entities.types.fields.actions.move') }}</span>
                   </v-tooltip>
 
                   <v-tooltip left>
-                    <v-icon slot="activator" small color="grey" v-if="props.item.type === 'id'" class="EntityTypeFieldsConfig__row-handle EntityTypeFieldsConfig__row-handle--locked">lock</v-icon>
+                    <v-icon slot="activator" small color="grey" v-if="editable && props.item.type === 'id'" class="EntityTypeFieldsConfig__row-handle EntityTypeFieldsConfig__row-handle--locked">lock</v-icon>
                     <span>{{ $t('cms.entities.types.fields.actions.idNoMove') }}</span>
                   </v-tooltip>
 
@@ -70,7 +70,7 @@
                   <v-icon color="grey lighten-1" v-if="!props.item.required && props.item.type !== 'id'">clear</v-icon>
                 </td>
                 <td class="EntityTypeFieldsConfig__column-field-actions">
-                  <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
+                  <EntityTypeFieldEdit v-if="editable" :entityType="entityType" :fieldPath="fieldPathActive" :field="props.item" :key="`${fieldPathActive}.${props.item._meta.camel}`" />
                 </td>
               </tr>
             </template>
@@ -79,11 +79,11 @@
         </div>
 
         <div :class="fieldsActionsClasses" v-if="fieldsDisplayed.length">
-          <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
+          <EntityTypeFieldEdit v-if="editable" :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`" />
         </div>
 
         <div :class="fieldsActionsClasses" v-if="!fieldsDisplayed.length">
-          <EntityTypeFieldEdit :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`">
+          <EntityTypeFieldEdit v-if="editable" :entityType="entityType" :fieldPath="fieldPathActive" isNew :key="`entity-field-create-${fieldPathActive}`">
             <v-btn large slot="button" color="primary" light>
               <v-icon left>add</v-icon>{{ $t('cms.entities.types.fields.actions.addFirstFieldOnObject', { fieldName: fieldPaths[fieldPaths.length-1].label }) }}
             </v-btn>
@@ -316,6 +316,9 @@ export default {
         classes.push('EntityTypeFieldsConfig__fields-actions--transitioning')
       }
       return classes
+    },
+    editable() {
+      return this.entityTypeData.data._locationKey === 'app'
     }
   },
   data() {
