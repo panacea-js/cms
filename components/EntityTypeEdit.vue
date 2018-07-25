@@ -15,35 +15,38 @@
           <v-form v-model="valid" ref="EntityTypeEditForm">
             <v-container fluid grid-list-xl>
               <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-text-field box
-                    v-model="entityDataForm.name"
-                    :label="$t('cms.entities.types.attributes.name.label')"
-                    required
-                    :rules="rules.name" />
-                </v-flex>
-              </v-layout>
+
+              <v-text-field box
+                v-model="entityDataForm.name"
+                :label="$t('cms.entities.types.attributes.name.label')"
+                required
+                :rules="rules.name" />
+
+              <v-combobox box
+                v-model="entityDataForm.data.group"
+                :items="['test','test2']"
+                :label="$t('cms.entities.types.attributes.group.label')"
+                :hint="$t('cms.entities.types.attributes.group.hint')" />
 
               <v-text-field box
                 :label="$t('cms.entities.types.attributes.description.label')"
                 v-model="entityDataForm.data.description"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.types.attributes.description.hint')" />
+                :hint="$t('cms.entities.types.attributes.description.hint')" />
 
               <v-text-field box
                 :label="$t('cms.entities.types.attributes.plural.label')"
                 required
                 v-model="entityDataForm.data.plural"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.types.attributes.plural.hint')"
+                :hint="$t('cms.entities.types.attributes.plural.hint')"
                 :rules="rules.plural" />
 
               <v-text-field box
                 :label="$t('cms.entities.types.attributes.idLabel.label')"
                 v-model="entityDataForm.data.fields.id.label"
                 v-if="!!entityDataForm.data"
-                :hint="this.$t('cms.entities.types.attributes.idLabel.hint')" />
+                :hint="$t('cms.entities.types.attributes.idLabel.hint')" />
 
             </v-container>
           </v-form>
@@ -85,7 +88,9 @@
       const validations = {
         required: (v) => !!v || this.$t('cms.entities.types.attributes.validations.required'),
         entityNameExists: (v) => {
-          const entityTypeNames = _(this.entityTypes).map(entity => entity.name.toLowerCase())
+          const entityTypeNames = _(this.entityTypes)
+            .filter(entity => entity.name !== this.entityType)
+            .map(entity => entity.name.toLowerCase())
           const entityTypeNameAvailable = !entityTypeNames.find(x => x === v.toLowerCase().trim())
           return entityTypeNameAvailable || this.$t('cms.entities.types.attributes.validations.exists', { entityTypeName : v })
         }

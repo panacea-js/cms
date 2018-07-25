@@ -40,6 +40,10 @@
             "db": "Database",
             "fs": "File system"
           },
+          "group": {
+            "label": "Group",
+            "hint": "Can be optionally used to group entity types together"
+          },
           "validations": {
             "required": "This attribute is required",
             "exists": "The entity type {entityTypeName} already exists"
