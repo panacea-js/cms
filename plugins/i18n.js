@@ -16,7 +16,7 @@ export default ({ app, store, req }) => {
   if (cookieJar.length > 0) {
     cookieJar.split('; ').map(cookie => {
       const [ key, value ] = cookie.split('=')
-      if (key === 'PANACEA-CMS-LANGUAGE') {
+      if (key === 'PANACEA-LANGUAGE') {
         activeLanguage = value
       }
     })
