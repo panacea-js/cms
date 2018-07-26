@@ -27,7 +27,7 @@
 
             <template slot="items" slot-scope="props">
               <tr :class="`EntityTypeFieldsConfig__row EntityTypeFieldsConfig__row--${props.item.type}`" :key="fieldOrderKey(props.item)">
-                <td class="EntityTypeFieldsConfig__column-handles">
+                <td class="EntityTypeFieldsConfig__column-handles" v-if="editable">
 
                   <v-tooltip left>
                     <v-icon slot="activator" v-if="editable && props.item.type !== 'id'" class="EntityTypeFieldsConfig__row-handle">drag_handle</v-icon>
@@ -42,9 +42,10 @@
                 </td>
                 <td class="EntityTypeFieldsConfig__column-field-label">
                   {{ props.item.label }}
-                  <v-tooltip top v-if="!!props.item.description">
+                  <v-tooltip top v-if="props.item.description || props.item._meta.hookFile">
                     <sup slot="activator"><v-icon small color="grey lighten-1">info</v-icon></sup>
-                    <span>{{ props.item.description }}</span>
+                    <p class="ma-0" v-if="props.item.description">{{ props.item.description }}</p>
+                    <p class="ma-0 mt-2" v-if="props.item._meta.hookFile">Defined in: <code>{{ props.item._meta.hookFile }}</code></p>
                   </v-tooltip>
                 </td>
                 <td class="EntityTypeFieldsConfig__column-field-property-path hidden-sm-and-down">
@@ -319,32 +320,13 @@ export default {
     },
     editable() {
       return this.entityTypeData.data._locationKey === 'app'
-    }
-  },
-  data() {
-    return {
-      entityTypeData: {
-        name: '',
-        data: {
-          description: '',
-          fields: {}
-        }
-      },
-      fieldTypes: [],
-      fieldsDisplayed: [],
-      fieldPathActive: 'all',
-      fieldPaths: [
-        {
-          path: 'all',
-          label: 'cms.entities.types.fields.breadcrumb.allFields'
-        }
-      ],
-      fieldOrderKeys: new WeakMap(),
-      currentfieldOrderKey: 0,
-      fieldHeaders: [
-        {
-          class: 'sort-handle'
-        },
+    },
+    fieldHeaders() {
+      const sortColumn = {
+        class: 'sort-handle'
+      }
+      return [
+        this.editable ? sortColumn : null,
         {
           text: this.$t('cms.entities.types.fields.attributes.label'),
           value: 'label'
@@ -366,11 +348,35 @@ export default {
           text: '',
           value: 'actions'
         }
-      ].map(h => {
+      ]
+      .filter(x => !!x)
+      .map(h => {
         h.align = 'left'
         h.sortable = false
         return h
-      }),
+      })
+    },
+  },
+  data() {
+    return {
+      entityTypeData: {
+        name: '',
+        data: {
+          description: '',
+          fields: {}
+        }
+      },
+      fieldTypes: [],
+      fieldsDisplayed: [],
+      fieldPathActive: 'all',
+      fieldPaths: [
+        {
+          path: 'all',
+          label: 'cms.entities.types.fields.breadcrumb.allFields'
+        }
+      ],
+      fieldOrderKeys: new WeakMap(),
+      currentfieldOrderKey: 0,
       fieldsTableTransition: null,
       // @todo link graphql error with apollo error package.
       graphqlError: false,
