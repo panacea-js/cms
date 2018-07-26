@@ -102,6 +102,16 @@ export default {
   },
   sharedData() {
     return ['openEntityTypeGroups']
+  },
+  watch: {
+    openEntityTypeGroups(newValue) {
+      // Ensure openEntityTypeGroups doesn't exceed the number of entity type
+      // groups. Resolves issue where openEntityTypeGroups gets infinitely
+      // appended.
+      if (newValue.length > this.groupedEntityTypes.length) {
+        this.openEntityTypeGroups.splice(this.groupedEntityTypes.length)
+      }
+    }
   }
 }
 </script>
