@@ -1,11 +1,11 @@
 <template>
   <div class="EntityTypesList">
-    <v-expansion-panel expand>
-      <v-expansion-panel-content v-for="(_entityTypes, group) in groupedEntityTypes" :key="group" class="EntityTypesList__items" value="true">
+    <v-expansion-panel expand v-model="openEntityTypeGroups">
+      <v-expansion-panel-content v-for="[group, _entityTypes] in groupedEntityTypes" :key="group" class="EntityTypesList__items">
         <div slot="header" class="primary--text" v-html="group"></div>
         <template v-for="(entityType, index) in _entityTypes" class="EntityTypesList__items">
-          <v-tooltip v-bind:key="`entity-type-tooltip-${group}-${index}`" right>
-            <v-list-tile slot="activator" v-bind:key="`entity-type-${index}`" :class="itemClasses(entityType.name)" @click="redirectToEntityType(entityType.name)">
+          <v-tooltip :key="`entity-type-tooltip-${group}-${index}`" right>
+            <v-list-tile slot="activator" :key="`entity-type-${index}`" :class="itemClasses(entityType.name)" @click="redirectToEntityType(entityType.name)">
               <v-list-tile-content class="pl-1">
                 <v-list-tile-title v-html="entityType.name" />
                 <v-list-tile-sub-title v-if="!!entityTypeSubTitle(entityType)"><sup>{{ entityTypeSubTitle(entityType) }}</sup></v-list-tile-sub-title>
@@ -44,6 +44,43 @@ export default {
     },
     entityTypeSubTitle: function (entityType) {
       return entityType.data._locationKey !== 'app' && entityType.data._locationKey !== 'core' ? entityType.data._locationKey : ''
+    },
+    groupEntityTypes (entityTypes) {
+      // Construct array of tuples where first items are the group name and
+      // the second is the list of entity types. This allows sorting on the
+      // group names to maintain consistent ordering.
+      const groupedEntityTypes = entityTypes.reduce((acc, et) => {
+        const locationKey = et.data._locationKey
+        let group = et.data.group
+
+        if (!group) {
+          if (locationKey === 'app') {
+            group = this.$t('cms.entities.types.locations.app')
+          }
+          else if (locationKey === 'core') {
+            group = this.$t('cms.entities.types.locations.core')
+          }
+          else {
+            group = this.$t('cms.entities.types.locations.plugin')
+          }
+        }
+
+        const existingGroup = acc.find(entry => entry[0] === group)
+        if (!existingGroup) {
+          acc.push([group, [et]])
+        }
+        else {
+          existingGroup[1].push(et)
+        }
+
+        return acc
+      }, [])
+
+      // Sort alphabetically using the first tuple element (group name) as the
+      // comparison.
+      groupedEntityTypes.sort((a, b) => a[0] > b[0] ? 1 : -1)
+
+      this.groupedEntityTypes = groupedEntityTypes
     }
   },
   mounted () {
@@ -53,40 +90,18 @@ export default {
         return et
       })
       this.entityTypes = entityTypes
+      this.groupEntityTypes(entityTypes)
     })
   },
   data() {
     return {
-      entityTypes: []
+      entityTypes: [],
+      openEntityTypeGroups: [],
+      groupedEntityTypes: []
     }
   },
-  computed: {
-    groupedEntityTypes () {
-      if (this.entityTypes.length > 0) {
-        return this.entityTypes.reduce((acc, et) => {
-          const locationKey = et.data._locationKey
-          let group = et.data.group
-
-          if (!group) {
-            if (locationKey === 'app') {
-              group = this.$t('cms.entities.types.locations.app')
-            }
-            else if (locationKey === 'core') {
-              group = this.$t('cms.entities.types.locations.core')
-            }
-            else {
-              group = this.$t('cms.entities.types.locations.plugin')
-            }
-          }
-
-          acc[group] = acc[group] || []
-          acc[group].push(et)
-          return acc
-        }, {})
-      }
-
-      return []
-    }
+  sharedData() {
+    return ['openEntityTypeGroups']
   }
 }
 </script>

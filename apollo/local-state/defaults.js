@@ -6,7 +6,8 @@ import _ from 'lodash'
 // properties. This will ensure reactivity is maintained.
 const keyValues = {
   scheme: 'dark',
-  openEntities: {}
+  openEntities: {},
+  openEntityTypeGroups: []
 }
 
 export default _(keyValues).reduce((acc, value, key) => {

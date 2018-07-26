@@ -22,9 +22,9 @@
                 required
                 :rules="rules.name" />
 
-              <v-combobox box
+              <v-combobox box autofocus
                 v-model="entityDataForm.data.group"
-                :items="['test','test2']"
+                :items="existingGroups"
                 :label="$t('cms.entities.types.attributes.group.label')"
                 :hint="$t('cms.entities.types.attributes.group.hint')" />
 
@@ -71,6 +71,7 @@
     name: '',
     data: {
       storage: 'db',
+      group: '',
       description: '',
       plural: '',
       fields: {
@@ -112,6 +113,17 @@
         },
       }
 
+    },
+    computed: {
+      existingGroups() {
+        return _(this.entityTypes).reduce((acc, entityType) => {
+          const group = JSON.parse(entityType.data).group
+          if (group && !acc.includes(group)) {
+            acc.push(group)
+          }
+          return acc
+        }, [])
+      }
     },
     methods: {
       loadEntityFormData() {
