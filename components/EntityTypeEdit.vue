@@ -48,6 +48,8 @@
                 v-if="!!entityDataForm.data"
                 :hint="$t('cms.entities.types.attributes.idLabel.hint')" />
 
+              <v-switch label="Enable revisions" v-model="entityDataForm.data.revisions" color="success" hide-details></v-switch>
+
             </v-container>
           </v-form>
         </v-card-text>
@@ -72,6 +74,7 @@
     data: {
       storage: 'db',
       group: '',
+      revisions: false,
       description: '',
       plural: '',
       fields: {
