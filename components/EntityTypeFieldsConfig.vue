@@ -119,6 +119,8 @@ export default {
     this.$apollo.watchQuery({ query: _entityType, variables: {name: this.entityType} }).subscribe(result => {
       const entityType = _.cloneDeep(result.data._entityType)
       entityType.data = JSON.parse(entityType.data)
+      // Remove non-editable revisions field.
+      entityType.data.fields.revisions && delete entityType.data.fields.revisions
       this.entityTypeData = entityType
 
       this.setDisplayedFields()
