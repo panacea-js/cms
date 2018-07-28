@@ -14,8 +14,9 @@
         <v-card-text>
           <v-form v-model="valid" ref="EntityTypeEditForm">
             <v-container fluid grid-list-xl>
-              <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
+              <p><RequiredAsterisk />{{ $t('cms.forms.indicatesRequiredField')}}</p>
 
+              <RequiredAsterisk type="form-element" />
               <v-text-field box
                 v-model="entityDataForm.name"
                 :label="$t('cms.entities.types.attributes.name.label')"
@@ -34,6 +35,7 @@
                 v-if="!!entityDataForm.data"
                 :hint="$t('cms.entities.types.attributes.description.hint')" />
 
+              <RequiredAsterisk type="form-element" />
               <v-text-field box
                 :label="$t('cms.entities.types.attributes.plural.label')"
                 required
@@ -68,6 +70,7 @@
   import _createEntityType from '@/gql/mutations/_createEntityType.gql'
   import _entityTypes from '@/gql/queries/_entityTypes.gql'
   import _entityType from '@/gql/queries/_entityType.gql'
+  import RequiredAsterisk from './RequiredAsterisk.vue'
 
   const entityDataForm = {
     name: '',
@@ -87,16 +90,25 @@
   }
 
   export default {
+    components: {
+      RequiredAsterisk
+    },
     data() {
 
       const validations = {
-        required: (v) => !!v || this.$t('cms.entities.types.attributes.validations.required'),
-        entityNameExists: (v) => {
+        required: v => !!v || this.$t('cms.entities.types.attributes.validations.required'),
+        entityNameExists: v => {
+          v = v || ''
           const entityTypeNames = _(this.entityTypes)
             .filter(entity => entity.name !== this.entityType)
             .map(entity => entity.name.toLowerCase())
           const entityTypeNameAvailable = !entityTypeNames.find(x => x === v.toLowerCase().trim())
           return entityTypeNameAvailable || this.$t('cms.entities.types.attributes.validations.exists', { entityTypeName : v })
+        },
+        entityNameReserved: v => {
+          v = v || ''
+          const endMatches = ['Revision']
+          return !v || !_(endMatches).some(m => _(v.toLowerCase()).endsWith(m.toLowerCase())) || this.$t('cms.entities.types.attributes.validations.reservedSuffix', { entityTypeName : v }) // `{entityTypeName} ends in a reserved word required by Panacea`
         }
       }
 
@@ -112,8 +124,12 @@
         entityTypes: {},
         rules: {
           plural: [validations.required],
-          name: [validations.required, validations.entityNameExists]
-        },
+          name: [
+            validations.required,
+            validations.entityNameExists,
+            validations.entityNameReserved
+          ]
+        }
       }
 
     },

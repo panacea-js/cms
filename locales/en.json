@@ -46,7 +46,8 @@
           },
           "validations": {
             "required": "This attribute is required",
-            "exists": "The entity type {entityTypeName} already exists"
+            "exists": "The entity type {entityTypeName} already exists",
+            "reservedSuffix": "{entityTypeName} ends in a reserved word required by Panacea"
           }
         },
         "fields": {

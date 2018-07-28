@@ -16,14 +16,15 @@
         </v-card-title>
         <v-card-text>
           <v-form v-model="valid" ref="fieldEditForm" lazy-validation>
-            <v-container fluid grid-list-xl>
+            <v-container grid-list-xl>
               <p>*{{ $t('cms.forms.indicatesRequiredField')}}</p>
-              <v-layout wrap>
-                <v-flex xs12 lg6>
+              <v-layout row wrap>
+                <v-flex xs12 lg5>
+                  <RequiredAsterisk type="form-element" />
                   <v-text-field box v-model="fieldFormData.label" label="Label" v-if="showFormElement('label')" :disabled="disableFormElement('label')" :rules="rules.required" required @keyup="deriveMachineNameFromLabel()"></v-text-field>
                 </v-flex>
-                <v-flex xs12 lg6>
-
+                <v-flex xs12 lg5 offset-lg1>
+                  <RequiredAsterisk type="form-element" />
                   <v-text-field box :label="$t('cms.entities.types.fields.attributes.machineName')" v-if="showFormElement('machineName')" :disabled="disableFormElement('machineName')" v-model="fieldFormData.machineName" @keyup="machineNameChanged()" :hint="this.$t('cms.entities.types.fields.machineName.hint')" :rules="rules.required" required spellcheck="false"></v-text-field>
 
                   <div class="text-lg-center pa-2">
@@ -40,49 +41,51 @@
 
                 </v-flex>
 
-              </v-layout>
-
-              <v-text-field box :label="$t('cms.entities.types.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.types.fields.description.hint')"></v-text-field>
-
-              <v-layout wrap v-if="fieldFormData.type !== 'id'">
-
-                <v-flex xs12 lg6>
-
-                  <v-layout>
-                    <v-flex xs11>
-                      <v-select :label="$t('cms.entities.types.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
-                    </v-flex>
-                    <v-flex xs1 text-xs-center mt-4>
-                      <v-tooltip left content-class="EntityTypeFieldEdit__help-tooltip">
-                        <v-icon dark color="primary" slot="activator" class="EntityTypeFieldEdit__help-activator">help</v-icon>
-                        <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypes" hide-actions class="EntityTypeFieldEdit__help-table elevation-1">
-                          <template slot="items" slot-scope="props">
-                            <td>
-                              {{ props.item.label }}
-                            </td>
-                            <td>
-                              {{ props.item.description }}
-                            </td>
-                          </template>
-                        </v-data-table>
-                      </v-tooltip>
-                    </v-flex>
-                  </v-layout>
-
-                  <v-layout>
-                    <v-flex x11>
-                      <v-select :label="$t('cms.entities.types.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypeNames" v-model="fieldFormData.references" :rules="rules.references"></v-select>
-                    </v-flex>
-                    <v-flex xs1>
-                    </v-flex>
-                  </v-layout>
-
+                <v-flex xs12 lg5>
+                  <v-text-field box :label="$t('cms.entities.types.fields.attributes.description')" v-if="showFormElement('description')" :disabled="disableFormElement('description')" v-model="fieldFormData.description" :hint="this.$t('cms.entities.types.fields.description.hint')"></v-text-field>
                 </v-flex>
 
-                <v-flex xs12 lg6>
-                  <v-switch :label="$t('cms.entities.types.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
-                  <v-switch :label="$t('cms.entities.types.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
-                </v-flex>
+                <template v-if="fieldFormData.type !== 'id'">
+
+                  <v-flex xs12 lg5 offset-lg1>
+                    <v-layout>
+                      <v-flex xs11>
+                        <RequiredAsterisk type="form-element" />
+                        <v-select :label="$t('cms.entities.types.fields.attributes.type')" :disabled="disableFormElement('type')" :items="fieldTypesSelect" v-model="fieldFormData.type" :rules="rules.required" required></v-select>
+                      </v-flex>
+                      <v-flex xs1 text-xs-center mt-4>
+                        <v-tooltip left content-class="EntityTypeFieldEdit__help-tooltip">
+                          <v-icon dark color="primary" slot="activator" class="EntityTypeFieldEdit__help-activator">help</v-icon>
+                          <v-data-table :headers="fieldTypesSelectHelpHeaders" :items="fieldTypes" hide-actions class="EntityTypeFieldEdit__help-table elevation-1">
+                            <template slot="items" slot-scope="props">
+                              <td>
+                                {{ props.item.label }}
+                              </td>
+                              <td>
+                                {{ props.item.description }}
+                              </td>
+                            </template>
+                          </v-data-table>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-layout>
+
+                    <v-layout>
+                      <v-flex x11>
+                        <v-select :label="$t('cms.entities.types.fields.attributes.references')" v-if="showFormElement('references')" :disabled="disableFormElement('references')" :items="entityTypeNames" v-model="fieldFormData.references" :rules="rules.references"></v-select>
+                      </v-flex>
+                      <v-flex xs1>
+                      </v-flex>
+                    </v-layout>
+
+                  </v-flex>
+
+                  <v-flex xs12 lg5>
+                    <v-switch :label="$t('cms.entities.types.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
+                    <v-switch :label="$t('cms.entities.types.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+                  </v-flex>
+
+                </template>
 
               </v-layout>
 
@@ -123,8 +126,13 @@
 
   import _createEntityType from '@/gql/mutations/_createEntityType.gql'
 
+  import RequiredAsterisk from './RequiredAsterisk.vue'
+
   export default {
     inject: ['gotoField'],
+    components: {
+      RequiredAsterisk
+    },
     data() {
       const fieldFormData = {
         type: this.field.type,
