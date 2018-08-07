@@ -22,12 +22,21 @@
       </v-card>
     </div>
 
+    <div class="EntityEdit__actions" v-if="entityData">
+      <v-card flat>
+        <v-card-text>
+          <v-btn class="primary black--text" @click="submit">Save</v-btn>
+        </v-card-text>
+      </v-card>
+    </div>
+
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
 import _entityType from '@/gql/queries/_entityType.gql'
+import _createEntity from '@/gql/mutations/_createEntity.gql.js'
 import EntityEditFields from '@/components/EntityEditFields.vue'
 
 export default {
@@ -180,6 +189,22 @@ export default {
       this.fieldValues = fieldValues
       this.fields = transposedFields
     },
+    submit() {
+      // const gql = require('graphql-tag')
+      // const mutation = gql`mutation createEntity ($entityType: String!, $fields: Object!) {
+      //   create${this.entityType} (fields: $fields) {
+      //     id
+      //   }
+      // }`
+      // console.log(mutation)
+      const mutation = _createEntity({entityType: this.entityType})
+      const variables = {
+        fields: {name: this.fieldValues.name }//this.fieldValues
+      }
+      this.$apollo.mutate({ mutation, variables }).then(result => {
+        console.log(result)
+      }).catch(error => console.error(error))
+    }
   },
   watch: {
     expandAllPanels: function(value) {
