@@ -128,7 +128,7 @@ export default {
       this.entityData = this.getEmptyEntityStructure()
       this.transposeFields()
     },
-    transposeFields() {
+    transposeFields () {
       const fieldValues = {}
 
       const recurseFields = (parentPath, fields) => {
@@ -137,6 +137,9 @@ export default {
 
         _(fields).forEach((fieldData, fieldId) => {
           if (this.isNew && fieldData.type === 'id') {
+            return
+          }
+          if (fieldId === '_revisions') {
             return
           }
 
@@ -189,21 +192,47 @@ export default {
       this.fieldValues = fieldValues
       this.fields = transposedFields
     },
-    submit() {
-      // const gql = require('graphql-tag')
-      // const mutation = gql`mutation createEntity ($entityType: String!, $fields: Object!) {
-      //   create${this.entityType} (fields: $fields) {
-      //     id
-      //   }
-      // }`
-      // console.log(mutation)
-      const mutation = _createEntity({entityType: this.entityType})
+    submit () {
+      this.isNew ? this.createEntity() : this.updateEntity()
+    },
+    createEntity () {
+      const mutation = _createEntity({ entityType: this.entityType })
+      const preparedFieldValues = this.prepareCreateEntityValues(_.cloneDeep(this.fieldValues))
       const variables = {
-        fields: {name: this.fieldValues.name }//this.fieldValues
+        fields: preparedFieldValues
       }
-      this.$apollo.mutate({ mutation, variables }).then(result => {
-        console.log(result)
-      }).catch(error => console.error(error))
+      this.$apollo.mutate({ mutation, variables })
+        .then(result => {
+          // @todo Update local apollo cache - see EntityTypeEdit.vue
+          console.log(result)
+        })
+        .catch(error => console.error(error))
+    },
+    prepareCreateEntityValues (values) {
+      const removeEmptyValues = function (values) {
+        return _(values).reduce((acc, value, key) => {
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            value = removeEmptyValues(value)
+          }
+          if (Array.isArray(value)) {
+            value = value.filter(x => !!x)
+          }
+
+          if (!_(value).isEmpty()) {
+            acc[key] = value
+          }
+          return acc
+        }, {})
+      }
+
+      return removeEmptyValues(values)
+    },
+    updateEntity () {
+      console.log('TODO: update request handling')
+      // prepareUpdateEntityValues(this.fieldValues)
+    },
+    prepareUpdateEntityValues (values) {
+      return values
     }
   },
   watch: {
