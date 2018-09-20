@@ -12,6 +12,7 @@
           :label="field.label"
           :hint="field.description"
           :value="values[field._meta.camel]"
+          :rules="fieldValidators(field)"
           v-model="values[field._meta.camel]"
           :disabled="field.type === 'id'"
         />
@@ -32,6 +33,7 @@
                     :key="`${field.key}.${index}--input`"
                     :prefix="`${index+1}.`"
                     :value="values[field._meta.camel][index]"
+                    :rules="fieldValidators(field)"
                     v-model="values[field._meta.camel][index]"
                     class="pa-0"
                   />
@@ -124,17 +126,27 @@ import Sortable from 'sortablejs'
 
 export default {
   name: 'EntityEditFields',
-  data() {
+  data () {
     return {
       reordering: false,
       sortableAdded: false
     }
   },
   methods: {
-    getFieldComponent(fieldType) {
+    fieldValidators (field) {
+      return [
+        function (value) {
+          if (field.required && _.isEmpty(value)) {
+            return `Please enter a value`
+          }
+          return true
+        }
+      ]
+    },
+    getFieldComponent (fieldType) {
        return 'v-text-field'
     },
-    addAnotherNestedField(values, field) {
+    addAnotherNestedField (values, field) {
       const recurseFields = (field) => {
         const structure = {}
         _(field.fields).forEach(subField => {
@@ -172,11 +184,11 @@ export default {
       values[fieldId].splice(delta, 1)
       this.$forceUpdate()
     },
-    shrinkSortableItems() {
+    shrinkSortableItems () {
       const fieldsToCollapse = this.$el.querySelectorAll(':scope .EntityEditFields__sortable-item .EntityEditFields__field:nth-child(n+2)')
       fieldsToCollapse.forEach(field => field.classList.add('EntityEditFields__field--collapsed'))
     },
-    unShrinkSortableItems() {
+    unShrinkSortableItems () {
       this.$el.querySelectorAll(':scope .EntityEditFields__field--collapsed').forEach(field => field.classList.remove('EntityEditFields__field--collapsed'))
     },
     initialiseSortableItems () {
@@ -203,7 +215,7 @@ export default {
     },
   },
   watch: {
-    reordering(value) {
+    reordering (value) {
       value ? this.shrinkSortableItems() : this.unShrinkSortableItems()
       this.initialiseSortableItems()
     }
