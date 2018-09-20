@@ -116,7 +116,12 @@ export default {
             }
           }
           else {
-            structure[subFieldId] = subField.many ? [''] : ''
+            if (subField.many) {
+              structure[subFieldId] = ['']
+            }
+            else {
+              structure[subFieldId] = subField.default || ''
+            }
           }
         })
         return structure
@@ -209,15 +214,14 @@ export default {
         .catch(error => console.error(error))
     },
     prepareCreateEntityValues (values) {
-      const removeEmptyValues = function (values) {
+      const treeShakeEmptyValues = function (values) {
         return _(values).reduce((acc, value, key) => {
-          if (typeof value === 'object' && !Array.isArray(value)) {
-            value = removeEmptyValues(value)
-          }
           if (Array.isArray(value)) {
-            value = value.filter(x => !!x)
+            value = Object.values(treeShakeEmptyValues(value)).filter(x => !!x)
           }
-
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            value = treeShakeEmptyValues(value)
+          }
           if (!_(value).isEmpty()) {
             acc[key] = value
           }
@@ -225,7 +229,7 @@ export default {
         }, {})
       }
 
-      return removeEmptyValues(values)
+      return treeShakeEmptyValues(values)
     },
     updateEntity () {
       console.log('TODO: update request handling')

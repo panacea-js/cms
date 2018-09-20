@@ -81,8 +81,11 @@
                   </v-flex>
 
                   <v-flex xs12 lg5>
+                    <v-text-field box v-model="fieldFormData.default" label="Default value" v-if="showFormElement('default')"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 lg5 offset-lg1>
                     <v-switch :label="$t('cms.entities.types.fields.attributes.required')" v-if="showFormElement('required')" :disabled="disableFormElement('required')" v-model="fieldFormData.required" color="success" hide-details></v-switch>
-                    <v-switch :label="$t('cms.entities.types.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" hide-details></v-switch>
+                    <v-switch :label="$t('cms.entities.types.fields.cardinality.many')" v-if="showFormElement('many')" :disabled="disableFormElement('many')" v-model="fieldFormData.many" color="success" @click.native="manyClicked" hide-details></v-switch>
                   </v-flex>
 
                 </template>
@@ -140,6 +143,7 @@
         machineName: this.field._meta.camel,
         description: this.field.description,
         required: this.field.required,
+        default: this.field.default,
         many: this.field.many,
         references: this.field.references
       }
@@ -254,12 +258,20 @@
           (this.fieldFormData.type !== "reference" && element === "references") ||
           (this.fieldFormData.type === "id" && element === "machineNameLockText") ||
           (this.fieldFormData.type === "id" && element === "machineNameAutoText") ||
-          (this.fieldFormData.type !== "id" && element === "machineNameLockIdText")
+          (this.fieldFormData.type !== "id" && element === "machineNameLockIdText") ||
+          (this.fieldFormData.many === true && element === "default")
         ) {
           show = false
         }
 
         return show
+      },
+      manyClicked () {
+        if (this.fieldFormData.many) {
+          // Remove default value for many field as it's only applicible for
+          // singular values.
+          this.fieldFormData.default = ''
+        }
       },
       submit() {
 
@@ -303,6 +315,7 @@
           description: this.fieldFormData.description,
           many: this.fieldFormData.many,
           required: this.fieldFormData.required,
+          default: this.fieldFormData.default,
           references: this.fieldFormData.type === 'reference' ? this.fieldFormData.references : null,
         }
 
@@ -422,6 +435,7 @@
             },
             description: '',
             required: false,
+            default: '',
             many: false,
             references: ''
           }
