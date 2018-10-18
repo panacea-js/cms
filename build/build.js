@@ -1,5 +1,5 @@
 import { Nuxt, Builder } from 'nuxt'
-import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
+import Bootstrap from '@panaceajs/core/dist/utils/bootstrap'
 
 /**
  * Prepares a nuxt build for build and live reload scripts.
@@ -8,7 +8,11 @@ import Bootstrap from '@panaceajs/core/src/utils/bootstrap'
  *   Nuxt options (not Panacea's container options.)
  */
 export default async function (params = {}) {
-  await new Bootstrap().runStages([1, 2, 3])
+  await new Bootstrap().runStages([
+    '10-add-plugins-registry',
+    '20-register-hooks',
+    '30-register-entity-types'
+  ])
   const { _, path, options } = Panacea.container
 
   // Load defaults nuxt.config.js and override with options loaded in container.
